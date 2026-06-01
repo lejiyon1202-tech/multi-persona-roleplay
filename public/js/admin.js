@@ -25,7 +25,7 @@ document.getElementById('authForm').addEventListener('submit', async e => {
     sessionStorage.setItem('admin_token', token);
     showAdmin();
   } else {
-    document.getElementById('authError').style.display = 'block';
+    document.getElementById('authError').classList.remove('hidden');
   }
 });
 
@@ -37,7 +37,8 @@ async function verifyToken(token) {
 }
 
 function showAdmin() {
-  document.getElementById('authOverlay').style.display = 'none';
+  document.getElementById('authOverlay').classList.add('hidden');
+  document.getElementById('adminLayout').classList.remove('hidden');
   document.getElementById('adminLayout').style.display = 'flex';
   loadScenarios();
 }
@@ -48,9 +49,9 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
     const section = item.dataset.section;
-    document.getElementById('sectionScenarios').style.display = section === 'scenarios' ? '' : 'none';
-    document.getElementById('sectionLearners').style.display  = section === 'learners'  ? '' : 'none';
-    document.getElementById('sectionStats').style.display     = section === 'stats'     ? '' : 'none';
+    document.getElementById('sectionScenarios').classList.toggle('hidden', section !== 'scenarios');
+    document.getElementById('sectionLearners').classList.toggle('hidden',  section !== 'learners');
+    document.getElementById('sectionStats').classList.toggle('hidden',     section !== 'stats');
     if (section === 'stats') loadStats();
   });
 });

@@ -270,6 +270,16 @@ input, textarea, select { font-family: var(--font); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ═══════════════════════════════════════════════════
+   UTILITY
+   ═══════════════════════════════════════════════════ */
+.hidden { display: none !important; }
+.avatar-lead { background: #134e4a; }
+.flex-row-center { display: flex; align-items: center; gap: 10px; }
+.btn-sm  { height: 32px !important; padding: 0 12px !important; font-size: 12px !important; }
+.btn-sm-md { height: 36px !important; padding: 0 12px !important; font-size: 13px !important; }
+.divider-v { width: 1px; height: 20px; background: var(--border); display: inline-block; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════
    HEADER (공통)
    ═══════════════════════════════════════════════════ */
 .page-header {

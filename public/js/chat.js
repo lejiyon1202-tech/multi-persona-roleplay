@@ -78,7 +78,7 @@ function applyCharacterUI(char) {
   if (char.emotion_stages && char.emotion_stages.length > 0) {
     const badge = document.getElementById('emotionBadge');
     badge.textContent = char.emotion_stages[0].stage || '초기';
-    badge.style.display = 'inline-flex';
+    badge.classList.remove('hidden');
   }
 }
 
