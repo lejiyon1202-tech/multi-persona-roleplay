@@ -18,7 +18,8 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc:  ["'self'"],
-      styleSrc:   ["'self'"],
+      styleSrc:   ["'self'", 'https://cdn.jsdelivr.net'],
+      fontSrc:    ["'self'", 'https://cdn.jsdelivr.net'],
       imgSrc:     ["'self'", 'data:'],
     },
   },
