@@ -86,7 +86,7 @@ async function initSession() {
     const res  = await fetch('/api/sessions', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ character_id: CHARACTER_ID, learner_id: 1 })
+      body: JSON.stringify({ learner_id: 1, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID })
     });
     const data = await res.json();
     sessionId = data.session_id;
