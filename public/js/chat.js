@@ -179,22 +179,30 @@ function appendMsg(role, text, streaming = false) {
 
   const div = document.createElement('div');
   div.className = `msg ${role}`;
-  div.innerHTML = `
-    <div class="msg-avatar" style="background:${avatarBg}">${avatarText}</div>
-    <div>
-      <div class="msg-bubble ${role === 'ai' ? '' : ''}" style="${
-        role === 'ai'
-          ? `border-left-color:${color}`
-          : `background:${color}`
-      }">${escHtml(text)}</div>
-      <div class="msg-time">${now()}</div>
-    </div>`;
-  if (role === 'ai') {
-    div.querySelector('.msg-bubble').style.borderLeftColor = color;
-  }
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = avatarText;
+  avatar.style.background = avatarBg; // JS DOM 조작 — CSP 제어 대상 아님
+
+  const inner = document.createElement('div');
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.textContent = text;
+  if (role === 'ai') bubble.style.borderLeftColor = color;
+  else               bubble.style.background = color;
+
+  const time = document.createElement('div');
+  time.className = 'msg-time';
+  time.textContent = now();
+
+  inner.appendChild(bubble);
+  inner.appendChild(time);
+  div.appendChild(avatar);
+  div.appendChild(inner);
   wrap.appendChild(div);
   wrap.scrollTop = wrap.scrollHeight;
-  return div.querySelector('.msg-bubble');
+  return bubble;
 }
 
 function updateMsgEl(el, text) {

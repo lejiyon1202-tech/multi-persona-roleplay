@@ -161,18 +161,18 @@ async function deleteScenario(id, title) {
 async function openCharManager(scenarioId, scenarioTitle) {
   const list = document.getElementById('scenarioList');
   list.innerHTML = `
-    <div style="margin-bottom:16px;">
-      <button class="btn btn-secondary" id="backToScenarios" style="height:32px;padding:0 12px;font-size:12px;">← 시나리오 목록</button>
-      <span style="font-size:16px;font-weight:800;color:var(--text-primary);margin-left:12px;">${escHtml(scenarioTitle)} — 캐릭터</span>
+    <div class="mb16">
+      <button class="btn btn-secondary btn-sm" id="backToScenarios">← 시나리오 목록</button>
+      <span class="section-heading">${escHtml(scenarioTitle)} — 캐릭터</span>
     </div>
-    <div style="text-align:right;margin-bottom:12px;">
-      <button class="btn btn-primary" id="addCharBtn" style="height:36px;">
+    <div class="text-right-mb12">
+      <button class="btn btn-primary" id="addCharBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         캐릭터 추가
       </button>
     </div>
     <div class="char-admin-grid" id="charGrid">
-      <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+      <div class="empty-state grid-span-full"><div class="spinner"></div></div>
     </div>`;
 
   document.getElementById('backToScenarios').addEventListener('click', loadScenarios);
@@ -186,7 +186,7 @@ async function loadChars(scenarioId) {
   try {
     const data = await api('GET', `/api/admin/scenarios/${scenarioId}/characters`);
     if (!data.characters || !data.characters.length) {
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-state-title">캐릭터가 없습니다</p></div>`;
+      grid.innerHTML = `<div class="empty-state grid-span-full"><p class="empty-state-title">캐릭터가 없습니다</p></div>`;
       return;
     }
     grid.innerHTML = data.characters.map(c => {
@@ -194,11 +194,11 @@ async function loadChars(scenarioId) {
       const color = ROLE_COLORS[rk];
       return `
         <div class="char-admin-card">
-          <div class="char-admin-bar" style="background:${color}"></div>
+          <div class="char-admin-bar role-bar ${rk}"></div>
           <div class="char-admin-body">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="flex-row-sm">
               <span class="role-badge ${rk}">${escHtml(c.role_level)}</span>
-              ${!c.is_selectable ? '<span style="font-size:10px;color:var(--text-muted);">컨텍스트</span>' : ''}
+              ${!c.is_selectable ? '<span class="text-muted-sm">컨텍스트</span>' : ''}
             </div>
             <p class="char-admin-name">${escHtml(c.name)}</p>
             <p class="char-admin-role">${escHtml(c.department || '')}</p>
@@ -222,7 +222,7 @@ async function loadChars(scenarioId) {
       });
     });
   } catch {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-state-title">불러오기 실패</p></div>`;
+    grid.innerHTML = `<div class="empty-state grid-span-full"><p class="empty-state-title">불러오기 실패</p></div>`;
   }
 }
 

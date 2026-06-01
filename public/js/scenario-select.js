@@ -23,7 +23,7 @@ async function loadScenarios() {
     const data = await res.json();
     if (!data.scenarios || data.scenarios.length === 0) {
       grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state grid-span-full">
           <div class="empty-state-icon">📋</div>
           <p class="empty-state-title">등록된 시나리오가 없습니다</p>
           <p class="empty-state-desc">관리자 페이지에서 시나리오를 추가해 주세요.</p>
@@ -49,9 +49,10 @@ function renderScenarioCard(scenario, idx) {
         <span class="char-count">
           등장인물 ${charCount}명
           <span class="char-count-dot">
-            ${Array.from({length: Math.min(charCount,6)}, (_,j) =>
-              `<span style="background:${Object.values(ROLE_COLORS)[j % 4]}"></span>`
-            ).join('')}
+            ${Array.from({length: Math.min(charCount,6)}, (_,j) => {
+              const rks = ['executive','manager','lead','member'];
+              return `<span class="avatar-bg ${rks[j % 4]}"></span>`;
+            }).join('')}
           </span>
         </span>
       </div>

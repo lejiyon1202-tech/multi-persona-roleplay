@@ -96,7 +96,7 @@ function animateBar(barId, valId, value, max) {
 function renderFeedback(items) {
   const container = document.getElementById('feedbackCards');
   if (!items.length) {
-    container.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">피드백 데이터가 없습니다.</p>';
+    container.innerHTML = '<p class="text-muted-body">피드백 데이터가 없습니다.</p>';
     return;
   }
   container.innerHTML = items.map(item => {
@@ -138,19 +138,22 @@ function renderCompare(data) {
 
   container.innerHTML = `
     <div class="compare-grid">
-      ${sessions.map((s, i) => `
+      ${sessions.map((s, i) => {
+        const rk = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' }[s.character?.role_level] || ['executive','manager','lead','member'][i % 4];
+        return `
         <div class="compare-card">
           <div class="compare-card-header">
-            <div class="compare-avatar" style="background:${colors[i]}">${(s.character?.name || '?')[0]}</div>
+            <div class="compare-avatar avatar-bg ${rk}">${(s.character?.name || '?')[0]}</div>
             <div>
               <p class="compare-name">${escHtml(s.character?.name || '—')}</p>
-              <span class="role-badge ${['executive','manager','lead','member'][i % 4]}">${s.character?.role_level || '—'}</span>
+              <span class="role-badge ${rk}">${s.character?.role_level || '—'}</span>
             </div>
           </div>
           <p class="compare-score ${s.total_score >= 23.75 ? 'good' : s.total_score >= 20 ? 'mid' : 'bad'}">
-            ${(s.total_score || 0).toFixed(1)}<small style="font-size:14px;font-weight:400;color:var(--text-muted)"> / 25</small>
+            ${(s.total_score || 0).toFixed(1)}<small class="score-small"> / 25</small>
           </p>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>
     <div class="radar-wrap">
       <p class="radar-title">축별 비교</p>

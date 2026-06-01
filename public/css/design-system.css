@@ -274,6 +274,27 @@ input, textarea, select { font-family: var(--font); }
    ═══════════════════════════════════════════════════ */
 .hidden { display: none !important; }
 .avatar-lead { background: #134e4a; }
+/* ── 역할별 색상 바 (innerHTML 동적 생성용) ── */
+.role-bar { height: 3px; }
+.role-bar.executive { background: var(--role-executive); }
+.role-bar.manager   { background: var(--role-manager); }
+.role-bar.lead      { background: var(--role-lead); }
+.role-bar.member    { background: var(--role-member); }
+/* ── 역할별 아바타 ── */
+.avatar-bg.executive { background: var(--role-executive); }
+.avatar-bg.manager   { background: var(--role-manager); }
+.avatar-bg.lead      { background: var(--role-lead); }
+.avatar-bg.member    { background: var(--role-member); }
+/* ── 레이아웃 유틸리티 ── */
+.grid-span-full  { grid-column: 1 / -1; }
+.text-right-mb12 { text-align: right; margin-bottom: 12px; }
+.mb16            { margin-bottom: 16px; }
+.flex-row-sm     { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+/* ── 타이포그래피 유틸리티 ── */
+.section-heading { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-left: 12px; }
+.text-muted-sm   { font-size: 10px; color: var(--text-muted); }
+.text-muted-body { color: var(--text-muted); font-size: 14px; }
+.score-small     { font-size: 14px; font-weight: 400; color: var(--text-muted); }
 .flex-row-center { display: flex; align-items: center; gap: 10px; }
 .btn-sm  { height: 32px !important; padding: 0 12px !important; font-size: 12px !important; }
 .btn-sm-md { height: 36px !important; padding: 0 12px !important; font-size: 13px !important; }
