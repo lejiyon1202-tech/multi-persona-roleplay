@@ -63,8 +63,8 @@ function renderScenarioCard(scenario, idx) {
 
 function renderDemoCards() {
   const demos = [
-    { id: 1, title: '조직 방향성 정렬', case_name: 'Case Study 01', context_description: 'AI센터 그룹장으로서 팀원들과 외부 솔루션 도입에 대한 방향성을 정렬해야 합니다. 다양한 이해관계자들을 설득하는 리더십을 연습합니다.', learner_role: '김센터 그룹장', character_count: 6 },
-    { id: 2, title: '성과 압박 상황', case_name: 'Case Study 02', context_description: '성과 달성을 위한 압박 상황에서 팀원들과 소통하며 목표를 재정렬해야 합니다. 감정 조율과 합리적 의사소통 역량을 기릅니다.', learner_role: '김센터 그룹장', character_count: 6 }
+    { id: 1, title: '조직 방향성 정렬', case_name: 'Case Study 01', context_description: 'AI혁신센터 그룹장으로서 팀원들과 외부 솔루션 도입에 대한 방향성을 정렬해야 합니다. 다양한 이해관계자들을 설득하는 리더십을 연습합니다.', learner_role: '그룹장', character_count: 6 },
+    { id: 2, title: '성과 압박 상황', case_name: 'Case Study 02', context_description: '성과 달성을 위한 압박 상황에서 팀원들과 소통하며 목표를 재정렬해야 합니다. 감정 조율과 합리적 의사소통 역량을 기릅니다.', learner_role: '그룹장', character_count: 6 }
   ];
   return demos.map((s, i) => renderScenarioCard(s, i)).join('');
 }

@@ -47,7 +47,7 @@ multi-persona-roleplay/
 
 ## 첫 빌트인 콘텐츠
 
-삼성전자 DS AI센터 그룹장 워크샵 Case Study (2 Case × 상황 3 × 캐릭터 6명)
+글로벌 IT기업 AI혁신센터 그룹장 리더십 워크샵 Case Study (2 Case × 상황 3 × 캐릭터 6명)
 
 ## 합의서
 

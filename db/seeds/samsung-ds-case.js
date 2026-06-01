@@ -6,11 +6,11 @@ import pool from '../../src/data-store/db.js';
 const CASE2_CHARACTERS = [
   {
     card_number: 1, is_selectable: 0,
-    role_level: '상위리더', name: '이삼성 팀장', department: '경영진',
+    role_level: '상위리더', name: '이임원 팀장', department: '경영진',
     core_mindset: '지금은 일단 보여줄 수 있는 성과부터 만들어야 한다',
     situation: 'AI 전략 성과를 경영진에 보고해야 하는 압박 상황. 빠른 가시적 성과를 요구하며 그룹장에게 일정 단축을 지속 압박 중.',
     mission: '(컨텍스트 전용 — 학습자 선택 불가)',
-    persona_prompt: `당신은 DS AI센터의 상위 리더입니다. 경영진의 AI 전략 성과 압박을 받고 있으며, 그룹장에게 빠른 결과를 요구합니다.
+    persona_prompt: `당신은 AI혁신센터의 상위 리더입니다. 경영진의 AI 전략 성과 압박을 받고 있으며, 그룹장에게 빠른 결과를 요구합니다.
 핵심 마인드: "지금은 일단 보여줄 수 있는 성과부터 만들어야 한다"
 역할: 컨텍스트 제공용 (학습자가 직접 대화하는 캐릭터가 아닙니다)`,
     emotion_stages: [
@@ -20,11 +20,11 @@ const CASE2_CHARACTERS = [
   },
   {
     card_number: 2, is_selectable: 0,
-    role_level: '그룹장', name: '김센터 그룹장', department: 'AI센터',
+    role_level: '그룹장', name: '김센터 그룹장', department: 'AI혁신센터',
     core_mindset: '위에서는 무리한 요구, 아래에서는 거센 반발. 나는 어디에 서야 하나',
     situation: '위로는 경영진의 AI 성과 압박, 아래로는 팀원들의 반발 사이에서 갈등 중.',
     mission: '(컨텍스트 전용 — 학습자 선택 불가)',
-    persona_prompt: `당신은 DS AI센터의 그룹장입니다. 상위 리더의 압박과 팀원들의 반발 사이에서 딜레마를 겪고 있습니다.
+    persona_prompt: `당신은 AI혁신센터의 그룹장입니다. 상위 리더의 압박과 팀원들의 반발 사이에서 딜레마를 겪고 있습니다.
 핵심 마인드: "위에서는 무리한 요구, 아래에서는 거센 반발. 나는 어디에 서야 하나"
 역할: 컨텍스트 제공용 (학습자가 직접 대화하는 캐릭터가 아닙니다)`,
     emotion_stages: [
@@ -38,7 +38,7 @@ const CASE2_CHARACTERS = [
     core_mindset: '검증되지 않은 결과를 만들라니, 일의 본질을 흔드는 일',
     situation: '데이터 검증 없이 결과물을 내놓으라는 요구에 원칙적으로 반발 중.',
     mission: '학습자는 박수석 파트장을 설득하여 단기 성과 시범 데이터 협력을 이끌어내야 합니다.',
-    persona_prompt: `당신은 DS AI센터 데이터사이언스파트의 파트장입니다. 원칙과 데이터 신뢰성을 최우선으로 여깁니다.
+    persona_prompt: `당신은 AI혁신센터 데이터사이언스파트의 파트장입니다. 원칙과 데이터 신뢰성을 최우선으로 여깁니다.
 
 핵심 마인드: "검증되지 않은 결과를 만들라니, 일의 본질을 흔드는 일"
 
@@ -62,7 +62,7 @@ const CASE2_CHARACTERS = [
     core_mindset: '요구가 매주 바뀌어 기존 업무 올스톱, 내일까지 데이터?',
     situation: '매주 바뀌는 요구사항과 갑작스러운 데이터 요청으로 기존 업무가 마비된 상태.',
     mission: '학습자는 박보안 파트장의 업무 과부하를 이해하고 우선순위 재조정을 협의해야 합니다.',
-    persona_prompt: `당신은 DS AI센터 데이터거버넌스파트의 파트장입니다. 잦은 요구 변경으로 지쳐있으며 번아웃 직전 상태입니다.
+    persona_prompt: `당신은 AI혁신센터 데이터거버넌스파트의 파트장입니다. 잦은 요구 변경으로 지쳐있으며 번아웃 직전 상태입니다.
 
 핵심 마인드: "요구가 매주 바뀌어 기존 업무 올스톱, 내일까지 데이터?"
 
@@ -145,8 +145,8 @@ async function seed() {
     const [r1] = await conn.query(
       'INSERT INTO scenarios (title, case_name, context_description, learner_role) VALUES (?, ?, ?, ?)',
       [
-        'DS AI센터 그룹장 워크샵 Case 1',
-        '삼성전자DS AI센터 그룹장 리더십 케이스',
+        'AI혁신센터 그룹장 리더십 워크샵 Case 1',
+        '글로벌 IT기업 AI혁신센터 그룹장 리더십 케이스',
         'AI 전환 압박 속에서 상위 리더와 팀원 사이에서 균형을 잡아야 하는 그룹장의 딜레마 (Case 1)',
         '그룹장',
       ]
@@ -154,8 +154,8 @@ async function seed() {
     const [r2] = await conn.query(
       'INSERT INTO scenarios (title, case_name, context_description, learner_role) VALUES (?, ?, ?, ?)',
       [
-        'DS AI센터 그룹장 워크샵 Case 2',
-        '삼성전자DS AI센터 그룹장 리더십 케이스',
+        'AI혁신센터 그룹장 리더십 워크샵 Case 2',
+        '글로벌 IT기업 AI혁신센터 그룹장 리더십 케이스',
         'AI 도입 압박 속 그룹장 딜레마 — 성과와 현장 사이 (Case 2)',
         '그룹장',
       ]
@@ -191,7 +191,7 @@ async function seed() {
     }
 
     await conn.commit();
-    console.log('[SEED] ✅ 삼성 DS Case 1+2 시드 완료 — 시나리오 2건, 캐릭터 12명');
+    console.log('[SEED] ✅ AI혁신 Case 1+2 시드 완료 — 시나리오 2건, 캐릭터 12명');
   } catch (err) {
     await conn.rollback();
     console.error('[SEED] ❌ 오류:', err.message);

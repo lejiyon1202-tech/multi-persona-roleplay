@@ -22,6 +22,7 @@ app.use(helmet({
       styleSrc:   ["'self'", 'https://cdn.jsdelivr.net'],
       fontSrc:    ["'self'", 'https://cdn.jsdelivr.net'],
       imgSrc:     ["'self'", 'data:'],
+      upgradeInsecureRequests: null, // HTTP 환경 — HTTPS 자동 업그레이드 비활성 (Phase C에서 SSL 도입 시 제거)
     },
   },
 }));
