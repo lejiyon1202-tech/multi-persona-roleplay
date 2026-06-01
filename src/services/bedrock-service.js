@@ -13,7 +13,7 @@ const client = new BedrockRuntimeClient({ region: REGION });
 
 function buildBody(messages, systemPrompt, maxTokens = 1024) {
   return JSON.stringify({
-    anthropic_version: 'bedrock-2023-06-01',
+    anthropic_version: 'bedrock-2023-05-31',
     max_tokens: maxTokens,
     system: systemPrompt,
     messages,

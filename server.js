@@ -10,6 +10,7 @@ import reportsRouter   from './src/routes/reports.js';
 import adminRouter     from './src/routes/admin.js';
 
 const app  = express();
+app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT) || 3011;
 
 // ── 미들웨어 ─────────────────────────────────────────────────────────────────
