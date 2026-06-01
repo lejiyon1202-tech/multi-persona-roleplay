@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const scenarios = await listScenarios();
-    res.json(scenarios);
+    res.json({ scenarios });
   } catch (err) {
     console.error('[GET /api/scenarios]', err.message);
     res.status(500).json({ error: 'DB 오류' });
