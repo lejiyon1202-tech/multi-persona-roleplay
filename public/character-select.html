@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -11,26 +11,51 @@
 </head>
 <body>
 
-<!-- ── 헤더 ── -->
+<!-- ── 헤더 (재설계: 세로 레이아웃) ── -->
 <div class="page-header">
-  <p class="scenario-label" id="scenarioLabel">로딩 중...</p>
-  <h1 class="scenario-title">대화할 인물을 선택하세요</h1>
-  <p class="scenario-desc" id="scenarioDesc">시나리오 정보를 불러오는 중입니다.</p>
 
-  <div class="header-actions">
-    <!-- 범례 -->
-    <span class="selection-hint">
-      <span class="hint-dot selectable"></span>선택 가능
-    </span>
-    <span class="selection-hint">
-      <span class="hint-dot context"></span>컨텍스트 (선택 불가)
-    </span>
+  <!-- 상단 메타 바 -->
+  <div class="header-meta">
+    <p class="scenario-label" id="scenarioLabel">로딩 중...</p>
+    <div class="header-legend">
+      <span class="selection-hint">
+        <span class="hint-dot selectable"></span>선택 가능
+      </span>
+      <span class="selection-hint">
+        <span class="hint-dot context"></span>컨텍스트 (선택 불가)
+      </span>
+    </div>
   </div>
+
+  <!-- 페이지 제목 -->
+  <h1 class="scenario-title">대화할 인물을 선택하세요</h1>
+
+  <!-- 학습자 역할 브리핑 카드 -->
+  <div class="learner-briefing" id="learnerBriefing">
+    <div class="briefing-inner">
+      <div class="briefing-role">
+        <span class="briefing-label">학습자 역할</span>
+        <span class="briefing-value" id="learnerRole">—</span>
+      </div>
+      <div class="briefing-divider"></div>
+      <div class="briefing-context">
+        <span class="briefing-label">상황 요약</span>
+        <span class="briefing-value" id="learnerBrief">—</span>
+      </div>
+      <div class="briefing-divider"></div>
+      <div class="briefing-mission">
+        <span class="briefing-label">핵심 미션</span>
+        <span class="briefing-value" id="learnerMission">—</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ── 카드 그리드 (JS 동적 렌더) ── -->
 <div class="card-grid" id="cardGrid">
   <div class="loading-state grid-span-full" id="loadingState">
+    <div class="spinner"></div>
     <p>캐릭터 정보를 불러오는 중...</p>
   </div>
 </div>
@@ -50,7 +75,62 @@
   </button>
 </div>
 
+<!-- ── 캐릭터 상세 모달 ── -->
+<div class="char-modal-overlay hidden" id="charModalOverlay">
+  <div class="char-modal" id="charModal">
+    <button class="modal-close" id="modalClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <!-- 모달 헤더 (역할 색상 바) -->
+    <div class="modal-accent-bar" id="modalAccentBar"></div>
+
+    <div class="modal-body">
+      <!-- 상단: 역할 + 이름 -->
+      <div class="modal-identity">
+        <span class="role-badge" id="modalRoleBadge">역할</span>
+        <h2 class="modal-name" id="modalName">이름</h2>
+        <p class="modal-dept" id="modalDept">직책</p>
+      </div>
+
+      <!-- 핵심 마인드 -->
+      <blockquote class="modal-mindset" id="modalMindset"></blockquote>
+
+      <!-- 상황·감정 -->
+      <div class="modal-section">
+        <p class="modal-section-label">상황 · 감정</p>
+        <p class="modal-section-text" id="modalSituation">—</p>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <!-- 롤플레이 미션 -->
+      <div class="modal-section">
+        <p class="modal-section-label">롤플레이 미션</p>
+        <p class="modal-section-text" id="modalMission">—</p>
+      </div>
+
+      <!-- 첫 발화 힌트 (선택 가능 캐릭터만) -->
+      <div class="modal-hint-wrap hidden" id="modalHintWrap">
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <p class="modal-section-label">💡 이 캐릭터에게 먼저 말 걸기</p>
+          <div id="modalHints"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="modal-cta" id="modalCta">
+      <button class="modal-start-btn hidden" id="modalStartBtn">
+        이 캐릭터와 대화 시작
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <p class="modal-context-note hidden" id="modalContextNote">컨텍스트 전용 캐릭터입니다</p>
+    </div>
+  </div>
+</div>
+
 <script src="js/character-select.js" defer></script>
 </body>
 </html>
-
