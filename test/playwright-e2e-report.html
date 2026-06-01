@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Phase B v2 Playwright e2e 보고서</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 24px; color: #1a1a2e; }
+h1 { border-bottom: 3px solid #1a1a2e; padding-bottom: 8px; }
+.summary { background: #f5f7fa; padding: 16px; border-radius: 8px; margin: 16px 0; }
+.pass { color: #16a34a; font-weight: bold; } .fail { color: #dc2626; font-weight: bold; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th { background: #1a1a2e; color: #fff; padding: 10px; text-align: left; }
+td { border: 1px solid #e2e8f0; padding: 8px; }
+tr:nth-child(even) { background: #f8fafc; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+.grid figure { margin: 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+.grid figcaption { background: #f1f5f9; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.grid img { width: 100%; display: block; }
+</style>
+</head>
+<body>
+<h1>multi-persona-roleplay Phase B v2 — Playwright e2e 보고서</h1>
+<div class="summary">
+  <strong>실행 일시:</strong> 2026. 6. 2. AM 12:47:12 KST<br>
+  <strong>대상 URL:</strong> http://persona.3.39.80.158.nip.io<br>
+  <strong>결과:</strong> <span class="pass">PASS 8 / FAIL 0 / 총 8건</span><br>
+  <strong>판정:</strong> ✅ 전체 통과
+</div>
+<h2>테스트 결과</h2>
+<table>
+<tr><th>#</th><th>시나리오</th><th>결과</th><th>비고</th></tr>
+<tr><td>1</td><td>S1 인트로 페이지 로드 + 스크린샷</td><td class="pass">PASS</td><td></td></tr><tr><td>2</td><td>S2 캐릭터 6건·선택가능 4건 카드 UI 스크린샷</td><td class="pass">PASS</td><td></td></tr><tr><td>3</td><td>S3 학습자(id=8) + 세션(id=9) 시작</td><td class="pass">PASS</td><td></td></tr><tr><td>4</td><td>S4 채팅 API 5/5 턴 PASS + UI 스크린샷</td><td class="pass">PASS</td><td></td></tr><tr><td>5</td><td>S5 평가 total_score=0.8 grade=B+</td><td class="pass">PASS</td><td></td></tr><tr><td>6</td><td>S6 리포트 페이지 로드 + 스크린샷</td><td class="pass">PASS</td><td></td></tr><tr><td>7</td><td>S7 비교 리포트 2세션 + 스크린샷</td><td class="pass">PASS</td><td></td></tr><tr><td>8</td><td>S8 관리자 페이지 로드 + 스크린샷</td><td class="pass">PASS</td><td></td></tr>
+</table>
+<h2>스크린샷</h2>
+<div class="grid">
+  <figure><figcaption>S1 인트로</figcaption><img src="screenshots/s1-intro.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S2 캐릭터 선택 (카드 UI)</figcaption><img src="screenshots/s2-character-select.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S4 채팅 시작</figcaption><img src="screenshots/s4-chat-start.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S4 채팅 5턴 완료</figcaption><img src="screenshots/s4-chat-5turns.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S6 단일 리포트</figcaption><img src="screenshots/s6-report.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S7 360도 비교 리포트</figcaption><img src="screenshots/s7-compare.png" onerror="this.parentNode.style.display='none'"></figure>
+  <figure><figcaption>S8 관리자 페이지</figcaption><img src="screenshots/s8-admin.png" onerror="this.parentNode.style.display='none'"></figure>
+</div>
+</body>
+</html>
