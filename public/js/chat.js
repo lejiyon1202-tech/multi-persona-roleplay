@@ -74,7 +74,7 @@ function applyCharacterUI(char) {
 
 function applyDemoCharacter() {
   charData = { id: 3, name: '이모델 파트장', role_level: '파트장',
-    persona_prompt: '당신은 AI센터의 파트장입니다.', emotion_stages: [{stage:'방어'}] };
+    persona_prompt: '당신은 AI혁신센터의 파트장입니다.', emotion_stages: [{stage:'방어'}] };
   applyCharacterUI(charData);
 }
 
