@@ -1,4 +1,4 @@
-/* ── 상태 ── */
+﻿/* ── 상태 ── */
 const params = new URLSearchParams(location.search);
 const CHARACTER_ID = params.get('character');
 const SESSION_ID   = params.get('session_id') || null;
@@ -10,16 +10,6 @@ let turnCount   = 0;
 let isWaiting   = false;
 let charData    = null;
 
-/* ── 테마 전환 ── */
-document.querySelectorAll('[data-theme-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const theme = btn.dataset.themeTarget;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.querySelectorAll('[data-theme-target]').forEach(b =>
-      b.classList.toggle('active', b.dataset.themeTarget === theme)
-    );
-  });
-});
 
 /* ── 뒤로가기 ── */
 document.getElementById('backBtn').addEventListener('click', () => {
@@ -231,7 +221,7 @@ function showTyping(show) {
 function updateEmotionBadge(stage) {
   const badge = document.getElementById('emotionBadge');
   badge.textContent = stage;
-  badge.style.display = 'inline-flex';
+  badge.classList.remove('hidden');
   addSystemMsg(`감정 단계 전환: ${stage}`);
 }
 
@@ -257,3 +247,4 @@ function escHtml(str) {
 }
 
 loadCharacter();
+

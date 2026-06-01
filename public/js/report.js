@@ -1,17 +1,7 @@
-const params    = new URLSearchParams(location.search);
+﻿const params    = new URLSearchParams(location.search);
 const SESSION_ID = params.get('session_id');
 const ROLE_COLORS = { executive:'#312e81', manager:'#1e3a8a', lead:'#134e4a', member:'#78350f' };
 
-/* ── 테마 전환 ── */
-document.querySelectorAll('[data-theme-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const theme = btn.dataset.themeTarget;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.querySelectorAll('[data-theme-target]').forEach(b =>
-      b.classList.toggle('active', b.dataset.themeTarget === theme)
-    );
-  });
-});
 
 /* ── 탭 전환 ── */
 document.querySelectorAll('.report-tab').forEach(tab => {
@@ -229,3 +219,4 @@ function escHtml(str) {
 }
 
 loadReport();
+

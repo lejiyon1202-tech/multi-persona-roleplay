@@ -1,16 +1,6 @@
-let selectedCard = null;
+﻿let selectedCard = null;
 let selectedData = {};
 
-/* ── 테마 전환 ── */
-document.querySelectorAll('[data-theme-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const theme = btn.dataset.themeTarget;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.querySelectorAll('[data-theme-target]').forEach(b =>
-      b.classList.toggle('active', b.dataset.themeTarget === theme)
-    );
-  });
-});
 
 /* ── CTA 버튼 이벤트 ── */
 document.querySelectorAll('.cta-btn').forEach(btn => {
@@ -88,3 +78,4 @@ function goToChat() {
   if (!selectedData.number) return;
   window.location.href = `chat.html?character=${selectedData.number}`;
 }
+

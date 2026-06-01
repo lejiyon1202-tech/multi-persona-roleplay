@@ -1,19 +1,9 @@
-const ROLE_COLORS = {
+﻿const ROLE_COLORS = {
   executive: '#312e81', manager: '#1e3a8a',
   lead: '#134e4a', member: '#78350f'
 };
 const ROLE_MAP = { '상위리더': 'executive', '그룹장': 'manager', '파트장': 'lead', '부서원': 'member' };
 
-/* ── 테마 전환 ── */
-document.querySelectorAll('[data-theme-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const theme = btn.dataset.themeTarget;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.querySelectorAll('[data-theme-target]').forEach(b =>
-      b.classList.toggle('active', b.dataset.themeTarget === theme)
-    );
-  });
-});
 
 /* ── 시나리오 로드 ── */
 async function loadScenarios() {
@@ -101,3 +91,4 @@ function escHtml(str) {
 }
 
 loadScenarios();
+
