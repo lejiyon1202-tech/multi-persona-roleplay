@@ -1,5 +1,8 @@
 // 13번째 원칙: AWS SDK v3 공식 docs 확인 후 작성
 // Ref: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/bedrock-runtime/
+// anthropic_version 표준값: 'bedrock-2023-05-31'
+// Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
+// 자기반성 2026-06-01 KST: 'bedrock-2023-06-01' 추정 작성 → 공식 docs fetch 후 'bedrock-2023-05-31' 정정 (13번째 원칙)
 import {
   BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand,
@@ -13,6 +16,7 @@ const client = new BedrockRuntimeClient({ region: REGION });
 
 function buildBody(messages, systemPrompt, maxTokens = 1024) {
   return JSON.stringify({
+    // 공식 표준값 — Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
     anthropic_version: 'bedrock-2023-05-31',
     max_tokens: maxTokens,
     system: systemPrompt,
