@@ -1,5 +1,6 @@
 ﻿/* ── 상태 ── */
 const params = new URLSearchParams(location.search);
+const SCENARIO_ID  = params.get('scenario_id');
 const CHARACTER_ID = params.get('character');
 const SESSION_ID   = params.get('session_id') || null;
 
@@ -40,7 +41,7 @@ document.getElementById('endChatBtn').addEventListener('click', endChat);
 /* ── 캐릭터 정보 로드 ── */
 async function loadCharacter() {
   try {
-    const res  = await fetch(`/api/characters/${CHARACTER_ID}`);
+    const res  = await fetch(`/api/scenarios/${SCENARIO_ID}/characters/${CHARACTER_ID}`);
     const data = await res.json();
     charData = data.character;
     applyCharacterUI(charData);

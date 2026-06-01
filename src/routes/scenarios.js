@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  listScenarios, getScenario, getCharacters,
+  listScenarios, getScenario, getCharacters, getCharacter,
 } from '../data-store/scenarios-store.js';
 
 const router = Router();
@@ -32,6 +32,17 @@ router.get('/:id/characters', async (req, res) => {
     res.json(characters);
   } catch (err) {
     console.error('[GET /api/scenarios/:id/characters]', err.message);
+    res.status(500).json({ error: 'DB 오류' });
+  }
+});
+
+router.get('/:scenarioId/characters/:charId', async (req, res) => {
+  try {
+    const character = await getCharacter(Number(req.params.charId));
+    if (!character) return res.status(404).json({ error: '캐릭터 없음' });
+    res.json({ character });
+  } catch (err) {
+    console.error('[GET /api/scenarios/:scenarioId/characters/:charId]', err.message);
     res.status(500).json({ error: 'DB 오류' });
   }
 });
