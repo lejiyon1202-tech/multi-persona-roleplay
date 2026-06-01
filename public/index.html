@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시나리오 선택 — Multi-Persona Roleplay</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+<style>
+
+/* ═══════════════════════════════════════════════
+   시나리오 선택 화면 전용 스타일
+   ═══════════════════════════════════════════════ */
+.page-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 40px 80px;
+}
+
+.hero {
+  padding: 52px 0 36px;
+}
+.hero-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.hero-desc {
+  font-size: 16px;
+  color: var(--text-sub);
+  line-height: 1.7;
+  max-width: 560px;
+}
+.hero-actions {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── 시나리오 그리드 ── */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+@media (max-width: 767px) {
+  .scenario-grid { grid-template-columns: 1fr; }
+  .page-wrap { padding: 0 16px 60px; }
+  .hero { padding: 32px 0 24px; }
+  .hero-title { font-size: 24px; }
+}
+
+/* ── 시나리오 카드 ── */
+.scenario-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.4s ease both;
+  position: relative;
+  overflow: hidden;
+}
+.scenario-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--role-lead), var(--role-executive));
+  opacity: 0;
+  transition: opacity 0.22s;
+}
+.scenario-card:hover::before { opacity: 1; }
+.scenario-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--border-hover);
+}
+
+.scenario-card:nth-child(1) { animation-delay: 0.05s; }
+.scenario-card:nth-child(2) { animation-delay: 0.12s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 카드 헤더 */
+.scenario-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.case-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: var(--bg-quote);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.char-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.char-count-dot {
+  display: flex;
+  gap: 3px;
+}
+.char-count-dot span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* 카드 본문 */
+.scenario-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.scenario-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.scenario-desc {
+  font-size: 14px;
+  color: var(--text-sub);
+  line-height: 1.65;
+}
+
+/* 카드 하단 */
+.scenario-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--divider);
+  margin-top: auto;
+}
+.scenario-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.scenario-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--role-lead);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-family: var(--font);
+}
+.scenario-start-btn:hover { filter: brightness(1.1); }
+.scenario-start-btn svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+/* ── 로딩 상태 ── */
+.loading-state {
+  padding: 60px 24px;
+  text-align: center;
+}
+.loading-state .spinner { width: 28px; height: 28px; margin: 0 auto 12px; }
+.loading-text { font-size: 14px; color: var(--text-muted); }
+
+</style>
+</head>
+<body>
+
+<!-- ── 헤더 ── -->
+<header class="page-header">
+  <div class="header-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    AI 롤플레잉
+  </div>
+  <nav class="header-nav">
+    <div class="theme-switcher">
+      <button class="theme-btn active" data-theme-target="light">라이트</button>
+      <button class="theme-btn" data-theme-target="sepia">세피아</button>
+      <button class="theme-btn" data-theme-target="dark">다크</button>
+    </div>
+    <a href="admin.html" class="btn btn-secondary" style="height:32px;padding:0 12px;font-size:12px;">관리자</a>
+  </nav>
+</header>
+
+<!-- ── 본문 ── -->
+<main class="page-wrap">
+  <div class="hero">
+    <p class="hero-label">AI 롤플레잉 솔루션</p>
+    <h1 class="hero-title">어떤 상황을 연습하시겠습니까?</h1>
+    <p class="hero-desc">상황을 선택하면 대화할 인물을 고를 수 있습니다. 같은 상황을 다양한 관점에서 반복 도전하며 360도 학습이 가능합니다.</p>
+    <div class="hero-actions">
+      <div class="theme-switcher" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- 시나리오 그리드 -->
+  <div class="scenario-grid" id="scenarioGrid">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p class="loading-text">시나리오를 불러오는 중...</p>
+    </div>
+  </div>
+</main>
+
+<script>
+const ROLE_COLORS = {
+  executive: '#312e81', manager: '#1e3a8a',
+  lead: '#134e4a', member: '#78350f'
+};
+const ROLE_MAP = { '상위리더': 'executive', '그룹장': 'manager', '파트장': 'lead', '부서원': 'member' };
+
+/* ── 테마 전환 ── */
+document.querySelectorAll('[data-theme-target]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.themeTarget;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('[data-theme-target]').forEach(b =>
+      b.classList.toggle('active', b.dataset.themeTarget === theme)
+    );
+  });
+});
+
+/* ── 시나리오 로드 ── */
+async function loadScenarios() {
+  const grid = document.getElementById('scenarioGrid');
+  try {
+    const res = await fetch('/api/scenarios');
+    const data = await res.json();
+    if (!data.scenarios || data.scenarios.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon">📋</div>
+          <p class="empty-state-title">등록된 시나리오가 없습니다</p>
+          <p class="empty-state-desc">관리자 페이지에서 시나리오를 추가해 주세요.</p>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = data.scenarios.map((s, i) => renderScenarioCard(s, i)).join('');
+    bindScenarioEvents();
+  } catch (err) {
+    grid.innerHTML = renderDemoCards();
+    bindScenarioEvents();
+  }
+}
+
+function renderScenarioCard(scenario, idx) {
+  const caseNum = String(idx + 1).padStart(2, '0');
+  const charCount = scenario.character_count || 6;
+  return `
+    <div class="scenario-card" data-scenario-id="${scenario.id}" tabindex="0" role="button"
+         aria-label="${scenario.title} 시나리오 선택">
+      <div class="scenario-card-header">
+        <span class="case-badge">CASE ${caseNum}</span>
+        <span class="char-count">
+          등장인물 ${charCount}명
+          <span class="char-count-dot">
+            ${Array.from({length: Math.min(charCount,6)}, (_,j) =>
+              `<span style="background:${Object.values(ROLE_COLORS)[j % 4]}"></span>`
+            ).join('')}
+          </span>
+        </span>
+      </div>
+      <div>
+        <h2 class="scenario-title">${escHtml(scenario.title)}</h2>
+        ${scenario.case_name ? `<p class="scenario-subtitle">${escHtml(scenario.case_name)}</p>` : ''}
+      </div>
+      <p class="scenario-desc">${escHtml(scenario.context_description || '').slice(0, 100)}${(scenario.context_description || '').length > 100 ? '...' : ''}</p>
+      <div class="scenario-card-footer">
+        <span class="scenario-meta">학습자 역할: ${escHtml(scenario.learner_role || '그룹장')}</span>
+        <button class="scenario-start-btn" data-scenario-id="${scenario.id}">
+          시작하기
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderDemoCards() {
+  const demos = [
+    { id: 1, title: '조직 방향성 정렬', case_name: 'Case Study 01', context_description: 'AI센터 그룹장으로서 팀원들과 외부 솔루션 도입에 대한 방향성을 정렬해야 합니다. 다양한 이해관계자들을 설득하는 리더십을 연습합니다.', learner_role: '김센터 그룹장', character_count: 6 },
+    { id: 2, title: '성과 압박 상황', case_name: 'Case Study 02', context_description: '성과 달성을 위한 압박 상황에서 팀원들과 소통하며 목표를 재정렬해야 합니다. 감정 조율과 합리적 의사소통 역량을 기릅니다.', learner_role: '김센터 그룹장', character_count: 6 }
+  ];
+  return demos.map((s, i) => renderScenarioCard(s, i)).join('');
+}
+
+function bindScenarioEvents() {
+  document.querySelectorAll('.scenario-card').forEach(card => {
+    card.addEventListener('click', () => goToCharacterSelect(card.dataset.scenarioId));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') goToCharacterSelect(card.dataset.scenarioId); });
+  });
+  document.querySelectorAll('.scenario-start-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      goToCharacterSelect(btn.dataset.scenarioId);
+    });
+  });
+}
+
+function goToCharacterSelect(scenarioId) {
+  window.location.href = `character-select.html?scenario_id=${scenarioId}`;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadScenarios();
+</script>
+</body>
+</html>

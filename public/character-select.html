@@ -163,7 +163,7 @@ body {
   display: inline-block;
 }
 .hint-dot.selectable { background: var(--role-lead); }
-.hint-dot.context { background: var(--text-muted); }
+.hint-dot.context { background: #6b7280; } /* WCAG AA 4.7:1 on light bg */
 
 /* ───────────────────────────────────────────────
    CARD GRID
@@ -394,7 +394,7 @@ body {
 
 /* ── CONTEXT (비활성) STATE ── */
 .char-card.context-only {
-  opacity: 0.5;
+  opacity: 0.55;
   filter: grayscale(30%);
   cursor: not-allowed;
 }
@@ -523,9 +523,9 @@ body {
 
   <div class="header-actions">
     <!-- 테마 전환 -->
-    <button class="theme-btn active" onclick="setTheme('light')">라이트</button>
-    <button class="theme-btn" onclick="setTheme('sepia')">세피아</button>
-    <button class="theme-btn" onclick="setTheme('dark')">다크</button>
+    <button class="theme-btn active" data-theme-target="light">라이트</button>
+    <button class="theme-btn" data-theme-target="sepia">세피아</button>
+    <button class="theme-btn" data-theme-target="dark">다크</button>
 
     <span style="width:1px;height:20px;background:var(--border);display:inline-block;"></span>
 
@@ -635,7 +635,7 @@ body {
         </div>
       </div>
       <div class="card-cta">
-        <button class="cta-btn" onclick="startChat(event, '이모델 파트장', 'role-lead', '03')">
+        <button class="cta-btn" data-char-name="이모델 파트장" data-role-class="role-lead" data-char-number="03">
           대화 시작
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -675,7 +675,7 @@ body {
         </div>
       </div>
       <div class="card-cta">
-        <button class="cta-btn" onclick="startChat(event, '박보안 파트장', 'role-lead', '04')">
+        <button class="cta-btn" data-char-name="박보안 파트장" data-role-class="role-lead" data-char-number="04">
           대화 시작
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -715,7 +715,7 @@ body {
         </div>
       </div>
       <div class="card-cta">
-        <button class="cta-btn" onclick="startChat(event, '최담당 CL3', 'role-member', '05')">
+        <button class="cta-btn" data-char-name="최담당 CL3" data-role-class="role-member" data-char-number="05">
           대화 시작
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -755,7 +755,7 @@ body {
         </div>
       </div>
       <div class="card-cta">
-        <button class="cta-btn" onclick="startChat(event, '정인라 CL2', 'role-member', '06')">
+        <button class="cta-btn" data-char-name="정인라 CL2" data-role-class="role-member" data-char-number="06">
           대화 시작
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -777,7 +777,7 @@ body {
       <p class="selected-role" id="selectedRole">선택된 캐릭터</p>
     </div>
   </div>
-  <button class="start-btn" id="startBtn" onclick="goToChat()">
+  <button class="start-btn" id="startBtn">
     대화 시작하기
     <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </button>
@@ -788,14 +788,27 @@ let selectedCard = null;
 let selectedData = {};
 
 /* ── 테마 전환 ── */
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.includes(
-      theme === 'light' ? '라이트' : theme === 'sepia' ? '세피아' : '다크'
-    ));
+document.querySelectorAll('[data-theme-target]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.themeTarget;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('[data-theme-target]').forEach(b =>
+      b.classList.toggle('active', b.dataset.themeTarget === theme)
+    );
   });
-}
+});
+
+/* ── CTA 버튼 이벤트 ── */
+document.querySelectorAll('.cta-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const { charName, roleClass, charNumber } = btn.dataset;
+    window.location.href = `chat.html?character=${charNumber}`;
+  });
+});
+
+/* ── start 버튼 이벤트 ── */
+document.getElementById('startBtn').addEventListener('click', goToChat);
 
 /* ── 카드 클릭 (선택 가능 카드만) ── */
 document.querySelectorAll('.char-card.selectable').forEach(card => {
@@ -857,14 +870,9 @@ function updateStartBar(visible) {
   }
 }
 
-function startChat(e, name, roleClass, number) {
-  e.stopPropagation();
-  alert(`${name}와 대화를 시작합니다.\n(실제 구현 시 chat.html?character=${number}으로 이동)`);
-}
-
 function goToChat() {
   if (!selectedData.number) return;
-  alert(`${selectedData.name}와 대화를 시작합니다.\n(실제 구현 시 chat.html?character=${selectedData.number}으로 이동)`);
+  window.location.href = `chat.html?character=${selectedData.number}`;
 }
 </script>
 </body>

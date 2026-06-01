@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "migrate": "node db/migrations/migrate.js"
+    "migrate": "node db/migrations/migrate.js",
+    "seed": "node db/seeds/samsung-ds-case.js"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.600.0",

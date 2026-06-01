@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS scenario_characters (
   is_selectable   TINYINT(1)    NOT NULL DEFAULT 1
                   COMMENT '1=학습자 선택 가능 / 0=컨텍스트 전용',
   display_order   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  UNIQUE KEY uq_sc_card (scenario_id, card_number),
   CONSTRAINT fk_sc_scenario
     FOREIGN KEY (scenario_id) REFERENCES scenarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
