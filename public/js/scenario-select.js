@@ -22,9 +22,11 @@ async function loadScenarios() {
     }
     grid.innerHTML = data.scenarios.map((s, i) => renderScenarioCard(s, i)).join('');
     bindScenarioEvents();
+    document.dispatchEvent(new Event('scenariosLoaded'));
   } catch (err) {
     grid.innerHTML = renderDemoCards();
     bindScenarioEvents();
+    document.dispatchEvent(new Event('scenariosLoaded'));
   }
 }
 
