@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>캐릭터 선택</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+
+/* ───────────────────────────────────────────────
+   DESIGN SYSTEM — 역할 4색 팔레트 + 3테마
+──────────────────────────────────────────────── */
+:root {
+  /* 역할별 색상 (테마 공통) */
+  --role-executive:     #312e81;  /* 상위리더 — 딥 인디고 */
+  --role-executive-bg:  #eef2ff;
+  --role-executive-mid: #818cf8;
+
+  --role-manager:       #1e3a8a;  /* 그룹장 — 딥 블루 */
+  --role-manager-bg:    #dbeafe;
+  --role-manager-mid:   #60a5fa;
+
+  --role-lead:          #134e4a;  /* 파트장 — 딥 틸 */
+  --role-lead-bg:       #ccfbf1;
+  --role-lead-mid:      #2dd4bf;
+
+  --role-member:        #78350f;  /* 부서원 — 딥 앰버 */
+  --role-member-bg:     #fef3c7;
+  --role-member-mid:    #fbbf24;
+
+  /* 공통 */
+  --radius-card:    16px;
+  --radius-badge:   6px;
+  --transition:     all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --font:           'Pretendard', -apple-system, sans-serif;
+}
+
+/* ── 라이트 테마 ── */
+[data-theme="light"] {
+  --bg:           #f0f2f8;
+  --bg-card:      #ffffff;
+  --bg-quote:     #f8faff;
+  --border:       #e5e7f0;
+  --border-hover: #c7d2fe;
+  --text-primary: #111827;
+  --text-sub:     #4b5563;
+  --text-muted:   #9ca3af;
+  --shadow:       0 2px 8px rgba(0,0,0,0.07);
+  --shadow-hover: 0 12px 32px rgba(0,0,0,0.14);
+  --divider:      #e5e7f0;
+}
+
+/* ── 세피아 테마 ── */
+[data-theme="sepia"] {
+  --bg:           #ede8de;
+  --bg-card:      #faf7f2;
+  --bg-quote:     #f5f0e8;
+  --border:       #d8cfc2;
+  --border-hover: #b8956a;
+  --text-primary: #2c1a0e;
+  --text-sub:     #5c4a3a;
+  --text-muted:   #9c8a7a;
+  --shadow:       0 2px 8px rgba(92,50,20,0.10);
+  --shadow-hover: 0 12px 32px rgba(92,50,20,0.18);
+  --divider:      #d8cfc2;
+}
+
+/* ── 다크 테마 ── */
+[data-theme="dark"] {
+  --bg:           #0d1117;
+  --bg-card:      #161b24;
+  --bg-quote:     #1c2232;
+  --border:       #2d3748;
+  --border-hover: #4a5568;
+  --text-primary: #e2e8f0;
+  --text-sub:     #94a3b8;
+  --text-muted:   #4a5568;
+  --shadow:       0 2px 8px rgba(0,0,0,0.4);
+  --shadow-hover: 0 12px 32px rgba(0,0,0,0.6);
+  --divider:      #2d3748;
+}
+
+/* ───────────────────────────────────────────────
+   BASE
+──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ───────────────────────────────────────────────
+   HEADER
+──────────────────────────────────────────────── */
+.page-header {
+  padding: 36px 40px 24px;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.scenario-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.scenario-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.scenario-desc {
+  font-size: 15px;
+  color: var(--text-sub);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.header-actions {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-sub);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.theme-btn:hover { border-color: var(--border-hover); }
+.theme-btn.active { border-color: var(--border-hover); background: var(--bg-quote); }
+
+.selection-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hint-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.hint-dot.selectable { background: var(--role-lead); }
+.hint-dot.context { background: var(--text-muted); }
+
+/* ───────────────────────────────────────────────
+   CARD GRID
+──────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 40px 60px;
+}
+
+@media (max-width: 1023px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+  .card-grid { grid-template-columns: 1fr; padding: 0 20px 40px; }
+  .page-header { padding: 24px 20px 16px; }
+  .scenario-title { font-size: 22px; }
+}
+
+/* ───────────────────────────────────────────────
+   CHARACTER CARD
+──────────────────────────────────────────────── */
+.char-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.char-card:nth-child(1) { animation-delay: 0.05s; }
+.char-card:nth-child(2) { animation-delay: 0.10s; }
+.char-card:nth-child(3) { animation-delay: 0.15s; }
+.char-card:nth-child(4) { animation-delay: 0.20s; }
+.char-card:nth-child(5) { animation-delay: 0.25s; }
+.char-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* 역할 색상 액센트 바 (상단) */
+.card-accent-bar {
+  height: 4px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* 카드 내용 */
+.card-body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 14px;
+}
+
+/* ── 1단: 메타 (역할 뱃지 + 번호) ── */
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-badge);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.card-number {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+/* ── 2단: 신원 ── */
+.card-identity .char-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.card-identity .char-dept {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── 3단: 핵심 마인드 ── */
+.card-mindset {
+  background: var(--bg-quote);
+  border-left: 3px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--text-sub);
+  line-height: 1.6;
+  quotes: "\201C" "\201D";
+}
+.card-mindset::before { content: open-quote; margin-right: 2px; opacity: 0.6; }
+.card-mindset::after  { content: close-quote; margin-left: 2px; opacity: 0.6; }
+
+/* ── 4단: 상황·감정 + 미션 ── */
+.card-context {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.context-section {}
+.context-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.context-text {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+.card-divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 2px 0;
+}
+
+/* ── 선택 CTA (하단) ── */
+.card-cta {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+}
+
+.cta-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.cta-check svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+/* ───────────────────────────────────────────────
+   HOVER STATE (선택 가능 카드만)
+──────────────────────────────────────────────── */
+.char-card.selectable:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--role-color-mid, #818cf8);
+}
+
+.char-card.selectable:hover .cta-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ── SELECTED STATE ── */
+.char-card.selected {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-width: 2.5px;
+}
+
+.char-card.selected .cta-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.char-card.selected .cta-check {
+  opacity: 1;
+}
+
+/* ── CONTEXT (비활성) STATE ── */
+.char-card.context-only {
+  opacity: 0.5;
+  filter: grayscale(30%);
+  cursor: not-allowed;
+}
+
+.context-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  height: 20px;
+  padding: 0 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+}
+
+/* ───────────────────────────────────────────────
+   역할별 색상 적용
+──────────────────────────────────────────────── */
+.role-executive .card-accent-bar   { background: var(--role-executive); }
+.role-executive .role-badge        { background: var(--role-executive); }
+.role-executive .card-mindset      { border-left-color: var(--role-executive-mid); }
+.role-executive.selected           { border-color: var(--role-executive); }
+.role-executive .cta-btn           { background: var(--role-executive); }
+.role-executive .cta-check         { background: var(--role-executive); }
+
+.role-manager .card-accent-bar    { background: var(--role-manager); }
+.role-manager .role-badge         { background: var(--role-manager); }
+.role-manager .card-mindset       { border-left-color: var(--role-manager-mid); }
+.role-manager.selected            { border-color: var(--role-manager); }
+.role-manager .cta-btn            { background: var(--role-manager); }
+.role-manager .cta-check          { background: var(--role-manager); }
+
+.role-lead .card-accent-bar       { background: var(--role-lead); }
+.role-lead .role-badge            { background: var(--role-lead); }
+.role-lead .card-mindset          { border-left-color: var(--role-lead-mid); }
+.role-lead.selected               { border-color: var(--role-lead); }
+.role-lead .cta-btn               { background: var(--role-lead); }
+.role-lead .cta-check             { background: var(--role-lead); }
+
+.role-member .card-accent-bar     { background: var(--role-member); }
+.role-member .role-badge          { background: var(--role-member); }
+.role-member .card-mindset        { border-left-color: var(--role-member-mid); }
+.role-member.selected             { border-color: var(--role-member); }
+.role-member .cta-btn             { background: var(--role-member); }
+.role-member .cta-check           { background: var(--role-member); }
+
+/* hover border-color via CSS (JS에서 class 추가) */
+.char-card.selectable:hover { border-color: var(--accent-color); }
+
+/* ───────────────────────────────────────────────
+   START BUTTON (선택 후)
+──────────────────────────────────────────────── */
+.start-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 40px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.start-bar.visible { transform: translateY(0); }
+
+.selected-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.selected-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.selected-role { font-size: 12px; color: var(--text-muted); }
+
+.start-btn {
+  height: 44px;
+  padding: 0 28px;
+  border-radius: 10px;
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.start-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+.start-btn svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+</style>
+</head>
+<body>
+
+<!-- ── 헤더 ── -->
+<div class="page-header">
+  <p class="scenario-label">Case Study 01 · 조직 방향성 정렬</p>
+  <h1 class="scenario-title">대화할 인물을 선택하세요</h1>
+  <p class="scenario-desc">AI센터 그룹장으로서 조직 내 변화를 이끌어야 합니다. 아래 인물 중 한 명을 선택해 대화를 시작하세요. 같은 상황을 다양한 관점에서 반복 도전할 수 있습니다.</p>
+
+  <div class="header-actions">
+    <!-- 테마 전환 -->
+    <button class="theme-btn active" onclick="setTheme('light')">라이트</button>
+    <button class="theme-btn" onclick="setTheme('sepia')">세피아</button>
+    <button class="theme-btn" onclick="setTheme('dark')">다크</button>
+
+    <span style="width:1px;height:20px;background:var(--border);display:inline-block;"></span>
+
+    <!-- 범례 -->
+    <span class="selection-hint">
+      <span class="hint-dot selectable"></span>선택 가능
+    </span>
+    <span class="selection-hint">
+      <span class="hint-dot context"></span>컨텍스트 (선택 불가)
+    </span>
+  </div>
+</div>
+
+<!-- ── 카드 그리드 ── -->
+<div class="card-grid">
+
+  <!-- ── CARD 01: 이삼성 팀장 (상위리더 / 컨텍스트) ── -->
+  <div class="char-card role-executive context-only"
+       data-role="상위리더" data-selectable="false" data-number="01"
+       data-name="이삼성 팀장" data-emoji="👔">
+    <div class="card-accent-bar"></div>
+    <div class="context-overlay">컨텍스트</div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">상위리더</span>
+        <span class="card-number">NO. 01</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">이삼성 팀장</p>
+        <p class="char-dept">AI센터 상위 리더</p>
+      </div>
+      <blockquote class="card-mindset">
+        다시 돌아가 더이상의 변화는 없어. 영향력 있는 멤버들만 설득하면 돼.
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">경영층 회의에서 변화에 대한 위임이 없다는 압력을 받고, 조직 전체보다 개별 영역 보호를 원하는 분위기가 팽배합니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">이 그룹장의 혼란을 정리하고 분리된 영역을 극복할 수 있도록 PoC 시도를 설득하십시오.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 02: 김센터 그룹장 (그룹장 / 컨텍스트) ── -->
+  <div class="char-card role-manager context-only"
+       data-role="그룹장" data-selectable="false" data-number="02"
+       data-name="김센터 그룹장" data-emoji="📊">
+    <div class="card-accent-bar"></div>
+    <div class="context-overlay">컨텍스트</div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">그룹장</span>
+        <span class="card-number">NO. 02</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">김센터 그룹장</p>
+        <p class="char-dept">학습자 역할 (당신)</p>
+      </div>
+      <blockquote class="card-mindset">
+        계속 가도, 가는 프로세스가 무너진다. 뭔가 더 해야 하는데.
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">4분기 팀원의 70%가 현재 프로젝트 지연 상태. 외부 솔루션 도입 방침을 수용하지 않은 팀원으로 인해 전환이 막히고 있습니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">팀 내 지지 세력을 설득하면서 이삼성 팀장의 외부 솔루션 도입 결정에 동의를 이끌어내십시오.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 03: 이모델 파트장 (파트장A / 선택 가능) ── -->
+  <div class="char-card role-lead selectable"
+       data-role="파트장" data-selectable="true" data-number="03"
+       data-name="이모델 파트장" data-emoji="⚡">
+    <div class="card-accent-bar"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">파트장</span>
+        <span class="card-number">NO. 03</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">이모델 파트장</p>
+        <p class="char-dept">파트장 A · AI 모델링 담당 파트</p>
+      </div>
+      <blockquote class="card-mindset">
+        이런 상황이라면, 우리가 변화를 먼저 선도하지 않으면 안 된다.
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">4분기 외부 솔루션 활용 지침을 받아들이지 않아 팀 전체 성과 공유가 어려운 상황. 변화에 대한 저항이 있지만, 팀 분리를 피하고 싶습니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">4분기 이후의 변화에 이 팀이 합류하도록 설득하고, 팀 내 PoC 방향을 제안하십시오.</p>
+        </div>
+      </div>
+      <div class="card-cta">
+        <button class="cta-btn" onclick="startChat(event, '이모델 파트장', 'role-lead', '03')">
+          대화 시작
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="cta-check">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 04: 박보안 파트장 (파트장B / 선택 가능) ── -->
+  <div class="char-card role-lead selectable"
+       data-role="파트장" data-selectable="true" data-number="04"
+       data-name="박보안 파트장" data-emoji="🔐">
+    <div class="card-accent-bar"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">파트장</span>
+        <span class="card-number">NO. 04</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">박보안 파트장</p>
+        <p class="char-dept">파트장 B · 보안·데이터 거버넌스 파트</p>
+      </div>
+      <blockquote class="card-mindset">
+        방향이 바뀌면, 책임 소재도 함께 정리되어야 합니다.
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">전체 구조의 변화가 어떤 부서에도 그대로 적용되기 어렵습니다. 새로운 리스크가 발생할 수 있는 보안 책임 소재가 불명확한 채 진행되는 일에 불안함이 있습니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">외부 솔루션 도입 시 보안 책임 분리를 명확하게 요청하고, 현재 팀에서 지원 가능한 방식을 제안하십시오.</p>
+        </div>
+      </div>
+      <div class="card-cta">
+        <button class="cta-btn" onclick="startChat(event, '박보안 파트장', 'role-lead', '04')">
+          대화 시작
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="cta-check">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 05: 최담당 CL3 (부서원A / 선택 가능) ── -->
+  <div class="char-card role-member selectable"
+       data-role="부서원" data-selectable="true" data-number="05"
+       data-name="최담당 CL3" data-emoji="💼">
+    <div class="card-accent-bar"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">부서원</span>
+        <span class="card-number">NO. 05</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">최담당 CL3</p>
+        <p class="char-dept">AI 시스템 구축 담당자</p>
+      </div>
+      <blockquote class="card-mindset">
+        지금 이 시스템을 바꿀 수 있다면, 내가 해온 것들은 어디로 가는 거지?
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">지금 이 시스템을 바꾸면 자신의 성과가 폄하될 것 같아 불안합니다. 반복되는 변경 작업이 피로감으로 쌓여있으며 새 지시에 의욕이 낮습니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">기존 PoC 결과의 가치를 인정해주고, 추가 인력이나 자원 지원을 요청하십시오.</p>
+        </div>
+      </div>
+      <div class="card-cta">
+        <button class="cta-btn" onclick="startChat(event, '최담당 CL3', 'role-member', '05')">
+          대화 시작
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="cta-check">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 06: 정인라 CL2 (부서원B / 선택 가능) ── -->
+  <div class="char-card role-member selectable"
+       data-role="부서원" data-selectable="true" data-number="06"
+       data-name="정인라 CL2" data-emoji="🌱">
+    <div class="card-accent-bar"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="role-badge">부서원</span>
+        <span class="card-number">NO. 06</span>
+      </div>
+      <div class="card-identity">
+        <p class="char-name">정인라 CL2</p>
+        <p class="char-dept">AI 서비스 기획 담당자</p>
+      </div>
+      <blockquote class="card-mindset">
+        나만 이직을 고민하는 게 아닐 텐데, 왜 이렇게 지시가 반복되는 걸까.
+      </blockquote>
+      <div class="card-context">
+        <div class="context-section">
+          <p class="context-label">상황 · 감정</p>
+          <p class="context-text">이런 그룹의 다시 바꾸는 방식에 회의감을 느끼고 있습니다. 자발적으로 그게 좋다는 확신도 없어졌고, 어떤 방향이든 따라가기 지쳐있는 상태입니다.</p>
+        </div>
+        <div class="card-divider"></div>
+        <div class="context-section">
+          <p class="context-label">롤플레이 미션</p>
+          <p class="context-text">이 그룹에 대한 변화의 의미를 공유해주고, 현재 이루고자 하는 것을 본인 말로 표현할 수 있도록 지원하십시오.</p>
+        </div>
+      </div>
+      <div class="card-cta">
+        <button class="cta-btn" onclick="startChat(event, '정인라 CL2', 'role-member', '06')">
+          대화 시작
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="cta-check">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── 선택 확인 바 ── -->
+<div class="start-bar" id="startBar">
+  <div class="selected-info">
+    <div class="selected-avatar" id="selectedAvatar"></div>
+    <div>
+      <p class="selected-name" id="selectedName">—</p>
+      <p class="selected-role" id="selectedRole">선택된 캐릭터</p>
+    </div>
+  </div>
+  <button class="start-btn" id="startBtn" onclick="goToChat()">
+    대화 시작하기
+    <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+</div>
+
+<script>
+let selectedCard = null;
+let selectedData = {};
+
+/* ── 테마 전환 ── */
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(
+      theme === 'light' ? '라이트' : theme === 'sepia' ? '세피아' : '다크'
+    ));
+  });
+}
+
+/* ── 카드 클릭 (선택 가능 카드만) ── */
+document.querySelectorAll('.char-card.selectable').forEach(card => {
+  card.addEventListener('click', () => selectCard(card));
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectCard(card); });
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `${card.dataset.name} 선택 — ${card.dataset.role}`);
+});
+
+function selectCard(card) {
+  // 이전 선택 해제
+  if (selectedCard && selectedCard !== card) {
+    selectedCard.classList.remove('selected');
+    const prev = selectedCard.querySelector('.cta-check');
+    if (prev) prev.style.opacity = '0';
+  }
+
+  const isSelected = card.classList.toggle('selected');
+  const check = card.querySelector('.cta-check');
+
+  if (isSelected) {
+    selectedCard = card;
+    if (check) check.style.opacity = '1';
+    selectedData = {
+      name: card.dataset.name,
+      role: card.dataset.role,
+      number: card.dataset.number,
+      emoji: card.dataset.emoji,
+      roleClass: card.className.match(/role-\w+/)?.[0] || ''
+    };
+    updateStartBar(true);
+  } else {
+    selectedCard = null;
+    if (check) check.style.opacity = '0';
+    updateStartBar(false);
+  }
+}
+
+function updateStartBar(visible) {
+  const bar = document.getElementById('startBar');
+  bar.classList.toggle('visible', visible);
+
+  if (visible) {
+    const roleColors = {
+      'role-lead':    '#134e4a',
+      'role-member':  '#78350f',
+      'role-executive': '#312e81',
+      'role-manager': '#1e3a8a'
+    };
+    const avatar = document.getElementById('selectedAvatar');
+    avatar.textContent = selectedData.emoji;
+    avatar.style.background = roleColors[selectedData.roleClass] || '#374151';
+    document.getElementById('selectedName').textContent = selectedData.name;
+    document.getElementById('selectedRole').textContent = selectedData.role;
+
+    const btn = document.getElementById('startBtn');
+    btn.style.background = roleColors[selectedData.roleClass] || '#374151';
+  }
+}
+
+function startChat(e, name, roleClass, number) {
+  e.stopPropagation();
+  alert(`${name}와 대화를 시작합니다.\n(실제 구현 시 chat.html?character=${number}으로 이동)`);
+}
+
+function goToChat() {
+  if (!selectedData.number) return;
+  alert(`${selectedData.name}와 대화를 시작합니다.\n(실제 구현 시 chat.html?character=${selectedData.number}으로 이동)`);
+}
+</script>
+</body>
+</html>
