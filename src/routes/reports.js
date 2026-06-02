@@ -42,6 +42,7 @@ router.get('/sessions/compare', async (req, res) => {
     const sessions = await getSessionsForCompare(
       Number(learner_id), Number(scenario_id)
     );
+    console.log('[DEBUG compare] learner=%s scenario=%s rows=%d', learner_id, scenario_id, sessions.length);
     if (sessions.length < 2) {
       return res.status(400).json({ error: '비교 리포트는 최소 2세션 필요' });
     }

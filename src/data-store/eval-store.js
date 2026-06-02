@@ -21,11 +21,21 @@ export async function getEvaluation(sessionId) {
 }
 
 export async function getSessionsForCompare(learnerId, scenarioId) {
+  // v3 모드는 character_id=NULL, dialogue_partner_ids JSON 배열 첫 파트너를 fallback
+  console.log('[COMPARE] learnerId=%s(type:%s) scenarioId=%s(type:%s)',
+    learnerId, typeof learnerId, scenarioId, typeof scenarioId);
   const [rows] = await pool.query(
-    `SELECT s.id AS session_id, s.character_id, sc.name AS character_name,
-            sc.role_level, e.scores, e.feedback, e.total_score, e.grade
+    `SELECT s.id AS session_id,
+            COALESCE(s.character_id,
+              CAST(JSON_UNQUOTE(JSON_EXTRACT(s.dialogue_partner_ids, '$[0]')) AS UNSIGNED)
+            ) AS character_id,
+            sc.name AS character_name, sc.role_level,
+            e.scores, e.feedback, e.total_score, e.grade
      FROM sessions s
-     JOIN scenario_characters sc ON sc.id = s.character_id
+     LEFT JOIN scenario_characters sc ON sc.id = COALESCE(
+       s.character_id,
+       CAST(JSON_UNQUOTE(JSON_EXTRACT(s.dialogue_partner_ids, '$[0]')) AS UNSIGNED)
+     )
      LEFT JOIN evaluations e ON e.session_id = s.id
      WHERE s.learner_id = ? AND s.scenario_id = ? AND s.status = 'completed'
      ORDER BY s.started_at`,
