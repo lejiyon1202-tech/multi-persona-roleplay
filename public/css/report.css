@@ -1,19 +1,19 @@
 /* ═══════════════════════════════════════════════
    리포트 화면 전용 스타일
    ═══════════════════════════════════════════════ */
-.page-wrap { max-width: 900px; margin: 0 auto; padding: 32px 40px 80px; }
+.page-wrap { max-width: 920px; margin: 0 auto; padding: 36px 48px 80px; }
 @media (max-width: 767px) { .page-wrap { padding: 20px 16px 60px; } }
 
 /* ── 탭 ── */
 .report-tabs {
   display: flex;
   border-bottom: 2px solid var(--border);
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   gap: 0;
 }
 .report-tab {
-  padding: 10px 24px;
-  font-size: 14px;
+  padding: 12px 28px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-muted);
   border: none;
@@ -23,6 +23,7 @@
   margin-bottom: -2px;
   transition: var(--transition);
   font-family: var(--font);
+  letter-spacing: -0.01em;
 }
 .report-tab:hover  { color: var(--text-sub); }
 .report-tab.active { color: var(--role-lead); border-bottom-color: var(--role-lead); }

@@ -136,15 +136,15 @@
 .partner-card {
   background: var(--bg-card);
   border: 2px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   display: flex;
   flex-direction: column;
-  animation: fadeUp 0.4s ease both;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .partner-card:nth-child(1) { animation-delay: 0.04s; }
 .partner-card:nth-child(2) { animation-delay: 0.08s; }
@@ -227,11 +227,11 @@
 
 /* 카드 본문 */
 .card-body {
-  padding: 16px 20px 18px;
+  padding: 20px 22px 22px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 8px;
+  gap: 10px;
 }
 .card-meta {
   display: flex;
