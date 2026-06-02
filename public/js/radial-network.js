@@ -41,15 +41,81 @@ function _pickCenter(chars, scenarioId) {
   return chars.find(c => c.role_level === role) || chars[0];
 }
 
-/* 주변 n개 좌표 (−90°부터 균등 분할) */
-function _peerCoords(n) {
-  const out = [];
-  const start = -Math.PI / 2;
-  for (let i = 0; i < n; i++) {
-    const a = start + (2 * Math.PI / n) * i;
-    out.push({ x: RADIAL_CX + RADIAL_R * Math.cos(a), y: RADIAL_CY + RADIAL_R * Math.sin(a) });
+/* ── A안: 위계 기반 유기적 비대칭 배치 ── */
+
+/* 위계별 기본 반지름 */
+const ORGANIC_R = {
+  executive: RADIAL_R + 20,
+  manager:   RADIAL_R,
+  lead:      RADIAL_R,
+  member:    RADIAL_R - 15,
+};
+
+/* 관계 강도별 반지름 미세 조정 */
+const RELATION_R_FINE = {
+  '갈등':     -20,
+  '상위':      -5,
+  '부하':      -5,
+  '동료':        0,
+  '간접영향': +15,
+};
+
+/* peer → center 방향 관계 타입 추출 */
+function _peerRelType(peer, center) {
+  const raw = peer.learner_detail;
+  if (!raw) return null;
+  const ld = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  const rels = ld?.relationships_structured;
+  if (!Array.isArray(rels)) return null;
+  return rels.find(r => r.target_name === center.name)?.type || null;
+}
+
+/* 위계 기반 유기적 좌표 계산 */
+function _peerCoordsOrganic(peers, center) {
+  const bins = { executive: [], manager: [], lead: [], member: [] };
+  peers.forEach((p, idx) => {
+    const role = ROLE_LAYER_CLASS[p.role_level] || 'member';
+    (bins[role] || bins.member).push({ p, idx });
+  });
+
+  const result = new Array(peers.length);
+
+  const place = (group, centerDeg, spreadDeg, baseR) => {
+    group.forEach(({ p, idx }, i) => {
+      const n = group.length;
+      const deg = centerDeg + (i - (n - 1) / 2) * spreadDeg;
+      const ang = deg * Math.PI / 180;
+      const fine = RELATION_R_FINE[_peerRelType(p, center)] ?? 0;
+      result[idx] = {
+        x: RADIAL_CX + (baseR + fine) * Math.cos(ang),
+        y: RADIAL_CY + (baseR + fine) * Math.sin(ang),
+      };
+    });
+  };
+
+  /* 상위리더 → 위 12시 (−90°), 2명이면 ±25° */
+  place(bins.executive, -90, 50, ORGANIC_R.executive);
+
+  /* 파트장·동료 → 좌(−150°)∼우(−30°) 균등 분산 */
+  const sideGroup = [...bins.manager, ...bins.lead];
+  if (sideGroup.length > 0) {
+    const step = sideGroup.length > 1 ? 120 / (sideGroup.length - 1) : 0;
+    sideGroup.forEach(({ p, idx }, i) => {
+      const deg = -150 + i * step;
+      const ang = deg * Math.PI / 180;
+      const role = ROLE_LAYER_CLASS[p.role_level] || 'member';
+      const fine = RELATION_R_FINE[_peerRelType(p, center)] ?? 0;
+      result[idx] = {
+        x: RADIAL_CX + (ORGANIC_R[role] + fine) * Math.cos(ang),
+        y: RADIAL_CY + (ORGANIC_R[role] + fine) * Math.sin(ang),
+      };
+    });
   }
-  return out;
+
+  /* 부서원 → 아래 6시 (+90°), 2명이면 ±25° */
+  place(bins.member, 90, 50, ORGANIC_R.member);
+
+  return result;
 }
 
 /* relationships_structured → 중복 제거 관계 배열 */
@@ -165,7 +231,7 @@ function renderRadialNetwork(chars, scenarioId) {
   /* 중심·주변 분리 */
   const center     = _pickCenter(chars, scenarioId);
   const peers      = chars.filter(c => c.id !== center.id);
-  const peerCoords = _peerCoords(peers.length);
+  const peerCoords = _peerCoordsOrganic(peers, center);
 
   /* 좌표 맵 */
   const posMap = new Map();
