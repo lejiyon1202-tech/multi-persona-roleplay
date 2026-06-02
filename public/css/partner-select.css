@@ -258,7 +258,7 @@
   margin-left: auto;
 }
 .card-identity .char-name {
-  font-family: var(--font-serif);
+  font-family: var(--font);
   font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
