@@ -238,30 +238,34 @@ function renderRadialNetwork(chars, scenarioId) {
   posMap.set(center.id, { x: RADIAL_CX, y: RADIAL_CY });
   peers.forEach((c, i) => posMap.set(c.id, peerCoords[i]));
 
-  /* relationships_structured 관계선 (주변↔주변은 갈등만·엉킴 방지) */
+  /* 모든 쌍 관계선 — 타입별 색 구분 */
   const relations  = _parseRelations(chars);
   const drawnPairs = new Set();
   relations.forEach(({ fromId, toId, type, label }) => {
     const a = posMap.get(fromId);
     const b = posMap.get(toId);
     if (!a || !b) return;
-    const involveCenter = fromId === center.id || toId === center.id;
-    if (!involveCenter && type !== '갈등') return;
     svg.appendChild(_buildLine(a.x, a.y, b.x, b.y, type));
-    const lbl = _buildLabel(a.x, a.y, b.x, b.y, label);
-    if (lbl) svg.appendChild(lbl);
+    /* 라벨은 위계·갈등만 표시 — 동료·간접은 색으로만 구분 (빽빽함 방지) */
+    if (type === '상위' || type === '부하' || type === '갈등') {
+      const lbl = _buildLabel(a.x, a.y, b.x, b.y, label);
+      if (lbl) svg.appendChild(lbl);
+    }
     drawnPairs.add([fromId, toId].sort().join('-'));
   });
 
-  /* 관계 없는 중심↔주변 → 기본 간접선 */
-  peers.forEach(pc => {
-    const key = [center.id, pc.id].sort().join('-');
-    if (!drawnPairs.has(key)) {
-      const a = posMap.get(center.id);
-      const b = posMap.get(pc.id);
-      svg.appendChild(_buildLine(a.x, a.y, b.x, b.y, '간접영향'));
+  /* 관계 데이터 없는 모든 쌍 → 간접 영향선 */
+  const allIds = [center.id, ...peers.map(p => p.id)];
+  for (let i = 0; i < allIds.length; i++) {
+    for (let j = i + 1; j < allIds.length; j++) {
+      const key = [allIds[i], allIds[j]].sort().join('-');
+      if (!drawnPairs.has(key)) {
+        const a = posMap.get(allIds[i]);
+        const b = posMap.get(allIds[j]);
+        if (a && b) svg.appendChild(_buildLine(a.x, a.y, b.x, b.y, '간접영향'));
+      }
     }
-  });
+  }
 
   /* 노드 렌더 (중심 → 주변) */
   wrap.appendChild(_buildNode(center, true, { x: RADIAL_CX, y: RADIAL_CY }));
