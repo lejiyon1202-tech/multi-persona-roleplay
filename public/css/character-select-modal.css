@@ -332,6 +332,14 @@
   display: block;
   font-family: var(--font);
 }
+/* 연결선 — data-type 기반 스타일 */
+.relation-diagram line { stroke: #D4D4D8; stroke-width: 1.5; }
+.relation-diagram line[data-type="상사"],
+.relation-diagram line[data-type="부하"] { stroke: #09090B; stroke-width: 2; }
+.relation-diagram line[data-type="경영진"] { stroke: #3F3F46; stroke-width: 2; }
+.relation-diagram line[data-type="동료"],
+.relation-diagram line[data-type="선배"] { stroke: #52525B; stroke-width: 1.5; }
+.relation-diagram line[data-type*="간접"] { stroke: #A1A1AA; stroke-width: 1.5; stroke-dasharray: 5,3; }
 .rel-node-circle {
   fill: var(--bg-quote);
   stroke: var(--border);

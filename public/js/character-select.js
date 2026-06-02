@@ -306,13 +306,11 @@ function renderRelations(id, structured, fallback, lEmoji, lName) {
     const y = CY + R * Math.sin(angle);
     const { stroke, sw, dash } = getLineStyle(r.type);
 
-    // 연결선
+    // 연결선 (data-type으로 CSS 스타일 제어)
     const line = document.createElementNS(NS, 'line');
     line.setAttribute('x1', CX); line.setAttribute('y1', CY);
     line.setAttribute('x2', x);  line.setAttribute('y2', y);
-    line.setAttribute('stroke', stroke);
-    line.setAttribute('stroke-width', sw);
-    if (dash) line.setAttribute('stroke-dasharray', dash);
+    line.setAttribute('data-type', r.type || '연결');
     line.setAttribute('aria-hidden', 'true');
     svg.appendChild(line);
 
