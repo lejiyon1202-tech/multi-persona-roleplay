@@ -19,11 +19,11 @@
   pointer-events: none;
 }
 
-/* 관계선 클래스별 스타일 */
-.org-radial-line              { stroke: #D4D4D8; stroke-width: 1.5; }
-.org-radial-line--hierarchy   { stroke: #3F3F46; stroke-width: 2; }
-.org-radial-line--conflict    { stroke: #09090B; stroke-width: 2.5; stroke-dasharray: none; }
-.org-radial-line--colleague   { stroke: #71717A; stroke-width: 1.5; }
+/* 관계선 클래스별 스타일 — 색상 차별화 */
+.org-radial-line              { stroke: #D4D4D8; stroke-width: 1; }
+.org-radial-line--hierarchy   { stroke: #2563EB; stroke-width: 2.5; }
+.org-radial-line--conflict    { stroke: #DC2626; stroke-width: 3; }
+.org-radial-line--colleague   { stroke: #16A34A; stroke-width: 2; }
 .org-radial-line--indirect    { stroke: #A1A1AA; stroke-width: 1.2; stroke-dasharray: 5,3; }
 
 /* 관계 라벨 — WCAG AA 가독성 강화 */
