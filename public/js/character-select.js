@@ -380,9 +380,6 @@ function renderRelations(id, structured, fallback, lEmoji, lName) {
   svg.appendChild(cNm);
 
   el.appendChild(svg);
-  return;
-  }
-  el.textContent = (typeof fallback === 'string' && fallback) ? fallback : '—';
 }
 
 function renderEmotionTimeline(id, states) {
