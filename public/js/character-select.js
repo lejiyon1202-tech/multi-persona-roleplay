@@ -137,8 +137,7 @@ function openModal(charId) {
   renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
   renderIconRows('modalMission', ld.mission || c.mission, 'check');
   renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
-  const HUMAN_C = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
-  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, HUMAN_C[c.role_level] || '🧑‍💼', c.name);
+  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
   renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
 
   // 첫 발화 힌트 (3 → 5개로 확장)
@@ -275,7 +274,20 @@ function getLineStyle(type) {
   return { stroke: '#A1A1AA', sw: 1.5, dash: '5,3' };
 }
 
-function renderRelations(id, structured, fallback, lEmoji, lName) {
+function getRoleAvatar(roleLevel) {
+  const map = { '상위리더': 'exec', '그룹장': 'mgr', '파트장': 'lead', '부서원': 'member' };
+  return map[roleLevel] || 'lead';
+}
+
+function getRelCategory(type) {
+  if (!type) return 'other';
+  if (/상사|경영진|본부장/.test(type)) return 'superior';
+  if (/동료|선배/.test(type)) return 'peer';
+  if (/부하|후배|간접/.test(type)) return 'subordinate';
+  return 'other';
+}
+
+function renderRelations(id, structured, fallback, lName, lRoleLevel) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = '';
@@ -285,89 +297,105 @@ function renderRelations(id, structured, fallback, lEmoji, lName) {
     return;
   }
 
-  const n = structured.length;
-  const R = n <= 3 ? 36 : n <= 5 ? 34 : 30; // % 단위 반경
-
-  // 래퍼 (position:relative)
   const wrap = document.createElement('div');
-  wrap.className = 'rel-diagram-wrap';
+  wrap.className = 'rel-infographic';
   wrap.setAttribute('role', 'img');
-  wrap.setAttribute('aria-label', `${lName || '캐릭터'} 관계 구조도 — ${n}명`);
+  wrap.setAttribute('aria-label', `${lName || '캐릭터'} 관계 인포그래픽`);
 
-  // SVG 선 레이어 (aria-hidden)
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.className = 'rel-svg-lines';
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('viewBox', '0 0 100 100');
-  svg.setAttribute('preserveAspectRatio', 'none');
+  // ① 중앙 캐릭터 카드
+  const centerCard = document.createElement('div');
+  centerCard.className = 'rel-center-card';
 
-  structured.forEach((r, i) => {
-    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
-    const x = 50 + R * Math.cos(angle);
-    const y = 50 + R * Math.sin(angle);
-    const line = document.createElementNS(NS, 'line');
-    line.setAttribute('x1', '50'); line.setAttribute('y1', '50');
-    line.setAttribute('x2', String(x.toFixed(1)));
-    line.setAttribute('y2', String(y.toFixed(1)));
-    line.setAttribute('data-type', r.type || '연결');
-    svg.appendChild(line);
-  });
-  wrap.appendChild(svg);
+  const cAv = document.createElement('div');
+  cAv.className = `rel-avatar rel-avatar--lg ${getRoleAvatar(lRoleLevel)}`;
+  cAv.setAttribute('aria-hidden', 'true');
 
-  // 외부 노드들 (HTML div)
-  const HUMAN = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
-  structured.forEach((r, i) => {
-    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
-    const x = 50 + R * Math.cos(angle);
-    const y = 50 + R * Math.sin(angle);
+  const cInfo = document.createElement('div');
+  cInfo.className = 'rel-center-info';
+  const cName = document.createElement('p');
+  cName.className = 'rel-cname';
+  cName.textContent = lName || '—';
+  const cRole = document.createElement('span');
+  cRole.className = 'rel-crole';
+  cRole.textContent = lRoleLevel || '';
+  cInfo.appendChild(cName);
+  cInfo.appendChild(cRole);
+  centerCard.appendChild(cAv);
+  centerCard.appendChild(cInfo);
+  wrap.appendChild(centerCard);
 
+  // ② 섹션별 분류
+  const CATS = {
+    superior:    { label: '직속 보고 상사', cls: 'superior', items: [] },
+    peer:        { label: '주요 동료',       cls: 'peer',     items: [] },
+    subordinate: { label: '팀원 · 후배',     cls: 'sub',      items: [] },
+    other:       { label: '주요 관계',       cls: 'other',    items: [] },
+  };
+
+  structured.forEach(r => {
     const found = allChars.find(ch => ch.name === r.target_name);
-    const nodeEmoji = HUMAN[found?.role_level] || '👤';
-
-    const node = document.createElement('div');
-    node.className = 'rel-node';
-    node.style.left = x.toFixed(1) + '%';
-    node.style.top  = y.toFixed(1) + '%';
-
-    const circ = document.createElement('div');
-    circ.className = 'rel-node-circle';
-    circ.textContent = nodeEmoji;
-
-    const nm = document.createElement('div');
-    nm.className = 'rel-node-name';
-    nm.textContent = (r.target_name || '').split(' ').slice(0, 2).join('\n');
-
-    node.appendChild(circ);
-    node.appendChild(nm);
-
-    if (r.type) {
-      const tp = document.createElement('div');
-      tp.className = 'rel-node-type';
-      tp.textContent = r.type;
-      node.appendChild(tp);
-    }
-
-    wrap.appendChild(node);
+    CATS[getRelCategory(r.type)].items.push({ ...r, found });
   });
 
-  // 중앙 노드 (클릭한 캐릭터)
-  const center = document.createElement('div');
-  center.className = 'rel-center';
-  center.style.left = '50%';
-  center.style.top  = '50%';
+  Object.values(CATS).forEach(cat => {
+    if (!cat.items.length) return;
 
-  const cCirc = document.createElement('div');
-  cCirc.className = 'rel-center-circle';
-  cCirc.textContent = lEmoji || '🧑‍💼';
+    const section = document.createElement('div');
+    section.className = `rel-section rel-section--${cat.cls}`;
 
-  const cNm = document.createElement('div');
-  cNm.className = 'rel-center-name';
-  cNm.textContent = (lName || '나').split(' ').slice(0, 2).join(' ');
+    const hdr = document.createElement('div');
+    hdr.className = 'rel-section-hdr';
+    const icon = document.createElement('span');
+    icon.className = `rel-cat-icon rel-cat-icon--${cat.cls}`;
+    icon.setAttribute('aria-hidden', 'true');
+    const lbl = document.createElement('span');
+    lbl.className = 'rel-section-lbl';
+    lbl.textContent = cat.label;
+    hdr.appendChild(icon);
+    hdr.appendChild(lbl);
+    section.appendChild(hdr);
 
-  center.appendChild(cCirc);
-  center.appendChild(cNm);
-  wrap.appendChild(center);
+    const cards = document.createElement('div');
+    cards.className = 'rel-mini-cards';
+
+    cat.items.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'rel-mini-card';
+
+      const av = document.createElement('div');
+      av.className = `rel-avatar ${getRoleAvatar(r.found?.role_level)}`;
+      av.setAttribute('aria-hidden', 'true');
+
+      const info = document.createElement('div');
+      info.className = 'rel-mini-info';
+
+      const nm = document.createElement('p');
+      nm.className = 'rel-mini-name';
+      nm.textContent = r.target_name || '—';
+      info.appendChild(nm);
+
+      if (r.description) {
+        const desc = document.createElement('p');
+        desc.className = 'rel-mini-desc';
+        desc.textContent = r.description;
+        info.appendChild(desc);
+      }
+
+      if (r.type) {
+        const tp = document.createElement('span');
+        tp.className = 'rel-mini-type';
+        tp.textContent = r.type;
+        info.appendChild(tp);
+      }
+
+      card.appendChild(av);
+      card.appendChild(info);
+      cards.appendChild(card);
+    });
+
+    section.appendChild(cards);
+    wrap.appendChild(section);
+  });
 
   el.appendChild(wrap);
 }

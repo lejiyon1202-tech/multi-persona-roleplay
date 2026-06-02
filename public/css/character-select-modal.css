@@ -325,90 +325,124 @@
 .modal-icon svg { width: 16px; height: 16px; }
 .modal-icon-text { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
 
-/* ── 관계 구조도 — CSS absolute positioning 하이브리드 ── */
-.rel-diagram-wrap {
-  position: relative;
-  height: 230px;
-  margin: 4px 0;
-}
-/* SVG 연결선 레이어 (아래에 깔림) */
-.rel-svg-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-/* 연결선 data-type 셀렉터 (viewBox 100×100 기준 단위) */
-.rel-svg-lines line { stroke: #D4D4D8; stroke-width: 0.8; }
-.rel-svg-lines line[data-type="상사"],
-.rel-svg-lines line[data-type="부하"]    { stroke: #09090B; stroke-width: 1.2; }
-.rel-svg-lines line[data-type="경영진"]   { stroke: #3F3F46; stroke-width: 1.2; }
-.rel-svg-lines line[data-type="동료"],
-.rel-svg-lines line[data-type="선배"]    { stroke: #52525B; stroke-width: 0.8; }
-.rel-svg-lines line[data-type*="간접"]   { stroke: #A1A1AA; stroke-width: 0.8; stroke-dasharray: 3,2; }
-/* 외부 노드 */
-.rel-node {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  z-index: 1;
-}
-.rel-node-circle {
-  width: 38px; height: 38px;
+/* ── 관계 인포그래픽 카드 레이아웃 ── */
+
+/* CSS 아바타 (사람 실루엣·역할별 색상) */
+.rel-avatar {
+  flex-shrink: 0;
   border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+}
+.rel-avatar::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  left: 50%; transform: translateX(-50%);
+}
+.rel-avatar::after {
+  content: '';
+  position: absolute;
+  border-radius: 60% 60% 0 0;
+  background: rgba(255,255,255,0.85);
+  left: 50%; transform: translateX(-50%);
+}
+/* 기본 크기 */
+.rel-avatar::before { width: 42%; height: 42%; top: 18%; }
+.rel-avatar::after  { width: 68%; height: 38%; bottom: 0; }
+/* 역할별 배경 */
+.rel-avatar.exec   { background: var(--role-executive); }
+.rel-avatar.mgr    { background: var(--role-manager); }
+.rel-avatar.lead   { background: var(--role-lead); }
+.rel-avatar.member { background: var(--role-member); }
+/* 대형 아바타 (중앙 카드) */
+.rel-avatar--lg { width: 52px; height: 52px; }
+.rel-avatar--lg::before { width: 38%; height: 38%; top: 18%; }
+.rel-avatar--lg::after  { width: 65%; height: 36%; }
+/* 기본 크기 */
+.rel-avatar:not(.rel-avatar--lg) { width: 36px; height: 36px; }
+
+/* 중앙 캐릭터 카드 */
+.rel-infographic { display: flex; flex-direction: column; gap: 10px; }
+.rel-center-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background: var(--bg-quote);
-  border: 1.5px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  line-height: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
 }
-.rel-node-name {
-  font-size: 9.5px;
+.rel-center-info { flex: 1; }
+.rel-cname { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.rel-crole {
+  font-size: 11px;
   color: var(--text-muted);
-  text-align: center;
-  white-space: pre-line;
-  line-height: 1.3;
-  max-width: 56px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 7px;
+  display: inline-block;
+  margin-top: 3px;
 }
-.rel-node-type {
-  font-size: 8.5px;
-  color: var(--text-placeholder);
+
+/* 관계 섹션 */
+.rel-section { }
+.rel-section-hdr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+.rel-section-lbl {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* 섹션 아이콘 (CSS content) */
+.rel-cat-icon {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+.rel-cat-icon--superior  { background: #09090B; color: #fff; }
+.rel-cat-icon--superior::before  { content: '↑'; }
+.rel-cat-icon--peer      { background: #3F3F46; color: #fff; }
+.rel-cat-icon--peer::before      { content: '↔'; }
+.rel-cat-icon--subordinate { background: #71717A; color: #fff; }
+.rel-cat-icon--subordinate::before { content: '↓'; }
+.rel-cat-icon--other     { background: #A1A1AA; color: #fff; }
+.rel-cat-icon--other::before     { content: '→'; }
+
+/* 미니 카드들 */
+.rel-mini-cards { display: flex; flex-direction: column; gap: 6px; }
+.rel-mini-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.rel-mini-info { flex: 1; }
+.rel-mini-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.rel-mini-desc { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 2px; }
+.rel-mini-type {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-muted);
   background: var(--bg-quote);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 1px 5px;
-  white-space: nowrap;
-}
-/* 중앙 노드 */
-.rel-center {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  z-index: 2;
-}
-.rel-center-circle {
-  width: 48px; height: 48px;
-  border-radius: 50%;
-  background: #09090B;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  line-height: 1;
-}
-.rel-center-name {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-align: center;
-  max-width: 64px;
-  white-space: pre-line;
-  line-height: 1.3;
+  padding: 1px 6px;
+  margin-top: 3px;
 }
 
 /* 감정 흐름 타임라인 */
