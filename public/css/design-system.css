@@ -21,13 +21,51 @@
   --role-member-bg:     #fef3c7;
   --role-member-mid:    #fbbf24;
 
-  /* 공통 */
+  /* 반경 */
   --radius-card:     16px;
   --radius-sm:       8px;
   --radius-badge:    6px;
+  --radius-lg:       24px;
+  --radius-modal:    20px;
+  --radius-full:     9999px;
+
+  /* 전환 */
   --transition:      all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  --font:            'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
-  --font-mono:       'Pretendard', ui-monospace, monospace;
+  --transition-fast: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 스페이싱 */
+  --sp-xs:   4px;
+  --sp-sm:   8px;
+  --sp-md:   16px;
+  --sp-lg:   24px;
+  --sp-xl:   32px;
+  --sp-2xl:  48px;
+
+  /* 타이포 스케일 */
+  --text-xs:   10px;
+  --text-sm:   12px;
+  --text-base: 14px;
+  --text-md:   16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+
+  /* 폰트 무게 */
+  --fw-normal:   400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-black:    900;
+
+  /* z-index */
+  --z-header: 50;
+  --z-modal:  100;
+  --z-toast:  200;
+
+  /* 폰트 */
+  --font:      'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --font-mono: 'Pretendard', ui-monospace, monospace;
 }
 
 /* ───── 라이트 테마 ───── */
@@ -48,6 +86,8 @@
   --shadow-md:       0 6px 20px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.06);
   --shadow-hover:    0 16px 40px rgba(15,23,42,0.14), 0 4px 12px rgba(15,23,42,0.06);
   --shadow-card:     0 1px 3px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.06);
+  --shadow-lg:       0 12px 36px rgba(15,23,42,0.14), 0 4px 12px rgba(15,23,42,0.08);
+  --shadow-xl:       0 24px 64px rgba(15,23,42,0.18), 0 8px 24px rgba(15,23,42,0.10);
   --divider:         #e8eaf0;
   --overlay:         rgba(15,23,42,0.45);
   --success:         #059669;
