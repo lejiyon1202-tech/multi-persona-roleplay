@@ -22,8 +22,6 @@ export async function getEvaluation(sessionId) {
 
 export async function getSessionsForCompare(learnerId, scenarioId) {
   // v3 모드는 character_id=NULL, dialogue_partner_ids JSON 배열 첫 파트너를 fallback
-  console.log('[COMPARE] learnerId=%s(type:%s) scenarioId=%s(type:%s)',
-    learnerId, typeof learnerId, scenarioId, typeof scenarioId);
   const [rows] = await pool.query(
     `SELECT s.id AS session_id,
             COALESCE(s.character_id,
