@@ -136,7 +136,14 @@ function buildOrgNodeEl(c) {
   const illust = document.createElement('div');
   illust.className = 'org-illust';
   illust.setAttribute('aria-hidden', 'true');
-  illust.innerHTML = SVG_ILLUST[illustId] || SVG_ILLUST.member;
+
+  const avatarSrc = c.avatar_url || `/avatars/char-${c.id}.jpg`;
+  const img = document.createElement('img');
+  img.className = 'org-avatar-img';
+  img.alt = '';
+  img.src = avatarSrc;
+  img.onerror = () => { illust.innerHTML = SVG_ILLUST[illustId] || SVG_ILLUST.member; };
+  illust.appendChild(img);
 
   const nameEl = document.createElement('p');
   nameEl.className = 'org-node-name';
