@@ -110,9 +110,9 @@ function _buildNode(c, isCenter, pos) {
   node.setAttribute('role', 'treeitem');
   node.setAttribute('tabindex', '0');
   node.setAttribute('aria-label', `${c.name} — 클릭해서 이 역할 맡기`);
-  /* DOM property — CSP 무관 */
-  node.style.left = `${pos.x}px`;
-  node.style.top  = `${pos.y}px`;
+  /* % 기반 — SVG viewBox 스케일과 항상 일치 (CSP 무관) */
+  node.style.left = `${(pos.x / RADIAL_W * 100).toFixed(2)}%`;
+  node.style.top  = `${(pos.y / RADIAL_H * 100).toFixed(2)}%`;
 
   const illust = document.createElement('div');
   illust.className = 'org-illust';
@@ -172,13 +172,15 @@ function renderRadialNetwork(chars, scenarioId) {
   posMap.set(center.id, { x: RADIAL_CX, y: RADIAL_CY });
   peers.forEach((c, i) => posMap.set(c.id, peerCoords[i]));
 
-  /* relationships_structured 관계선 */
+  /* relationships_structured 관계선 (주변↔주변은 갈등만·엉킴 방지) */
   const relations  = _parseRelations(chars);
   const drawnPairs = new Set();
   relations.forEach(({ fromId, toId, type, label }) => {
     const a = posMap.get(fromId);
     const b = posMap.get(toId);
     if (!a || !b) return;
+    const involveCenter = fromId === center.id || toId === center.id;
+    if (!involveCenter && type !== '갈등') return;
     svg.appendChild(_buildLine(a.x, a.y, b.x, b.y, type));
     const lbl = _buildLabel(a.x, a.y, b.x, b.y, label);
     if (lbl) svg.appendChild(lbl);
