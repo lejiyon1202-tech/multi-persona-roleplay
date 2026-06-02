@@ -54,7 +54,7 @@ function renderScenarioCard(scenario, idx) {
       </div>
       <p class="scenario-desc">${escHtml(scenario.context_description || '').slice(0, 100)}${(scenario.context_description || '').length > 100 ? '...' : ''}</p>
       <div class="scenario-card-footer">
-        <span class="scenario-meta">학습자 역할: ${escHtml(scenario.learner_role || '그룹장')}</span>
+        <span class="scenario-meta">학습자 역할: ${escHtml(scenario.learner_role || '자유 선택')}</span>
         <button class="scenario-start-btn" data-scenario-id="${scenario.id}">
           시작하기
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
