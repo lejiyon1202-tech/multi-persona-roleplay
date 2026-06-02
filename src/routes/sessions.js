@@ -110,7 +110,22 @@ router.post('/chat', async (req, res) => {
     const history = await getMessages(session_id);
     const messages = history.map(m => ({ role: m.role, content: m.content }));
 
-    for await (const chunk of invokeChat(messages, char.persona_prompt)) {
+    // v3: 학습자 캐릭터 정보를 시스템 프롬프트에 추가 — 이름 환각 방지
+    let systemPrompt = char.persona_prompt;
+    if (session.learner_character_id) {
+      const learnerChar = await getCharacter(session.learner_character_id);
+      if (learnerChar) {
+        systemPrompt = `${char.persona_prompt}
+
+---
+
+[대화 맥락 — 반드시 준수]
+지금 당신과 대화하는 상대는 ${learnerChar.name}(${learnerChar.role_level})입니다.
+상대를 "${learnerChar.name}" 또는 "${learnerChar.role_level}"로 호칭하십시오. 임의로 이름을 지어내지 마십시오.`;
+      }
+    }
+
+    for await (const chunk of invokeChat(messages, systemPrompt)) {
       fullResponse += chunk;
       res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
     }
