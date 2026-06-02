@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════
    리포트 화면 전용 스타일
    ═══════════════════════════════════════════════ */
 .page-wrap { max-width: 920px; margin: 0 auto; padding: 36px 48px 80px; }
@@ -36,17 +36,17 @@
 .score-hero {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 28px 32px;
+  gap: 28px;
+  padding: 32px 36px;
   background: var(--bg-card);
   border: 1.5px solid var(--border);
   border-radius: 20px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 .score-circle {
-  width: 100px;
-  height: 100px;
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -60,16 +60,16 @@
 .score-circle.partial { border-color: #d97706; }
 .score-circle.fail    { border-color: #dc2626; }
 .score-num {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1;
 }
 .score-circle.pass    .score-num { color: #059669; }
 .score-circle.partial .score-num { color: #d97706; }
 .score-circle.fail    .score-num { color: #dc2626; }
-.score-max { font-size: 12px; color: var(--text-muted); }
+.score-max { font-size: 13px; color: var(--text-muted); }
 .score-info { flex: 1; }
-.score-grade { font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 6px; }
+.score-grade { font-size: 24px; font-weight: 900; color: var(--text-primary); margin-bottom: 7px; letter-spacing: -0.01em; }
 .score-char {
   font-size: 14px;
   color: var(--text-sub);
@@ -247,3 +247,4 @@
 .compare-table th { color: var(--text-muted); font-weight: 700; }
 .compare-table td { color: var(--text-primary); }
 .compare-table tr:last-child td { border-bottom: none; }
+
