@@ -69,49 +69,67 @@
       <div class="modal-panel-divider"></div>
       <blockquote class="modal-mindset" id="modalMindset"></blockquote>
     </div>
-    <!-- 오른쪽: 상세 정보 패널 -->
+    <!-- 오른쪽: 탭 분할 패널 -->
     <div class="modal-right-panel">
-      <div class="modal-section">
-        <p class="modal-section-label">배경 · 경력</p>
-        <p class="modal-section-text" id="modalBackground">—</p>
+      <!-- 탭 버튼 -->
+      <div class="modal-tabs" role="tablist" aria-label="캐릭터 정보 탭">
+        <button class="modal-tab active" role="tab" aria-selected="true" data-tab="profile">프로필</button>
+        <button class="modal-tab" role="tab" aria-selected="false" data-tab="relation">관계</button>
+        <button class="modal-tab" role="tab" aria-selected="false" data-tab="emotion">감정 흐름</button>
       </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">핵심 가치관</p>
-        <p class="modal-section-text" id="modalValues">—</p>
-      </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">말투 · 발화 스타일</p>
-        <p class="modal-section-text" id="modalSpeechStyle">—</p>
-      </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">직면한 압박 · 갈등</p>
-        <p class="modal-section-text" id="modalPressure">—</p>
-      </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">롤플레이 미션</p>
-        <p class="modal-section-text" id="modalMission">—</p>
-      </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">주요 인물 관계</p>
-        <p class="modal-section-text" id="modalRelationships">—</p>
-      </div>
-      <div class="modal-divider"></div>
-      <div class="modal-section">
-        <p class="modal-section-label">감정 흐름 (방어→저항→수용)</p>
-        <p class="modal-section-text" id="modalEmotionalStates">—</p>
-      </div>
-      <div class="modal-hint-wrap hidden" id="modalHintWrap">
+
+      <!-- 탭 1: 프로필 -->
+      <div class="modal-tab-panel active" id="tabProfile" data-panel="profile">
+        <div class="modal-section">
+          <p class="modal-section-label">배경 · 경력</p>
+          <p class="modal-section-text" id="modalBackground">—</p>
+        </div>
         <div class="modal-divider"></div>
         <div class="modal-section">
-          <p class="modal-section-label">💡 이 역할로 말문 트기</p>
-          <div id="modalHints"></div>
+          <p class="modal-section-label">핵심 가치관</p>
+          <p class="modal-section-text" id="modalValues">—</p>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <p class="modal-section-label">말투 · 발화 스타일</p>
+          <p class="modal-section-text" id="modalSpeechStyle">—</p>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <p class="modal-section-label">직면한 압박 · 갈등</p>
+          <p class="modal-section-text" id="modalPressure">—</p>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <p class="modal-section-label">롤플레이 미션</p>
+          <p class="modal-section-text" id="modalMission">—</p>
         </div>
       </div>
+
+      <!-- 탭 2: 관계 -->
+      <div class="modal-tab-panel" id="tabRelation" data-panel="relation">
+        <div class="modal-section">
+          <p class="modal-section-label">주요 인물 관계 · 태도</p>
+          <p class="modal-section-text" id="modalRelationships">—</p>
+        </div>
+      </div>
+
+      <!-- 탭 3: 감정 흐름 -->
+      <div class="modal-tab-panel" id="tabEmotion" data-panel="emotion">
+        <div class="modal-section">
+          <p class="modal-section-label">감정 흐름 (방어→저항→수용)</p>
+          <p class="modal-section-text" id="modalEmotionalStates">—</p>
+        </div>
+        <div class="modal-hint-wrap hidden" id="modalHintWrap">
+          <div class="modal-divider"></div>
+          <div class="modal-section">
+            <p class="modal-section-label">💡 이 역할로 말문 트기</p>
+            <div id="modalHints"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA: 항상 표시 -->
       <div class="modal-cta">
         <button class="modal-start-btn" id="modalSelectBtn">
           이 역할 맡기

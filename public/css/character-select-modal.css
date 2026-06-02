@@ -151,13 +151,45 @@
 .modal-mindset::after  { content: close-quote; opacity: 0.7; margin-left: 1px; }
 
 /* ───────────────────────────────────────────────
-   오른쪽: 상세 정보 패널
+   오른쪽: 탭 분할 패널
 ──────────────────────────────────────────────── */
 .modal-right-panel {
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
 }
+
+/* 탭 버튼 */
+.modal-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+  padding: 0 22px;
+}
+.modal-tab {
+  padding: 13px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+.modal-tab:hover { color: var(--text-sub); }
+.modal-tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+/* 탭 패널 */
+.modal-tab-panel {
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-tab-panel.active { display: flex; }
 
 .modal-section {
   padding: 14px 22px;
@@ -185,6 +217,7 @@
   font-size: 14px;
   color: var(--text-sub);
   line-height: 1.75;
+  white-space: pre-line;
 }
 
 .modal-divider {

@@ -174,6 +174,8 @@ function openModal(charId) {
   selectBtn.style.background = color;
   selectBtn.dataset.charId = charId;
 
+  // 탭 첫 번째(프로필)로 초기화
+  resetModalTabs();
   document.getElementById('charModalOverlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -189,6 +191,31 @@ function bindModalEvents() {
   document.getElementById('modalSelectBtn').addEventListener('click', () => {
     const charId = document.getElementById('modalSelectBtn').dataset.charId;
     selectLearnerChar(charId);
+  });
+
+  // 탭 전환
+  document.querySelectorAll('.modal-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.modal-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === target);
+        t.setAttribute('aria-selected', t.dataset.tab === target ? 'true' : 'false');
+      });
+      document.querySelectorAll('.modal-tab-panel').forEach(p => {
+        p.classList.toggle('active', p.dataset.panel === target);
+      });
+    });
+  });
+}
+
+/* ── 탭 초기화 (모달 열릴 때) ── */
+function resetModalTabs() {
+  document.querySelectorAll('.modal-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === 0);
+    t.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+  });
+  document.querySelectorAll('.modal-tab-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === 0);
   });
 }
 
