@@ -182,16 +182,16 @@
   padding: 14px 22px;
 }
 .modal-section-label {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 5px;
+  color: #52525B;
+  margin-bottom: 6px;
 }
 .modal-section-text {
-  font-size: 14px;
-  color: var(--text-sub);
+  font-size: 15px;
+  color: #1F2937;
   line-height: 1.75;
   white-space: pre-line;
 }
@@ -284,11 +284,11 @@
 
 /* 인용구 박스 (가치관) */
 .modal-quote-box {
-  font-size: 14px;
-  color: var(--text-sub);
-  line-height: 1.7;
+  font-size: 15px;
+  color: #1F2937;
+  line-height: 1.75;
   background: var(--bg-quote);
-  border-left: 2px solid var(--text-muted);
+  border-left: 2px solid #52525B;
   padding: 10px 14px;
   border-radius: 0 6px 6px 0;
   font-style: italic;
@@ -296,15 +296,15 @@
 
 /* 발화 예시 박스 (말투) */
 .modal-speech-box {
-  font-size: 13px;
-  color: var(--text-sub);
+  font-size: 14px;
+  color: #1F2937;
   background: var(--bg-quote);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 9px 13px;
   margin-bottom: 6px;
   font-style: italic;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 .modal-speech-box::before { content: '"'; color: var(--text-muted); }
 .modal-speech-box::after  { content: '"'; color: var(--text-muted); }
@@ -323,7 +323,7 @@
   color: var(--text-muted);
 }
 .modal-icon svg { width: 16px; height: 16px; }
-.modal-icon-text { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+.modal-icon-text { font-size: 15px; color: #1F2937; line-height: 1.75; }
 
 /* ── 관계 인포그래픽 카드 레이아웃 ── */
 
