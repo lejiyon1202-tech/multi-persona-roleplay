@@ -75,7 +75,7 @@ async function loadCharacters() {
       mount.innerHTML = '<p class="empty-state">등록된 캐릭터가 없습니다.</p>';
       return;
     }
-    renderOrgTree(allChars.sort((a, b) => a.card_number - b.card_number));
+    renderOrgTree(allChars.sort((a, b) => a.card_number - b.card_number), scenarioId);
     document.dispatchEvent(new Event('charactersLoaded'));
   } catch {
     const el = document.getElementById('orgChart') || document.getElementById('cardGrid');
@@ -87,74 +87,6 @@ function esc(str) {
   return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* ── 조직도 트리 렌더 (D안) ── */
-const ROLE_LAYER_ORDER  = ['상위리더', '그룹장', '파트장', '부서원'];
-const ROLE_LAYER_CLASS  = { '상위리더': 'executive', '그룹장': 'manager', '파트장': 'lead', '부서원': 'member' };
-
-function renderOrgTree(chars) {
-  const mount = document.getElementById('orgChart');
-  if (!mount) return;
-
-  const byLayer = {};
-  ROLE_LAYER_ORDER.forEach(r => { byLayer[r] = []; });
-  chars.forEach(c => {
-    const r = c.role_level;
-    (byLayer[r] || (byLayer['부서원'])).push(c);
-  });
-
-  const tree = document.createElement('div');
-  tree.className = 'org-tree';
-  tree.setAttribute('role', 'tree');
-  tree.setAttribute('aria-label', '캐릭터 조직 구조도');
-
-  ROLE_LAYER_ORDER.forEach((role, idx) => {
-    if (!byLayer[role].length) return;
-    if (idx > 0) {
-      const conn = document.createElement('div');
-      conn.className = 'org-connector';
-      conn.setAttribute('aria-hidden', 'true');
-      tree.appendChild(conn);
-    }
-    const level = document.createElement('div');
-    level.className = `org-level org-level--${ROLE_LAYER_CLASS[role]}`;
-    level.setAttribute('aria-level', String(idx + 1));
-    const label = document.createElement('span');
-    label.className = 'org-level-label';
-    label.textContent = role;
-    label.setAttribute('aria-hidden', 'true');
-    level.appendChild(label);
-    const nodes = document.createElement('div');
-    nodes.className = 'org-nodes';
-    byLayer[role].forEach(c => nodes.appendChild(buildOrgNodeEl(c)));
-    level.appendChild(nodes);
-    tree.appendChild(level);
-  });
-
-  mount.innerHTML = '';
-  mount.appendChild(tree);
-}
-
-function buildOrgNodeEl(c) {
-  const roleClass  = ROLE_CLASS[c.role_level] || 'role-member';
-  const emoji      = c.emoji || getDefaultEmoji(c.role_level);
-  const valueStr   = c.learner_detail?.values || c.core_mindset || '';
-  const valueShort = valueStr.slice(0, 32) + (valueStr.length > 32 ? '...' : '');
-  const node = document.createElement('div');
-  node.className = `org-node ${roleClass}`;
-  node.setAttribute('role', 'treeitem');
-  node.setAttribute('tabindex', '0');
-  node.dataset.charId = c.id;
-  node.setAttribute('aria-label', `${c.name} — 클릭해서 이 역할 맡기`);
-  node.innerHTML = `<div class="org-node-inner">
-    <span class="node-emoji" aria-hidden="true">${emoji}</span>
-    <p class="node-name">${esc(c.name)}</p>
-    <span class="node-role">${esc(c.role_level)}</span>
-    <p class="node-mindset">"${esc(valueShort)}"</p>
-  </div>`;
-  node.addEventListener('click', () => openModal(c.id));
-  node.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(c.id); });
-  return node;
-}
 
 function getDefaultEmoji(roleLevel) {
   const map = { '상위리더': '👔', '그룹장': '📊', '파트장': '⚡', '부서원': '💼' };
