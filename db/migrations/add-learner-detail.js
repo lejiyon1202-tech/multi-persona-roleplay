@@ -96,7 +96,7 @@ async function migrate() {
       await connection.query(
         `ALTER TABLE sessions
          ADD COLUMN dialogue_partner_ids JSON DEFAULT NULL AFTER learner_character_id
-         COMMENT '학습자가 대화할 AI 캐릭터 ID 배열 [int, ...]'`
+         COMMENT '학습자가 대화할 AI 캐릭터 ID 배열 JSON'`
       );
       console.log('[MIGRATE-V2] sessions.dialogue_partner_ids 추가');
     }
