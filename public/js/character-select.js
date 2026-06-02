@@ -135,12 +135,35 @@ function openModal(charId) {
   document.getElementById('modalPressure').textContent   = ld.pressures || ld.inner_conflict || c.situation || '—';
   document.getElementById('modalMission').textContent    = ld.mission || c.mission || '—';
 
-  // 첫 발화 힌트
+  // 말투·관계·감정 단계 (신규 섹션 — 기안84 확정 ID)
+  const speechEl = document.getElementById('modalSpeechStyle');
+  if (speechEl) speechEl.textContent = ld.speech_style || ld.speaking_style || '—';
+
+  const relEl = document.getElementById('modalRelationships');
+  if (relEl) relEl.textContent = ld.relationships || '—';
+
+  const emoEl = document.getElementById('modalEmotionalStates');
+  if (emoEl) {
+    if (Array.isArray(ld.emotional_states) && ld.emotional_states.length > 0) {
+      emoEl.innerHTML = ld.emotional_states.map(es =>
+        `<div class="modal-stage">
+          <span class="stage-label">${esc(es.stage)}</span>
+          <p class="stage-trigger">${esc(es.trigger)}</p>
+          <p class="stage-example">"${esc(es.example)}"</p>
+        </div>`
+      ).join('');
+      emoEl.closest('.modal-section')?.classList.remove('hidden');
+    } else {
+      emoEl.closest('.modal-section')?.classList.add('hidden');
+    }
+  }
+
+  // 첫 발화 힌트 (3 → 5개로 확장)
   const hints  = ld.ai_hints?.first_utterances || c.first_utterances || [];
   const hintEl = document.getElementById('modalHints');
   const hintWrap = document.getElementById('modalHintWrap');
   if (hints.length > 0) {
-    hintEl.innerHTML = hints.slice(0, 3).map(h => `<div class="modal-hint-item">${esc(h)}</div>`).join('');
+    hintEl.innerHTML = hints.slice(0, 5).map(h => `<div class="modal-hint-item">${esc(h)}</div>`).join('');
     hintWrap.classList.remove('hidden');
   } else {
     hintWrap.classList.add('hidden');
