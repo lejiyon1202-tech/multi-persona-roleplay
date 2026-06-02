@@ -116,7 +116,9 @@ function openModal(charId) {
   const emoji     = c.emoji || getDefaultEmoji(c.role_level);
   const ld        = c.learner_detail || {};
 
-  document.getElementById('modalAccentBar').style.background = color;
+  const leftPanel = document.getElementById('modalAccentBar');
+  leftPanel.style.background = '';
+  leftPanel.style.borderTopColor = color;
 
   const badge = document.getElementById('modalRoleBadge');
   badge.textContent = c.role_level;
