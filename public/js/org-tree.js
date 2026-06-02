@@ -1,4 +1,4 @@
-/* ── org-tree.js: B안 조직도 트리 렌더 (원형 아바타 + 연결선 + 갈등 메타포) ── */
+/* ── org-tree.js: B안 조직도 트리 렌더 (SVG 인물 + 관계 라벨 연결선 + 갈등 메타포) ── */
 
 /* 역할별 SVG 인물 일러스트 (CC0 자체 제작) */
 const SVG_ILLUST = {
@@ -23,6 +23,22 @@ const SCENE_CONFLICT = {
   4: { top: '그룹장',   bot: '파트장', topIcon: '⚡', topLabel: 'CDP D-30 치명적 오류', botIcon: '↑', botLabel: '현장 위기 보고' },
 };
 
+/* relationships_structured 기반 레이어 간 관계 라벨 추출 */
+function getLayerRelLabel(topChars, botChars) {
+  const botNames = new Set(botChars.map(c => c.name));
+  for (const c of topChars) {
+    const raw = c.learner_detail;
+    if (!raw) continue;
+    const ld = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    const rels = ld?.relationships_structured;
+    if (!Array.isArray(rels)) continue;
+    if (rels.some(r => r.type === '부하' && botNames.has(r.target_name))) {
+      return { topLabel: '직속 보고 라인 ↓', botLabel: '↑ 현장 보고' };
+    }
+  }
+  return null;
+}
+
 function renderOrgTree(chars, scenarioId) {
   const mount = document.getElementById('orgChart');
   if (!mount) return;
@@ -45,7 +61,8 @@ function renderOrgTree(chars, scenarioId) {
 
     if (prevPopulated !== null) {
       const isConflict = conflict && conflict.top === prevPopulated && conflict.bot === role;
-      mount.appendChild(buildConnector(isConflict ? conflict : null));
+      const relLabel   = !isConflict ? getLayerRelLabel(byLayer[prevPopulated], byLayer[role]) : null;
+      mount.appendChild(buildConnector(isConflict ? conflict : null, relLabel));
     }
 
     const level = document.createElement('div');
@@ -61,30 +78,48 @@ function renderOrgTree(chars, scenarioId) {
   });
 }
 
-function buildConnector(conflictData) {
+function buildConnector(conflictData, relLabel) {
   const conn = document.createElement('div');
   conn.setAttribute('aria-hidden', 'true');
-  if (!conflictData) {
-    conn.className = 'org-connector';
+
+  if (conflictData) {
+    conn.className = 'org-connector org-connector--conflict';
+    const icon = document.createElement('div');
+    icon.className = 'org-conflict-icon';
+    const down = document.createElement('span');
+    down.className = 'conflict-label';
+    down.textContent = `${conflictData.topIcon} ${conflictData.topLabel}`;
+    const vs = document.createElement('span');
+    vs.className = 'conflict-vs';
+    vs.setAttribute('aria-hidden', 'true');
+    vs.textContent = 'VS';
+    const up = document.createElement('span');
+    up.className = 'conflict-label';
+    up.textContent = `${conflictData.botIcon} ${conflictData.botLabel}`;
+    icon.appendChild(down);
+    icon.appendChild(vs);
+    icon.appendChild(up);
+    conn.appendChild(icon);
     return conn;
   }
-  conn.className = 'org-connector org-connector--conflict';
-  const icon = document.createElement('div');
-  icon.className = 'org-conflict-icon';
-  const down = document.createElement('span');
-  down.className = 'conflict-label';
-  down.textContent = `${conflictData.topIcon} ${conflictData.topLabel}`;
-  const vs = document.createElement('span');
-  vs.className = 'conflict-vs';
-  vs.setAttribute('aria-hidden', 'true');
-  vs.textContent = 'VS';
-  const up = document.createElement('span');
-  up.className = 'conflict-label';
-  up.textContent = `${conflictData.botIcon} ${conflictData.botLabel}`;
-  icon.appendChild(down);
-  icon.appendChild(vs);
-  icon.appendChild(up);
-  conn.appendChild(icon);
+
+  if (relLabel) {
+    conn.className = 'org-connector org-connector--relation';
+    const icon = document.createElement('div');
+    icon.className = 'org-rel-icon';
+    const topSpan = document.createElement('span');
+    topSpan.className = 'rel-label';
+    topSpan.textContent = relLabel.topLabel;
+    const botSpan = document.createElement('span');
+    botSpan.className = 'rel-label';
+    botSpan.textContent = relLabel.botLabel;
+    icon.appendChild(topSpan);
+    icon.appendChild(botSpan);
+    conn.appendChild(icon);
+    return conn;
+  }
+
+  conn.className = 'org-connector';
   return conn;
 }
 
