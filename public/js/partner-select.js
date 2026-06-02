@@ -7,8 +7,9 @@ const params        = new URLSearchParams(location.search);
 const scenarioId    = params.get('scenario_id') || '1';
 const learnerCharId = params.get('learner_char');
 
-let allChars      = [];
+let allChars         = [];
 let selectedPartners = new Set();
+let recommendedMap   = new Map(); // character_id → reason
 
 /* ── 초기화 ── */
 async function initPage() {
@@ -44,6 +45,17 @@ async function loadCharacters() {
       document.getElementById('myRoleEmoji').textContent = emoji;
       document.getElementById('myRoleName').textContent  = learnerChar.name;
       document.getElementById('myRoleDept').textContent  = learnerChar.department || '';
+
+      // 추천 대화 상대 매핑 (recommended_first_partners)
+      const recs = learnerChar.learner_detail?.recommended_first_partners || [];
+      recommendedMap.clear();
+      recs.forEach(r => {
+        if (typeof r === 'object' && r.character_id) {
+          recommendedMap.set(String(r.character_id), r.reason || '추천 대화 상대');
+        } else if (typeof r === 'number' || typeof r === 'string') {
+          recommendedMap.set(String(r), '추천 대화 상대');
+        }
+      });
     }
 
     // 학습자 역할 캐릭터 제외 → 나머지 모두 상대 후보
@@ -70,10 +82,12 @@ function getDefaultEmoji(roleLevel) {
 
 /* ── 파트너 카드 HTML ── */
 function buildPartnerCardHTML(c, idx) {
-  const roleClass = ROLE_CLASS[c.role_level] || 'role-member';
-  const emoji     = c.emoji || getDefaultEmoji(c.role_level);
-  const num       = String(c.card_number).padStart(2, '0');
-  const isLearner = String(c.id) === String(learnerCharId);
+  const roleClass    = ROLE_CLASS[c.role_level] || 'role-member';
+  const emoji        = c.emoji || getDefaultEmoji(c.role_level);
+  const num          = String(c.card_number).padStart(2, '0');
+  const isLearner    = String(c.id) === String(learnerCharId);
+  const isRecommended = !isLearner && recommendedMap.has(String(c.id));
+  const recReason    = isRecommended ? recommendedMap.get(String(c.id)) : '';
 
   // 상황 요약 1줄
   const sitShort = (c.situation || '').slice(0, 50) + ((c.situation || '').length > 50 ? '...' : '');
@@ -81,15 +95,19 @@ function buildPartnerCardHTML(c, idx) {
   const mindShort = (c.core_mindset || '').slice(0, 45) + ((c.core_mindset || '').length > 45 ? '...' : '');
 
   const learnerTag = isLearner ? '<span class="learner-tag">내 역할</span>' : '';
+  const recBadge   = isRecommended
+    ? `<div class="recommended-badge" aria-label="추천 대화 상대">💡 추천<span class="recommend-reason">${esc(recReason)}</span></div>`
+    : '';
 
   return `
-  <div class="partner-card ${roleClass}${isLearner ? ' is-learner' : ''}"
+  <div class="partner-card ${roleClass}${isLearner ? ' is-learner' : ''}${isRecommended ? ' is-recommended' : ''}"
        data-char-id="${c.id}" data-number="${num}"
        data-name="${esc(c.name)}" data-emoji="${emoji}"
        data-role="${esc(c.role_level)}"
        ${!isLearner ? 'tabindex="0" role="checkbox" aria-checked="false"' : ''}
        ${!isLearner ? `aria-label="${esc(c.name)} 선택"` : ''}>
     <div class="partner-card-accent"></div>
+    ${recBadge}
     ${!isLearner ? '<div class="partner-checkbox"><div class="checkbox-inner"></div></div>' : ''}
     <div class="card-body">
       <div class="card-meta">

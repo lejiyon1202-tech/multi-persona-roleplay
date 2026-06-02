@@ -370,6 +370,38 @@
 .start-chat-btn:hover { filter: brightness(1.08); transform: scale(1.02); }
 .start-chat-btn svg { width: 15px; height: 15px; stroke: #fff; stroke-width: 2.5; fill: none; }
 
+/* ── 추천 대화 상대 배지 ── */
+.partner-card.is-recommended {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(180,83,9,0.10), var(--shadow-card);
+}
+.partner-card.is-recommended .partner-card-accent {
+  background: var(--amber);
+}
+.recommended-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--amber-lt);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  z-index: 1;
+}
+.recommend-reason {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--amber);
+  opacity: 0.85;
+}
+
 @media (max-width: 767px) {
   .page-header { padding: 16px 16px 12px; }
   .scenario-title { font-size: 22px; white-space: normal; }
