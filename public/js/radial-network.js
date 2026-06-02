@@ -128,13 +128,19 @@ function _peerCoordsOrganic(peers, center) {
 function _parseRelations(chars) {
   const idByName = new Map(chars.map(c => [c.name, c.id]));
 
-  /* target_name이 축약형일 때 전체 이름으로 폴백 매칭 */
+  /* target_name이 축약형일 때 전체 이름으로 폴백 매칭
+     1순위: 정확 일치
+     2순위: startsWith 양방향
+     3순위: 첫 토큰(공백 기준) 으로 시작하는 이름이 DB에 단 1개일 때만 매칭 (오매칭 방지) */
   function _resolveId(targetName) {
     const exact = idByName.get(targetName);
     if (exact) return exact;
     for (const [name, id] of idByName) {
       if (name.startsWith(targetName) || targetName.startsWith(name)) return id;
     }
+    const firstToken = targetName.split(' ')[0];
+    const candidates = [...idByName.entries()].filter(([n]) => n.startsWith(firstToken));
+    if (candidates.length === 1) return candidates[0][1];
     return undefined;
   }
 
@@ -258,7 +264,18 @@ function renderRadialNetwork(chars, scenarioId) {
   /* 렌더 순서: indirect → colleague → hierarchy → conflict (중요 선이 위에) */
   const TYPE_PRIORITY = { '간접영향': 0, '간접 관리': 0, '동료': 1, '선배': 1,
                           '상위': 2, '부하': 2, '상사': 2, '갈등': 3 };
-  const relations  = _parseRelations(chars);
+  const allRelations = _parseRelations(chars);
+
+  /* 동일 쌍에 복수 관계 → 우선순위 최고 타입 1개만 표시 (D안: hierarchy가 colleague를 가리는 문제 해소) */
+  const pairBest = new Map();
+  allRelations.forEach(r => {
+    const key = [r.fromId, r.toId].sort((a, b) => a - b).join('-');
+    const pri = TYPE_PRIORITY[r.type] ?? 0;
+    if (!pairBest.has(key) || pri > (TYPE_PRIORITY[pairBest.get(key).type] ?? 0)) {
+      pairBest.set(key, r);
+    }
+  });
+  const relations  = [...pairBest.values()];
   const drawnPairs = new Set();
 
   /* 관계 데이터 없는 모든 쌍 → 간접 영향선 먼저 (뒤에 깔림) */
