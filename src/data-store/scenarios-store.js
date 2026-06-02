@@ -18,7 +18,8 @@ export async function getCharacters(scenarioId) {
   const [rows] = await pool.query(
     `SELECT id, scenario_id, name, department, role_level, card_number,
             core_mindset, situation, mission, avatar_url,
-            is_selectable, display_order
+            is_selectable, display_order,
+            learner_detail, emoji
      FROM scenario_characters
      WHERE scenario_id = ?
      ORDER BY display_order, card_number`,
