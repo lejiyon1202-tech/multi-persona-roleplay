@@ -136,18 +136,20 @@ function updateBar() {
   const partnersEl = document.getElementById('selectedPartners');
   if (selectedPartners.size > 0) {
     bar.classList.remove('hidden');
-    // 선택된 파트너 아바타 표시
-    const chips = [...selectedPartners].map(id => {
+    // 선택된 파트너 아바타 표시 (DOM property 방식 — CSP 무관)
+    partnersEl.innerHTML = '';
+    [...selectedPartners].forEach(id => {
       const c = allChars.find(ch => String(ch.id) === id);
-      if (!c) return '';
+      if (!c) return;
       const roleClass = ROLE_CLASS[c.role_level] || 'role-member';
       const color = ROLE_COLORS[roleClass] || '#134e4a';
       const emoji = c.emoji || getDefaultEmoji(c.role_level);
-      return `<div class="partner-chip" style="background:${color}">
-        ${emoji} ${esc(c.name.split(' ')[0])}
-      </div>`;
-    }).join('');
-    partnersEl.innerHTML = chips;
+      const chip = document.createElement('div');
+      chip.className = 'partner-chip';
+      chip.style.background = color;
+      chip.textContent = `${emoji} ${c.name.split(' ')[0]}`;
+      partnersEl.appendChild(chip);
+    });
   } else {
     bar.classList.add('hidden');
   }

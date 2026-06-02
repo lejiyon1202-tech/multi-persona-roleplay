@@ -9,7 +9,7 @@ const SESSION_ID       = params.get('session_id') || null;
 
 let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 
-const ROLE_COLORS = { executive:'#312e81', manager:'#1e3a8a', lead:'#134e4a', member:'#78350f' };
+const ROLE_COLORS = { executive:'#312E2B', manager:'#1B3250', lead:'#1A3D30', member:'#6B3B1D' };
 const ROLE_MAP    = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' };
 
 let sessionId   = SESSION_ID;
@@ -105,11 +105,12 @@ function renderPartnersStrip() {
     if (id === activePartnerId) chip.style.borderColor = color;
 
     chip.innerHTML = `
-      <div class="partner-chip-avatar" style="background:${color}">${initial}</div>
+      <div class="partner-chip-avatar">${initial}</div>
       <div class="partner-chip-info">
         <span class="partner-chip-name">${label}</span>
         <span class="partner-chip-role">${char?.role_level || ''}</span>
       </div>`;
+    chip.querySelector('.partner-chip-avatar').style.background = color;
     chip.addEventListener('click', () => switchPartner(id));
     strip.appendChild(chip);
   });
@@ -148,7 +149,17 @@ function updateTargetIndicator() {
   const name  = char?.name || `캐릭터 ${activePartnerId}`;
   const el    = document.getElementById('targetIndicator');
   el.classList.remove('hidden');
-  el.innerHTML = `<span style="color:${color}">▶</span><span class="target-name" style="color:${color}">${name}</span>에게 전송`;
+  el.innerHTML = '';
+  const arrow = document.createElement('span');
+  arrow.style.color = color;
+  arrow.textContent = '▶';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'target-name';
+  nameSpan.style.color = color;
+  nameSpan.textContent = name;
+  el.appendChild(arrow);
+  el.appendChild(nameSpan);
+  el.appendChild(document.createTextNode('에게 전송'));
 }
 
 function applyCharacterUI(char) {
