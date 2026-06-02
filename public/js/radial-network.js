@@ -130,17 +130,18 @@ function _parseRelations(chars) {
 
   /* target_name이 축약형일 때 전체 이름으로 폴백 매칭
      1순위: 정확 일치
-     2순위: startsWith 양방향
-     3순위: 첫 토큰(공백 기준) 으로 시작하는 이름이 DB에 단 1개일 때만 매칭 (오매칭 방지) */
+     2순위: startsWith 양방향 — 유일 후보 1개일 때만 반환 (오매칭 방지)
+     3순위: 첫 토큰(공백 기준) 유일 매칭 (예: "이동현 책임" → "이동현 시스템통합 책임") */
   function _resolveId(targetName) {
     const exact = idByName.get(targetName);
     if (exact) return exact;
-    for (const [name, id] of idByName) {
-      if (name.startsWith(targetName) || targetName.startsWith(name)) return id;
-    }
+    const startCands = [...idByName.entries()].filter(
+      ([n]) => n.startsWith(targetName) || targetName.startsWith(n)
+    );
+    if (startCands.length === 1) return startCands[0][1];
     const firstToken = targetName.split(' ')[0];
-    const candidates = [...idByName.entries()].filter(([n]) => n.startsWith(firstToken));
-    if (candidates.length === 1) return candidates[0][1];
+    const tokenCands = [...idByName.entries()].filter(([n]) => n.startsWith(firstToken));
+    if (tokenCands.length === 1) return tokenCands[0][1];
     return undefined;
   }
 
