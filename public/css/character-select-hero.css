@@ -2,7 +2,9 @@
 .scenario-hero {
   width: 100%;
   overflow: hidden;
-  padding-bottom: 48px;
+  padding-bottom: 56px;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 .scene-office-conflict {
   background: linear-gradient(145deg, #1B3250 0%, #2A2018 70%, #312E2B 100%);
@@ -96,8 +98,9 @@
 /* ── D안: 조직도 트리 ── */
 .org-chart {
   max-width: 1160px;
-  margin: -24px auto 0;
+  margin: 40px auto 0;
   padding: 0 40px 80px;
+  background: #FFFFFF;
   position: relative;
   z-index: 2;
   display: flex;
@@ -147,16 +150,19 @@
 .org-connector {
   display: flex;
   justify-content: center;
-  height: 24px;
+  align-items: center;
+  height: 36px;
   position: relative;
 }
 .org-connector::before {
   content: '';
-  width: 1px;
+  width: 2.5px;
   height: 100%;
-  background: var(--border);
+  background: #A1A1AA;
+  border-radius: 2px;
   display: block;
 }
+.org-connector--conflict::before { background: #6B7280; }
 
 /* ── B안: 개별 캐릭터 인물 아바타 노드 (카드 박스 없음) ── */
 .org-node {
@@ -166,7 +172,7 @@
   gap: 10px;
   cursor: pointer;
   transition: var(--transition);
-  width: 110px;
+  width: 128px;
   background: none;
   border: none;
   padding: 8px 4px;
@@ -174,32 +180,34 @@
 .org-node:hover { transform: translateY(-4px); }
 .org-node:hover .org-illust { box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
 
-/* 인물 일러스트 — 큰 원형 아바타 */
+/* 인물 일러스트 — 원형 아바타 */
 .org-illust {
-  width: 88px;
-  height: 104px;
+  width: 100px;
+  height: 118px;
   border-radius: 50% 50% 40% 40%;
   position: relative;
   flex-shrink: 0;
   transition: box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 /* 머리 실루엣 */
 .org-illust::before {
   content: '';
   position: absolute;
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.92);
-  top: 10px; left: 50%;
+  background: rgba(255,255,255,0.93);
+  top: 12px; left: 50%;
   transform: translateX(-50%);
+  box-shadow: -8px 14px 0 rgba(255,255,255,0.15), 8px 14px 0 rgba(255,255,255,0.15);
 }
 /* 몸통 실루엣 */
 .org-illust::after {
   content: '';
   position: absolute;
-  width: 58px; height: 46px;
+  width: 68px; height: 52px;
   border-radius: 50% 50% 0 0;
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.90);
   bottom: 8px; left: 50%;
   transform: translateX(-50%);
 }
@@ -212,16 +220,20 @@
 
 /* 이름·역할 라벨 */
 .org-node-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #1F2937;
   text-align: center;
   line-height: 1.25;
 }
 .org-node-dept {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-muted);
   text-align: center;
+  background: var(--bg-quote);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
 }
 
 /* ── org-level suffix 4종 (catch 40호) ── */
