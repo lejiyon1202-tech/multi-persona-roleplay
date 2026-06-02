@@ -131,34 +131,14 @@ function openModal(charId) {
   mindsetEl.textContent = c.core_mindset || '';
   mindsetEl.style.borderLeftColor = color;
 
-  // 연기용 detail (있으면 표시, 없으면 기본 필드 사용)
-  document.getElementById('modalBackground').textContent = ld.background || c.situation || '—';
-  document.getElementById('modalValues').textContent     = ld.values || c.core_mindset || '—';
-  document.getElementById('modalPressure').textContent   = ld.pressures || ld.inner_conflict || c.situation || '—';
-  document.getElementById('modalMission').textContent    = ld.mission || c.mission || '—';
-
-  // 말투·관계·감정 단계 (신규 섹션 — 기안84 확정 ID)
-  const speechEl = document.getElementById('modalSpeechStyle');
-  if (speechEl) speechEl.textContent = ld.speech_style || ld.speaking_style || '—';
-
-  const relEl = document.getElementById('modalRelationships');
-  if (relEl) relEl.textContent = ld.relationships || '—';
-
-  const emoEl = document.getElementById('modalEmotionalStates');
-  if (emoEl) {
-    if (Array.isArray(ld.emotional_states) && ld.emotional_states.length > 0) {
-      emoEl.innerHTML = ld.emotional_states.map(es =>
-        `<div class="modal-stage">
-          <span class="stage-label">${esc(es.stage)}</span>
-          <p class="stage-trigger">${esc(es.trigger)}</p>
-          <p class="stage-example">"${esc(es.example)}"</p>
-        </div>`
-      ).join('');
-      emoEl.closest('.modal-section')?.classList.remove('hidden');
-    } else {
-      emoEl.closest('.modal-section')?.classList.add('hidden');
-    }
-  }
+  // 연기용 detail — 구조화 렌더
+  setTxt('modalBackground', ld.background || c.situation);
+  renderQuoteBox('modalValues', ld.values || c.core_mindset);
+  renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
+  renderIconRows('modalMission', ld.mission || c.mission, 'check');
+  renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
+  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships);
+  renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
 
   // 첫 발화 힌트 (3 → 5개로 확장)
   const hints  = ld.ai_hints?.first_utterances || c.first_utterances || [];
@@ -231,6 +211,125 @@ function selectLearnerChar(charId) {
   if (!c) return;
   // URL: partner-select.html?scenario_id=4&learner_char=15
   window.location.href = `partner-select.html?scenario_id=${scenarioId}&learner_char=${charId}`;
+}
+
+/* ── 구조화 렌더 헬퍼 ── */
+const ICON_ALERT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+
+function setTxt(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val || '—';
+}
+
+function renderQuoteBox(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  if (!text) { el.textContent = '—'; return; }
+  const box = document.createElement('div');
+  box.className = 'modal-quote-box';
+  box.textContent = text;
+  el.appendChild(box);
+}
+
+function renderSpeechBoxes(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  if (!text) { el.textContent = '—'; return; }
+  text.split('\n').filter(s => s.trim()).forEach(line => {
+    const box = document.createElement('div');
+    box.className = 'modal-speech-box';
+    box.textContent = line.trim();
+    el.appendChild(box);
+  });
+  if (!el.firstChild) el.textContent = '—';
+}
+
+function renderIconRows(id, text, iconType) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  if (!text) { el.textContent = '—'; return; }
+  const row = document.createElement('div');
+  row.className = 'modal-icon-row';
+  const icon = document.createElement('span');
+  icon.className = 'modal-icon';
+  icon.innerHTML = iconType === 'alert' ? ICON_ALERT : ICON_CHECK;
+  const txt = document.createElement('span');
+  txt.className = 'modal-icon-text';
+  txt.textContent = text;
+  row.appendChild(icon);
+  row.appendChild(txt);
+  el.appendChild(row);
+}
+
+function renderRelations(id, structured, fallback) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  if (Array.isArray(structured) && structured.length > 0) {
+    const grid = document.createElement('div');
+    grid.className = 'relation-grid';
+    structured.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'relation-card';
+      const top = document.createElement('div');
+      top.className = 'relation-card-top';
+      const name = document.createElement('span');
+      name.className = 'relation-name';
+      name.textContent = r.target_name || r.name || '';
+      const type = document.createElement('span');
+      type.className = 'relation-type';
+      type.textContent = r.type || '';
+      top.appendChild(name);
+      top.appendChild(type);
+      const desc = document.createElement('p');
+      desc.className = 'relation-desc';
+      desc.textContent = r.description || '';
+      card.appendChild(top);
+      card.appendChild(desc);
+      grid.appendChild(card);
+    });
+    el.appendChild(grid);
+    return;
+  }
+  el.textContent = (typeof fallback === 'string' && fallback) ? fallback : '—';
+}
+
+function renderEmotionTimeline(id, states) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  if (!Array.isArray(states) || states.length === 0) { el.textContent = '—'; return; }
+  const tl = document.createElement('div');
+  tl.className = 'emotion-timeline';
+  states.forEach((s, i) => {
+    const step = document.createElement('div');
+    step.className = 'emotion-step';
+    const stage = document.createElement('div');
+    stage.className = 'emotion-stage-name';
+    stage.textContent = s.stage || '';
+    const trigger = document.createElement('div');
+    trigger.className = 'emotion-trigger';
+    trigger.textContent = s.trigger || '';
+    const ex = document.createElement('div');
+    ex.className = 'emotion-example';
+    ex.textContent = s.example ? `"${s.example}"` : '';
+    step.appendChild(stage);
+    step.appendChild(trigger);
+    step.appendChild(ex);
+    tl.appendChild(step);
+    if (i < states.length - 1) {
+      const arr = document.createElement('div');
+      arr.className = 'emotion-arrow';
+      arr.setAttribute('aria-hidden', 'true');
+      arr.textContent = '→';
+      tl.appendChild(arr);
+    }
+  });
+  el.appendChild(tl);
 }
 
 initPage();
