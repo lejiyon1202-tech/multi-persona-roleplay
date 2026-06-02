@@ -98,8 +98,8 @@
 /* ── D안: 조직도 트리 ── */
 .org-chart {
   max-width: 1160px;
-  margin: 40px auto 0;
-  padding: 0 40px 80px;
+  margin: 28px auto 0;
+  padding: 0 40px 32px;
   background: #FFFFFF;
   position: relative;
   z-index: 2;
@@ -151,7 +151,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 36px;
+  height: 28px;
   position: relative;
 }
 .org-connector::before {
@@ -169,10 +169,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
   transition: var(--transition);
-  width: 128px;
+  width: 110px;
   background: none;
   border: none;
   padding: 8px 4px;
@@ -182,34 +182,19 @@
 
 /* 인물 일러스트 — 원형 아바타 */
 .org-illust {
-  width: 100px;
-  height: 118px;
+  width: 84px;
+  height: 98px;
   border-radius: 50% 50% 40% 40%;
   position: relative;
   flex-shrink: 0;
   transition: box-shadow 0.2s;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-/* 머리 실루엣 */
-.org-illust::before {
-  content: '';
-  position: absolute;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.93);
-  top: 12px; left: 50%;
-  transform: translateX(-50%);
-  box-shadow: -8px 14px 0 rgba(255,255,255,0.15), 8px 14px 0 rgba(255,255,255,0.15);
-}
-/* 몸통 실루엣 */
-.org-illust::after {
-  content: '';
-  position: absolute;
-  width: 68px; height: 52px;
-  border-radius: 50% 50% 0 0;
-  background: rgba(255,255,255,0.90);
-  bottom: 8px; left: 50%;
-  transform: translateX(-50%);
+/* SVG 인물 일러스트 컨테이너 */
+.org-illust svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* 역할별 배경 그라데이션 */

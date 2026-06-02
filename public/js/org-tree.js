@@ -1,4 +1,13 @@
 /* ── org-tree.js: B안 조직도 트리 렌더 (원형 아바타 + 연결선 + 갈등 메타포) ── */
+
+/* 역할별 SVG 인물 일러스트 (CC0 자체 제작) */
+const SVG_ILLUST = {
+  executive: `<svg viewBox="0 0 80 110" aria-hidden="true"><circle cx="40" cy="26" r="19" fill="rgba(255,255,255,0.92)"/><circle cx="33" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><circle cx="47" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><path d="M33 33 Q40 40 47 33" stroke="#1C1917" fill="none" stroke-width="2" stroke-linecap="round" opacity="0.7"/><path d="M40 45 L38 54 L40 51 L42 54 Z" fill="rgba(255,255,255,0.8)"/><ellipse cx="40" cy="82" rx="24" ry="22" fill="rgba(255,255,255,0.88)"/><line x1="40" y1="55" x2="40" y2="64" stroke="rgba(255,255,255,0.7)" stroke-width="2"/></svg>`,
+  manager: `<svg viewBox="0 0 80 110" aria-hidden="true"><circle cx="40" cy="26" r="19" fill="rgba(255,255,255,0.92)"/><circle cx="33" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><circle cx="47" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><path d="M32 32 Q40 40 48 32" stroke="#1C1917" fill="none" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/><ellipse cx="40" cy="82" rx="24" ry="22" fill="rgba(255,255,255,0.88)"/></svg>`,
+  lead: `<svg viewBox="0 0 80 110" aria-hidden="true"><circle cx="40" cy="26" r="19" fill="rgba(255,255,255,0.92)"/><circle cx="33" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><circle cx="47" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><path d="M33 32 Q40 38 47 32" stroke="#1C1917" fill="none" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/><ellipse cx="40" cy="82" rx="24" ry="22" fill="rgba(255,255,255,0.88)"/><line x1="26" y1="70" x2="18" y2="82" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  member: `<svg viewBox="0 0 80 110" aria-hidden="true"><circle cx="40" cy="26" r="19" fill="rgba(255,255,255,0.92)"/><circle cx="33" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><circle cx="47" cy="22" r="2.5" fill="#1C1917" opacity="0.75"/><path d="M34 32 Q40 36 46 32" stroke="#1C1917" fill="none" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/><ellipse cx="40" cy="82" rx="24" ry="22" fill="rgba(255,255,255,0.88)"/></svg>`,
+};
+
 const ROLE_LAYER_ORDER = ['상위리더', '그룹장', '파트장', '부서원'];
 const ROLE_LAYER_CLASS = {
   '상위리더': 'executive',
@@ -92,6 +101,7 @@ function buildOrgNodeEl(c) {
   const illust = document.createElement('div');
   illust.className = 'org-illust';
   illust.setAttribute('aria-hidden', 'true');
+  illust.innerHTML = SVG_ILLUST[illustId] || SVG_ILLUST.member;
 
   const nameEl = document.createElement('p');
   nameEl.className = 'org-node-name';

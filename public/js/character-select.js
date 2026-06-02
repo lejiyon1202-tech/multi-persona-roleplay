@@ -44,6 +44,9 @@ function injectSceneHero(sid) {
 /* ── 초기화 ── */
 async function initPage() {
   injectSceneHero(scenarioId);
+  // D안: 히어로가 상황 설명 대체 → page-header 숨기기
+  const ph = document.querySelector('.page-header');
+  if (ph) ph.style.display = 'none';
   await Promise.all([loadScenarioInfo(), loadCharacters()]);
   document.getElementById('loadingState')?.remove();
   bindCardEvents();
