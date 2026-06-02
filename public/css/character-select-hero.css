@@ -254,6 +254,30 @@
   color: rgba(0,0,0,0.3);
   letter-spacing: 0.1em;
 }
+/* 관계 라벨 연결선 (직속 보고선) */
+.org-connector--relation {
+  height: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 32px;
+}
+.org-rel-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.rel-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #71717A;
+  letter-spacing: 0.06em;
+  background: #F4F4F5;
+  border: 1px solid #E4E4E7;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
 
 /* 반응형 */
 @media (max-width: 1023px) {
