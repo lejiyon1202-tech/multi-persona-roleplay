@@ -39,11 +39,14 @@
   gap: 10px;
 }
 
-/* ── 시나리오 그리드 ── */
+/* ── 시나리오 그리드 — 3열 ── */
 .scenario-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1023px) {
+  .scenario-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 767px) {
   .scenario-grid { grid-template-columns: 1fr; }
@@ -51,6 +54,34 @@
   .hero { padding: 32px 0 24px; }
   .hero-title { font-size: 24px; }
 }
+
+/* 시나리오 카드 풍부화 슬롯 */
+.scenario-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.scenario-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-quote);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.scenario-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.scenario-duration { display: flex; align-items: center; gap: 3px; }
+.scenario-duration::before { content: '⏱'; font-size: 11px; }
+.scenario-difficulty { display: flex; align-items: center; gap: 2px; letter-spacing: -1px; }
 
 /* ── 시나리오 카드 ── */
 .scenario-card {
