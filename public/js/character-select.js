@@ -171,9 +171,8 @@ function openModal(charId) {
     hintWrap.classList.add('hidden');
   }
 
-  // CTA 버튼
+  // CTA 버튼 (B안: 항상 블랙·CSS에서 관리)
   const selectBtn = document.getElementById('modalSelectBtn');
-  selectBtn.style.background = color;
   selectBtn.dataset.charId = charId;
 
   // 탭 첫 번째(프로필)로 초기화

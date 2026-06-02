@@ -69,7 +69,7 @@
 .score-circle.fail    .score-num { color: #dc2626; }
 .score-max { font-size: 13px; color: var(--text-muted); }
 .score-info { flex: 1; }
-.score-grade { font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 7px; }
+.score-grade { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 7px; letter-spacing: -0.01em; }
 .score-char {
   font-size: 14px;
   color: var(--text-sub);

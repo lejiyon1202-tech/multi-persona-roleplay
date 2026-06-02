@@ -85,13 +85,11 @@
 
 /* ── 학습자 역할 브리핑 카드 ── */
 .learner-briefing {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-left: 3px solid var(--amber);
-  border-radius: 12px;
+  background: var(--bg-quote);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 0;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
 }
 .briefing-inner {
   display: flex;
