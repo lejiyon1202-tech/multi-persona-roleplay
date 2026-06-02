@@ -1,0 +1,121 @@
+/* ── A안 방사형 네트워크 그래프 ── */
+
+/* 전체 컨테이너 */
+.org-radial-wrap {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  margin: 16px auto 16px;
+  max-width: 900px;
+}
+
+/* SVG 연결선 레이어 */
+.org-radial-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 관계선 클래스별 스타일 */
+.org-radial-line              { stroke: #D4D4D8; stroke-width: 1.5; }
+.org-radial-line--hierarchy   { stroke: #3F3F46; stroke-width: 2; }
+.org-radial-line--conflict    { stroke: #09090B; stroke-width: 2.5; stroke-dasharray: none; }
+.org-radial-line--colleague   { stroke: #71717A; stroke-width: 1.5; }
+.org-radial-line--indirect    { stroke: #A1A1AA; stroke-width: 1.2; stroke-dasharray: 5,3; }
+
+/* 관계 라벨 */
+.org-radial-label-el {
+  font-size: 9px;
+  fill: #71717A;
+  font-family: 'Pretendard', sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+/* 방사형 노드 공통 — .org-node 에 적용 */
+.org-radial-wrap .org-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.18s;
+  width: auto;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.org-radial-wrap .org-node:hover { transform: translate(-50%, -50%) scale(1.07); }
+
+/* 사진 이미지 */
+.org-radial-wrap .org-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.7);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* 중심 노드 강조 */
+.org-radial-wrap .org-node.is-center .org-avatar-img {
+  width: 84px;
+  height: 84px;
+  border: 3px solid rgba(255,255,255,0.9);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+
+/* 이름·배지 */
+.org-radial-wrap .org-node-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1F2937;
+  text-align: center;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.95);
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1.25;
+}
+.org-radial-wrap .org-node.is-center .org-node-name {
+  font-size: 13px;
+  max-width: 100px;
+}
+.org-radial-wrap .org-node-dept {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #71717A;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #E4E4E7;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ── 반응형 세로 스택 fallback (catch 31호) ── */
+@media (max-width: 767px) {
+  .org-radial-wrap {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+  .org-radial-svg { display: none; }
+  .org-radial-wrap .org-node {
+    position: static !important;
+    transform: none !important;
+  }
+  .org-radial-wrap .org-node:hover { transform: none !important; }
+  .org-radial-wrap .org-avatar-img { width: 56px !important; height: 56px !important; }
+  .org-radial-wrap .org-node.is-center .org-avatar-img { width: 68px !important; height: 68px !important; }
+}
