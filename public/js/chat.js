@@ -145,7 +145,7 @@ function syncTypingAndSend() {
 function updateTargetIndicator() {
   if (!IS_V3) return;
   const char  = partnersMap[activePartnerId];
-  const color = char ? ROLE_COLORS[getRoleKey(char.role_level)] : '#134e4a';
+  const color = char ? ROLE_COLORS[getRoleKey(char.role_level)] : '#1A3D30';
   const name  = char?.name || `캐릭터 ${activePartnerId}`;
   const el    = document.getElementById('targetIndicator');
   el.classList.remove('hidden');

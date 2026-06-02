@@ -142,7 +142,7 @@ function updateBar() {
       const c = allChars.find(ch => String(ch.id) === id);
       if (!c) return;
       const roleClass = ROLE_CLASS[c.role_level] || 'role-member';
-      const color = ROLE_COLORS[roleClass] || '#134e4a';
+      const color = ROLE_COLORS[roleClass] || '#1A3D30';
       const emoji = c.emoji || getDefaultEmoji(c.role_level);
       const chip = document.createElement('div');
       chip.className = 'partner-chip';
