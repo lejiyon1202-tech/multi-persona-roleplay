@@ -23,7 +23,7 @@
 .org-radial-line              { stroke: #D4D4D8; stroke-width: 1; opacity: 0.4; }
 .org-radial-line--hierarchy   { stroke: #2563EB; stroke-width: 2.5; opacity: 0.8; }
 .org-radial-line--conflict    { stroke: #DC2626; stroke-width: 3.5; opacity: 0.9; }
-.org-radial-line--colleague   { stroke: #0891B2; stroke-width: 1.5; opacity: 0.7; } /* 청록 — 적록색맹 구분 */
+.org-radial-line--colleague   { stroke: #0891B2; stroke-width: 2; opacity: 0.85; stroke-dasharray: 6,3; } /* 청록 대시·굵기 강조 — hierarchy 실선과 차별·적록색맹 구분 */
 .org-radial-line--indirect    { stroke: #6B7280; stroke-width: 1; stroke-dasharray: 5,3; opacity: 0.55; } /* 진한 회색 3:1+ */
 
 /* 관계 라벨 — WCAG AA 가독성 강화 */
