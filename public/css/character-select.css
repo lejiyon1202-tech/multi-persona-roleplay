@@ -427,8 +427,11 @@
 .role-member .cta-btn             { background: var(--role-member); }
 .role-member .cta-check           { background: var(--role-member); }
 
-/* hover border-color via CSS (JS에서 class 추가) */
-.char-card.selectable:hover { border-color: var(--accent-color); }
+/* hover border-color — 역할별 4색 코딩 정합 */
+.role-executive.selectable:hover { border-color: var(--role-executive-mid); }
+.role-manager.selectable:hover   { border-color: var(--role-manager-mid); }
+.role-lead.selectable:hover      { border-color: var(--role-lead-mid); }
+.role-member.selectable:hover    { border-color: var(--role-member-mid); }
 
 /* ── 간소형 카드 요소 ── */
 .card-emoji {
