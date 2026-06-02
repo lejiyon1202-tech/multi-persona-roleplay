@@ -1,22 +1,22 @@
-﻿/* ── 상태 ── */
+/* ── 상태 ── */
 const params = new URLSearchParams(location.search);
 const SCENARIO_ID      = params.get('scenario_id');
-const CHARACTER_ID     = params.get('character');           // v2 구형
-const LEARNER_CHAR_ID  = params.get('learner_char') || null; // v3 신규
-const PARTNER_IDS      = (params.get('partners') || '').split(',').filter(Boolean); // v3 신규
+const CHARACTER_ID     = params.get('character');
+const LEARNER_CHAR_ID  = params.get('learner_char') || null;
+const PARTNER_IDS      = (params.get('partners') || '').split(',').filter(Boolean);
 const IS_V3            = !!LEARNER_CHAR_ID;
 const SESSION_ID       = params.get('session_id') || null;
 
-// v3: 현재 대화 중인 파트너 ID (단일), v2: CHARACTER_ID
 let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 
-const ROLE_COLORS = { executive: '#312e81', manager: '#1e3a8a', lead: '#134e4a', member: '#78350f' };
+const ROLE_COLORS = { executive:'#312e81', manager:'#1e3a8a', lead:'#134e4a', member:'#78350f' };
+const ROLE_MAP    = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' };
 
 let sessionId   = SESSION_ID;
 let turnCount   = 0;
 let isWaiting   = false;
 let charData    = null;
-
+let partnersMap = {};   // v3: { charId: charObj }
 
 /* ── 뒤로가기 ── */
 document.getElementById('backBtn').addEventListener('click', () => {
@@ -44,11 +44,16 @@ msgInput.addEventListener('keydown', e => {
 sendBtn.addEventListener('click', sendMessage);
 document.getElementById('endChatBtn').addEventListener('click', endChat);
 
+/* ── 헬퍼 ── */
+function getRoleKey(roleLevel) {
+  return ROLE_MAP[roleLevel] || 'lead';
+}
+
 /* ── 캐릭터 정보 로드 ── */
 async function loadCharacter() {
-  const charId = IS_V3 ? activePartnerId : CHARACTER_ID;
+  if (IS_V3) { await loadAllPartners(); return; }
   try {
-    const res  = await fetch(`/api/scenarios/${SCENARIO_ID}/characters/${charId}`);
+    const res  = await fetch(`/api/scenarios/${SCENARIO_ID}/characters/${CHARACTER_ID}`);
     const data = await res.json();
     charData = data.character;
     applyCharacterUI(charData);
@@ -59,8 +64,95 @@ async function loadCharacter() {
   }
 }
 
+/* ── v3: 모든 파트너 로드 ── */
+async function loadAllPartners() {
+  try {
+    const fetches = PARTNER_IDS.map(id =>
+      fetch(`/api/scenarios/${SCENARIO_ID}/characters/${id}`)
+        .then(r => r.json())
+        .then(d => { if (d.character) partnersMap[id] = d.character; })
+        .catch(() => {})
+    );
+    await Promise.all(fetches);
+  } catch { /* 데모 모드 폴백 */ }
+  renderPartnersStrip();
+  updateTargetIndicator();
+  await initSession();
+}
+
+/* ── v3: 파트너 스트립 렌더링 ── */
+function renderPartnersStrip() {
+  const strip    = document.getElementById('partnersStrip');
+  const charMini = document.getElementById('charMini');
+  if (!IS_V3) return;
+
+  strip.innerHTML = '';
+  strip.classList.remove('hidden');
+  charMini.classList.add('hidden');
+
+  PARTNER_IDS.forEach(id => {
+    const char = partnersMap[id];
+    const label = char ? char.name : id;
+    const roleKey = char ? getRoleKey(char.role_level) : 'lead';
+    const color = ROLE_COLORS[roleKey];
+    const initial = char?.name ? char.name[0] : '?';
+
+    const chip = document.createElement('button');
+    chip.className = 'partner-chip' + (id === activePartnerId ? ' active' : '');
+    chip.dataset.id = id;
+    chip.setAttribute('role', 'tab');
+    chip.setAttribute('aria-selected', id === activePartnerId ? 'true' : 'false');
+    if (id === activePartnerId) chip.style.borderColor = color;
+
+    chip.innerHTML = `
+      <div class="partner-chip-avatar" style="background:${color}">${initial}</div>
+      <div class="partner-chip-info">
+        <span class="partner-chip-name">${label}</span>
+        <span class="partner-chip-role">${char?.role_level || ''}</span>
+      </div>`;
+    chip.addEventListener('click', () => switchPartner(id));
+    strip.appendChild(chip);
+  });
+
+  syncTypingAndSend();
+}
+
+/* ── v3: 파트너 전환 ── */
+function switchPartner(id) {
+  activePartnerId = id;
+  document.querySelectorAll('.partner-chip').forEach(c => {
+    const on = c.dataset.id === id;
+    c.classList.toggle('active', on);
+    c.setAttribute('aria-selected', on ? 'true' : 'false');
+    c.style.borderColor = on ? ROLE_COLORS[getRoleKey(partnersMap[id]?.role_level)] : '';
+  });
+  updateTargetIndicator();
+  syncTypingAndSend();
+}
+
+/* ── v3: 타이핑 아바타 + 전송 버튼 색 동기화 ── */
+function syncTypingAndSend() {
+  const char  = partnersMap[activePartnerId];
+  const color = char ? ROLE_COLORS[getRoleKey(char.role_level)] : ROLE_COLORS.lead;
+  const initial = char?.name ? char.name[0] : '?';
+  document.getElementById('typingAvatar').textContent = initial;
+  document.getElementById('typingAvatar').style.background = color;
+  document.querySelectorAll('.send-btn').forEach(b => b.style.background = color);
+}
+
+/* ── v3: 전송 대상 표시 ── */
+function updateTargetIndicator() {
+  if (!IS_V3) return;
+  const char  = partnersMap[activePartnerId];
+  const color = char ? ROLE_COLORS[getRoleKey(char.role_level)] : '#134e4a';
+  const name  = char?.name || `캐릭터 ${activePartnerId}`;
+  const el    = document.getElementById('targetIndicator');
+  el.classList.remove('hidden');
+  el.innerHTML = `<span style="color:${color}">▶</span><span class="target-name" style="color:${color}">${name}</span>에게 전송`;
+}
+
 function applyCharacterUI(char) {
-  const roleKey = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' }[char.role_level] || 'lead';
+  const roleKey = getRoleKey(char.role_level);
   const color   = ROLE_COLORS[roleKey];
 
   document.getElementById('miniAvatar').textContent = char.name ? char.name[0] : '?';
@@ -70,10 +162,9 @@ function applyCharacterUI(char) {
   document.getElementById('miniName').textContent = char.name || '—';
   document.getElementById('miniRole').textContent = char.role_level || '—';
   document.title = `${char.name}과 대화 — AI 롤플레잉`;
-
   document.querySelectorAll('.send-btn').forEach(b => b.style.background = color);
 
-  if (char.emotion_stages && char.emotion_stages.length > 0) {
+  if (char.emotion_stages?.length > 0) {
     const badge = document.getElementById('emotionBadge');
     badge.textContent = char.emotion_stages[0].stage || '초기';
     badge.classList.remove('hidden');
@@ -91,12 +182,9 @@ async function initSession() {
   if (sessionId) return;
   try {
     const body = IS_V3
-      ? {
-          learner_id: 1,
-          scenario_id: SCENARIO_ID,
+      ? { learner_id: 1, scenario_id: SCENARIO_ID,
           learner_character_id: Number(LEARNER_CHAR_ID),
-          dialogue_partner_ids: PARTNER_IDS.map(Number),
-        }
+          dialogue_partner_ids: PARTNER_IDS.map(Number) }
       : { learner_id: 1, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID };
 
     const res  = await fetch('/api/sessions', {
@@ -105,7 +193,7 @@ async function initSession() {
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    sessionId = data.session_id;
+    sessionId  = data.session_id;
   } catch { /* 데모 모드 */ }
 }
 
@@ -124,6 +212,8 @@ async function sendMessage() {
   appendMsg('user', text);
   showTyping(true);
 
+  const speakerId = IS_V3 ? activePartnerId : null;
+
   try {
     const chatBody = { session_id: sessionId, message: text };
     if (IS_V3 && activePartnerId) chatBody.target_character_id = Number(activePartnerId);
@@ -133,16 +223,15 @@ async function sendMessage() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(chatBody),
     });
-
     if (!res.ok) throw new Error('Chat API error');
 
-    const reader = res.body.getReader();
+    const reader  = res.body.getReader();
     const decoder = new TextDecoder();
     let aiText = '';
-    let msgEl = null;
+    let msgEl  = null;
 
     showTyping(false);
-    msgEl = appendMsg('ai', '', true);
+    msgEl = appendMsg('ai', '', true, speakerId);
 
     while (true) {
       const { value, done } = await reader.read();
@@ -152,10 +241,7 @@ async function sendMessage() {
       for (const line of lines) {
         try {
           const json = JSON.parse(line.slice(5).trim());
-          if (json.token) {
-            aiText += json.token;
-            updateMsgEl(msgEl, aiText);
-          }
+          if (json.token)         { aiText += json.token; updateMsgEl(msgEl, aiText); }
           if (json.emotion_stage) updateEmotionBadge(json.emotion_stage);
         } catch { /* partial chunk */ }
       }
@@ -163,7 +249,7 @@ async function sendMessage() {
     if (!aiText) updateMsgEl(msgEl, '(응답 없음)');
   } catch (err) {
     showTyping(false);
-    appendMsg('ai', `데모 응답입니다. 실제 서버에 연결하면 AI 캐릭터의 응답이 여기에 표시됩니다. (오류: ${err.message})`);
+    appendMsg('ai', `데모 응답입니다. 실제 서버에 연결하면 AI 캐릭터의 응답이 여기에 표시됩니다. (오류: ${err.message})`, false, speakerId);
   }
 
   isWaiting = false;
@@ -177,13 +263,15 @@ function endChat() {
   window.location.href = `report.html?session_id=${sessionId}`;
 }
 
-/* ── UI 헬퍼 ── */
-function appendMsg(role, text, streaming = false) {
+/* ── 메시지 추가 ── */
+function appendMsg(role, text, streaming = false, speakerCharId = null) {
   const wrap = document.getElementById('messagesWrap');
-  const char = charData || {};
-  const roleKey = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' }[char.role_level] || 'lead';
-  const color = ROLE_COLORS[roleKey];
 
+  let char = charData || {};
+  if (IS_V3 && role === 'ai') {
+    char = partnersMap[speakerCharId || activePartnerId] || {};
+  }
+  const color      = ROLE_COLORS[getRoleKey(char.role_level)];
   const avatarText = role === 'ai' ? (char.name ? char.name[0] : 'A') : '나';
   const avatarBg   = role === 'ai' ? color : '#374151';
 
@@ -193,14 +281,24 @@ function appendMsg(role, text, streaming = false) {
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
   avatar.textContent = avatarText;
-  avatar.style.background = avatarBg; // JS DOM 조작 — CSP 제어 대상 아님
+  avatar.style.background = avatarBg;
 
   const inner = document.createElement('div');
+
+  // v3: AI 발화자 이름 라벨
+  if (IS_V3 && role === 'ai' && char.name && PARTNER_IDS.length > 1) {
+    const speaker = document.createElement('div');
+    speaker.className = 'msg-speaker-name';
+    speaker.textContent = char.name;
+    speaker.style.color = color;
+    inner.appendChild(speaker);
+  }
+
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
   bubble.textContent = text;
   if (role === 'ai') bubble.style.borderLeftColor = color;
-  else               bubble.style.background = color;
+  else               bubble.style.background      = color;
 
   const time = document.createElement('div');
   time.className = 'msg-time';
@@ -217,8 +315,7 @@ function appendMsg(role, text, streaming = false) {
 
 function updateMsgEl(el, text) {
   if (el) el.textContent = text;
-  const wrap = document.getElementById('messagesWrap');
-  wrap.scrollTop = wrap.scrollHeight;
+  document.getElementById('messagesWrap').scrollTop = 999999;
 }
 
 function addSystemMsg(text) {
@@ -227,15 +324,12 @@ function addSystemMsg(text) {
   div.className = 'stage-change-notice';
   div.textContent = text;
   wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
+  wrap.scrollTop = 999999;
 }
 
 function showTyping(show) {
   document.getElementById('typingIndicator').classList.toggle('hidden', !show);
-  if (show) {
-    const wrap = document.getElementById('messagesWrap');
-    wrap.scrollTop = wrap.scrollHeight;
-  }
+  if (show) document.getElementById('messagesWrap').scrollTop = 999999;
 }
 
 function updateEmotionBadge(stage) {
@@ -267,4 +361,3 @@ function escHtml(str) {
 }
 
 loadCharacter();
-

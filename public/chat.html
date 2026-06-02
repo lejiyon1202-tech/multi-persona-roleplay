@@ -16,13 +16,16 @@
   <button class="back-btn" id="backBtn" aria-label="뒤로가기">
     <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
-  <div class="char-mini">
+  <!-- v2: 단일 캐릭터 -->
+  <div class="char-mini" id="charMini">
     <div class="char-mini-avatar" id="miniAvatar">?</div>
     <div class="char-mini-info">
       <p class="char-mini-name" id="miniName">로딩 중...</p>
       <p class="char-mini-role" id="miniRole">—</p>
     </div>
   </div>
+  <!-- v3: 멀티 파트너 스트립 -->
+  <div class="partners-strip hidden" id="partnersStrip" role="tablist" aria-label="대화 상대 선택"></div>
   <div class="chat-header-right">
     <span class="emotion-badge hidden" id="emotionBadge"></span>
     <span class="turn-counter" id="turnCounter">0 턴</span>
@@ -44,6 +47,8 @@
 
 <!-- ── 입력 영역 ── -->
 <footer class="chat-input-area">
+  <!-- v3: 전송 대상 표시 -->
+  <div class="target-indicator hidden" id="targetIndicator" aria-live="polite"></div>
   <div class="input-row">
     <textarea class="msg-textarea" id="msgInput"
       placeholder="메시지를 입력하세요... (Enter: 전송, Shift+Enter: 줄바꿈)"
