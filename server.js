@@ -39,8 +39,8 @@ const compareLimit = rateLimit({ windowMs: 60_000,     max: 5   });
 app.use(globalLimit);
 app.use('/api/chat',              chatLimit);
 app.use('/api/evaluate',          evalLimit);
-app.use('/api/sessions',          sessLimit);
-app.use('/api/sessions/compare',  compareLimit);
+app.post('/api/sessions',         sessLimit);
+app.get('/api/sessions/compare',  compareLimit);
 
 // ── 라우터 ────────────────────────────────────────────────────────────────────
 app.use('/api/scenarios',  scenariosRouter);
