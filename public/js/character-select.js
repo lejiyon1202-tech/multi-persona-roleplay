@@ -67,21 +67,19 @@ async function loadScenarioInfo() {
 }
 
 async function loadCharacters() {
-  const grid = document.getElementById('cardGrid');
+  const mount = document.getElementById('orgChart') || document.getElementById('cardGrid');
   try {
-    const res  = await fetch(`/api/scenarios/${scenarioId}/characters`);
-    allChars   = await res.json();
+    const res = await fetch(`/api/scenarios/${scenarioId}/characters`);
+    allChars  = await res.json();
     if (!allChars.length) {
-      grid.innerHTML = '<p class="empty-state grid-span-full">등록된 캐릭터가 없습니다.</p>';
+      mount.innerHTML = '<p class="empty-state">등록된 캐릭터가 없습니다.</p>';
       return;
     }
-    grid.innerHTML = allChars
-      .sort((a, b) => a.card_number - b.card_number)
-      .map((c, i) => buildCardHTML(c, i))
-      .join('');
+    renderOrgTree(allChars.sort((a, b) => a.card_number - b.card_number));
     document.dispatchEvent(new Event('charactersLoaded'));
   } catch {
-    grid.innerHTML = '<p class="empty-state grid-span-full">캐릭터 정보를 불러올 수 없습니다.</p>';
+    const el = document.getElementById('orgChart') || document.getElementById('cardGrid');
+    if (el) el.innerHTML = '<p class="empty-state">캐릭터 정보를 불러올 수 없습니다.</p>';
   }
 }
 
@@ -89,43 +87,73 @@ function esc(str) {
   return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* ── 카드 HTML (v3: 모든 캐릭터 선택 가능 + 연기용 간소 표시) ── */
-function buildCardHTML(c, idx) {
-  const roleClass = ROLE_CLASS[c.role_level] || 'role-member';
-  const emoji     = c.emoji || getDefaultEmoji(c.role_level);
-  const num       = String(c.card_number).padStart(2, '0');
+/* ── 조직도 트리 렌더 (D안) ── */
+const ROLE_LAYER_ORDER  = ['상위리더', '그룹장', '파트장', '부서원'];
+const ROLE_LAYER_CLASS  = { '상위리더': 'executive', '그룹장': 'manager', '파트장': 'lead', '부서원': 'member' };
 
-  // 연기용 가치관 1줄 (learner_detail.values 또는 core_mindset)
-  const valueStr = c.learner_detail?.values || c.core_mindset || '';
-  const valueShort = valueStr.slice(0, 45) + (valueStr.length > 45 ? '...' : '');
+function renderOrgTree(chars) {
+  const mount = document.getElementById('orgChart');
+  if (!mount) return;
 
-  // 상황 1줄
-  const sitStr = c.situation || '';
-  const sitShort = sitStr.slice(0, 50) + (sitStr.length > 50 ? '...' : '');
+  const byLayer = {};
+  ROLE_LAYER_ORDER.forEach(r => { byLayer[r] = []; });
+  chars.forEach(c => {
+    const r = c.role_level;
+    (byLayer[r] || (byLayer['부서원'])).push(c);
+  });
 
-  return `
-  <div class="char-card ${roleClass} selectable"
-       data-char-id="${c.id}" data-number="${num}"
-       data-name="${esc(c.name)}" data-emoji="${emoji}"
-       data-role="${esc(c.role_level)}"
-       tabindex="0" role="button"
-       aria-label="${esc(c.name)} — 클릭해서 이 역할 맡기">
-    <div class="card-accent-bar"></div>
-    <div class="card-body">
-      <div class="card-meta">
-        <span class="card-emoji">${emoji}</span>
-        <span class="role-badge">${esc(c.role_level)}</span>
-        <span class="card-number">NO. ${num}</span>
-      </div>
-      <div class="card-identity">
-        <p class="char-name">${esc(c.name)}</p>
-        <p class="char-dept">${esc(c.department)}</p>
-      </div>
-      <p class="card-mindset-short">"${esc(valueShort)}"</p>
-      <p class="card-situation-short">${esc(sitShort)}</p>
-      <p class="card-hint">클릭해서 자세히 보기 →</p>
-    </div>
+  const tree = document.createElement('div');
+  tree.className = 'org-tree';
+  tree.setAttribute('role', 'tree');
+  tree.setAttribute('aria-label', '캐릭터 조직 구조도');
+
+  ROLE_LAYER_ORDER.forEach((role, idx) => {
+    if (!byLayer[role].length) return;
+    if (idx > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'org-connector';
+      conn.setAttribute('aria-hidden', 'true');
+      tree.appendChild(conn);
+    }
+    const level = document.createElement('div');
+    level.className = `org-level org-level--${ROLE_LAYER_CLASS[role]}`;
+    level.setAttribute('aria-level', String(idx + 1));
+    const label = document.createElement('span');
+    label.className = 'org-level-label';
+    label.textContent = role;
+    label.setAttribute('aria-hidden', 'true');
+    level.appendChild(label);
+    const nodes = document.createElement('div');
+    nodes.className = 'org-nodes';
+    byLayer[role].forEach(c => nodes.appendChild(buildOrgNodeEl(c)));
+    level.appendChild(nodes);
+    tree.appendChild(level);
+  });
+
+  mount.innerHTML = '';
+  mount.appendChild(tree);
+}
+
+function buildOrgNodeEl(c) {
+  const roleClass  = ROLE_CLASS[c.role_level] || 'role-member';
+  const emoji      = c.emoji || getDefaultEmoji(c.role_level);
+  const valueStr   = c.learner_detail?.values || c.core_mindset || '';
+  const valueShort = valueStr.slice(0, 32) + (valueStr.length > 32 ? '...' : '');
+  const node = document.createElement('div');
+  node.className = `org-node ${roleClass}`;
+  node.setAttribute('role', 'treeitem');
+  node.setAttribute('tabindex', '0');
+  node.dataset.charId = c.id;
+  node.setAttribute('aria-label', `${c.name} — 클릭해서 이 역할 맡기`);
+  node.innerHTML = `<div class="org-node-inner">
+    <span class="node-emoji" aria-hidden="true">${emoji}</span>
+    <p class="node-name">${esc(c.name)}</p>
+    <span class="node-role">${esc(c.role_level)}</span>
+    <p class="node-mindset">"${esc(valueShort)}"</p>
   </div>`;
+  node.addEventListener('click', () => openModal(c.id));
+  node.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(c.id); });
+  return node;
 }
 
 function getDefaultEmoji(roleLevel) {
