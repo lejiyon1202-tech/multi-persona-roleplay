@@ -1,6 +1,6 @@
 ﻿const params    = new URLSearchParams(location.search);
 const SESSION_ID = params.get('session_id');
-const ROLE_COLORS = { executive:'#312e81', manager:'#1e3a8a', lead:'#134e4a', member:'#78350f' };
+const ROLE_COLORS = { executive:'#312E2B', manager:'#1B3250', lead:'#1A3D30', member:'#6B3B1D' };
 
 
 /* ── 탭 전환 ── */

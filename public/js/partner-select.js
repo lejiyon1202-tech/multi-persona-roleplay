@@ -1,6 +1,6 @@
 /* ── Phase C v3: 대화 상대 선택 (다중 선택 가능) ── */
 const ROLE_CLASS  = { '상위리더': 'role-executive', '그룹장': 'role-manager', '파트장': 'role-lead', '부서원': 'role-member' };
-const ROLE_COLORS = { 'role-executive': '#312e81', 'role-manager': '#1e3a8a', 'role-lead': '#134e4a', 'role-member': '#78350f' };
+const ROLE_COLORS = { 'role-executive': '#312E2B', 'role-manager': '#1B3250', 'role-lead': '#1A3D30', 'role-member': '#6B3B1D' };
 const MAX_PARTNERS = 3;
 
 const params        = new URLSearchParams(location.search);
