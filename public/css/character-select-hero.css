@@ -2,7 +2,7 @@
 .scenario-hero {
   width: 100%;
   overflow: hidden;
-  padding-bottom: 56px;
+  padding-bottom: 32px;
   border-radius: 0 0 32px 32px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
@@ -98,8 +98,8 @@
 /* ── D안: 조직도 트리 ── */
 .org-chart {
   max-width: 1160px;
-  margin: 28px auto 0;
-  padding: 0 40px 32px;
+  margin: 16px auto 0;
+  padding: 0 40px 16px;
   background: #FFFFFF;
   position: relative;
   z-index: 2;
@@ -142,7 +142,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
 }
 
