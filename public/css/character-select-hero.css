@@ -196,6 +196,14 @@
   height: 100%;
   display: block;
 }
+/* B안: 실제 아바타 이미지 */
+.org-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50% 50% 40% 40%;
+  display: block;
+}
 
 /* 역할별 배경 그라데이션 */
 .org-node.role-executive .org-illust { background: linear-gradient(155deg, #312E2B 0%, #1B3250 100%); }
