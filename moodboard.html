@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디자인 컨셉 제안 — 기안84</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+/* ═══ 기본 리셋 ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:    #F7F2EB;
+  --cream-dk: #EDE6D9;
+  --white:    #FFFFFF;
+  --charcoal: #1C1917;
+  --brown:    #57534E;
+  --muted:    #A8A29E;
+  --border:   #DDD6CC;
+  --amber:    #B45309;
+  --amber-lt: #FEF3C7;
+  --amber-md: #D97706;
+
+  --r1: #312E2B; /* 상위리더 딥 에스프레소 */
+  --r2: #1B3250; /* 그룹장 딥 네이비 */
+  --r3: #1A3D30; /* 파트장 딥 포레스트 */
+  --r4: #6B3B1D; /* 부서원 딥 앰버 브라운 */
+
+  --serif: 'Noto Serif KR', Georgia, serif;
+  --sans:  'Pretendard', -apple-system, sans-serif;
+}
+body{
+  background: var(--cream);
+  font-family: var(--sans);
+  color: var(--charcoal);
+  line-height: 1.7;
+  min-height: 100vh;
+  /* 미세 노이즈 텍스처 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ═══ 레이아웃 ═══ */
+.wrap{max-width:1100px;margin:0 auto;padding:60px 40px;}
+
+/* ═══ 제목 ═══ */
+.mb-title{
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+.mb-heading{
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.mb-sub{
+  font-size: 16px;
+  color: var(--brown);
+  line-height: 1.75;
+  max-width: 560px;
+}
+.header-rule{
+  height: 1px;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--border) 40%);
+  margin: 32px 0 48px;
+}
+
+/* ═══ 섹션 ═══ */
+.section{margin-bottom: 64px;}
+.section-label{
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background: var(--border);
+}
+
+/* ═══ 색상 팔레트 ═══ */
+.palette{display:flex;gap:12px;flex-wrap:wrap;}
+.swatch{
+  width: 80px;
+  text-align: center;
+}
+.swatch-color{
+  width:80px;height:80px;border-radius:12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  margin-bottom: 6px;
+}
+.swatch-name{font-size:10px;font-weight:700;color:var(--brown);letter-spacing:0.05em;}
+.swatch-hex{font-size:10px;color:var(--muted);}
+
+/* ═══ 비교 (Before / After) ═══ */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.compare-box{
+  background: var(--white);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+}
+.compare-label{
+  font-size:10px;font-weight:700;letter-spacing:0.15em;
+  text-transform:uppercase;margin-bottom:16px;
+  padding: 4px 10px;border-radius:4px;display:inline-block;
+}
+.compare-label.before{background:#FEE2E2;color:#991B1B;}
+.compare-label.after{background:var(--amber-lt);color:var(--amber);}
+
+/* ═══ 카드 — 기존 스타일 ═══ */
+.old-card{
+  background:#fff;border:1.5px solid #e2e5ef;border-radius:16px;
+  padding:20px;font-family:var(--sans);
+}
+.old-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.old-badge{
+  display:inline-flex;align-items:center;height:22px;padding:0 10px;
+  border-radius:6px;font-size:11px;font-weight:700;color:#fff;
+  background:#312e81;
+}
+.old-name{font-size:18px;font-weight:800;color:#0f172a;margin-bottom:2px;}
+.old-dept{font-size:12px;color:#6b7280;}
+.old-mindset{
+  background:#f7f9ff;border-left:3px solid #818cf8;
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  font-size:13px;font-style:italic;color:#374151;margin-top:12px;
+}
+
+/* ═══ 카드 — 새 스타일 ═══ */
+.new-card{
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  font-family: var(--sans);
+  box-shadow: 0 1px 3px rgba(28,25,23,0.04), 0 8px 24px rgba(28,25,23,0.04);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.new-card:hover{transform:translateY(-4px);box-shadow:0 4px 16px rgba(28,25,23,0.1),0 20px 48px rgba(28,25,23,0.08);}
+.new-card-bar{height:3px;background:var(--r1);}
+.new-card-body{padding:20px 20px 16px;}
+.new-card-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.new-card-emoji{font-size:28px;line-height:1;}
+.new-card-role{
+  font-size:9.5px;font-weight:700;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--border);padding:3px 8px;border-radius:4px;
+}
+.new-card-name{
+  font-family:var(--serif);
+  font-size:20px;font-weight:700;color:var(--charcoal);
+  line-height:1.2;margin-bottom:3px;
+}
+.new-card-dept{font-size:11.5px;color:var(--brown);margin-bottom:12px;}
+.new-card-mindset{
+  font-size:13.5px;font-style:italic;color:var(--brown);
+  line-height:1.65;
+  border-left:2px solid var(--amber);
+  padding-left:12px;
+}
+.new-card-footer{
+  padding:10px 20px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--border);margin-top:14px;
+}
+.new-card-hint{font-size:11px;color:var(--muted);}
+.new-card-cta{
+  font-size:11.5px;font-weight:700;color:var(--amber);
+  display:flex;align-items:center;gap:4px;
+}
+
+/* ═══ 모달 — 기존 ═══ */
+.old-modal{
+  background:#fff;border-radius:16px;border:1px solid #e2e5ef;
+  overflow:hidden;font-family:var(--sans);
+}
+.old-modal-bar{height:4px;background:#312e81;}
+.old-modal-body{padding:20px;}
+.old-modal-name{font-size:20px;font-weight:900;color:#0f172a;margin-bottom:4px;}
+.old-modal-dept{font-size:12px;color:#6b7280;margin-bottom:12px;}
+.old-modal-mindset{
+  background:#f7f9ff;border-left:3px solid #818cf8;
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  font-size:13px;font-style:italic;color:#374151;
+  line-height:1.65;margin-bottom:16px;
+}
+.old-section{margin-bottom:12px;}
+.old-section-lbl{font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;}
+.old-section-txt{font-size:13px;color:#374151;line-height:1.6;}
+.old-divider{height:1px;background:#e2e5ef;margin:10px 0;}
+
+/* ═══ 모달 — 새 스타일 ═══ */
+.new-modal{
+  background:var(--white);
+  border-radius:20px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:200px 1fr;
+  font-family:var(--sans);
+  box-shadow:0 20px 60px rgba(28,25,23,0.18);
+}
+.new-modal-left{
+  background: var(--r1);
+  padding: 28px 20px;
+  display:flex;flex-direction:column;gap:16px;
+  position:relative;
+  overflow:hidden;
+}
+.new-modal-left::after{
+  content:'';
+  position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.new-modal-emoji{font-size:40px;line-height:1;position:relative;z-index:1;}
+.new-modal-role-tag{
+  font-size:9px;font-weight:700;letter-spacing:0.18em;
+  text-transform:uppercase;color:rgba(255,255,255,0.6);
+  background:rgba(255,255,255,0.1);
+  padding:4px 8px;border-radius:4px;
+  display:inline-flex;width:fit-content;position:relative;z-index:1;
+}
+.new-modal-name{
+  font-family:var(--serif);
+  font-size:24px;font-weight:700;color:#fff;
+  line-height:1.15;position:relative;z-index:1;
+}
+.new-modal-dept{
+  font-size:11.5px;color:rgba(255,255,255,0.65);
+  position:relative;z-index:1;
+}
+.new-modal-divider{height:1px;background:rgba(255,255,255,0.12);position:relative;z-index:1;}
+.new-modal-mindset-left{
+  font-size:12px;font-style:italic;
+  color:rgba(255,255,255,0.8);
+  line-height:1.65;position:relative;z-index:1;
+}
+
+.new-modal-right{padding:24px;overflow-y:auto;}
+.new-modal-section{margin-bottom:14px;}
+.new-modal-section-lbl{
+  display:flex;align-items:center;gap:6px;
+  font-size:9.5px;font-weight:700;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--amber);
+  margin-bottom:5px;
+}
+.new-modal-section-lbl .dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--amber);flex-shrink:0;
+}
+.new-modal-section-txt{
+  font-size:13.5px;color:var(--brown);line-height:1.7;
+}
+.new-modal-divider2{height:1px;background:var(--border);margin:12px 0;}
+.new-modal-cta{
+  margin-top:16px;
+  width:100%;height:44px;
+  background:var(--amber);color:#fff;
+  border:none;border-radius:10px;
+  font-family:var(--sans);font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+
+/* ═══ 타이포그래피 샘플 ═══ */
+.typo-row{
+  display:flex;gap:40px;align-items:flex-start;
+}
+.typo-box{flex:1;}
+.typo-box-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.typo-serif-h{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--charcoal);line-height:1.2;}
+.typo-serif-sub{font-family:var(--serif);font-size:16px;color:var(--brown);margin-top:4px;line-height:1.65;}
+.typo-sans-h{font-family:var(--sans);font-size:32px;font-weight:800;color:#0f172a;line-height:1.2;}
+.typo-sans-sub{font-family:var(--sans);font-size:15px;color:#374151;margin-top:4px;}
+.typo-sample{
+  font-size:13px;color:var(--brown);margin-top:10px;
+  font-family:var(--sans);line-height:1.7;
+}
+
+/* ═══ 노트 ═══ */
+.design-note{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:20px 24px;margin-top:20px;
+  border-left:3px solid var(--amber);
+}
+.design-note p{font-size:13.5px;color:var(--brown);line-height:1.75;}
+.design-note strong{color:var(--charcoal);font-weight:700;}
+
+/* ═══ 반응형 ═══ */
+@media(max-width:768px){
+  .compare{grid-template-columns:1fr;}
+  .typo-row{flex-direction:column;}
+  .new-modal{grid-template-columns:1fr;}
+  .new-modal-left{padding:20px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <p class="mb-title">기안84 디자인 컨셉 제안 · 2026-06-02</p>
+  <h1 class="mb-heading">따뜻한 에디토리얼<br>— 크림 페이퍼 컨셉</h1>
+  <p class="mb-sub">AI 티를 완전히 걷어내고, 사람을 중심에 두는 디자인. 따뜻한 크림 톤 + 딥 앰버 포인트 + 세리프 타이포로 인간적 격조를 만듭니다.</p>
+  <div class="header-rule"></div>
+
+  <!-- 컬러 팔레트 -->
+  <div class="section">
+    <p class="section-label">신규 컬러 팔레트</p>
+    <div class="palette">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F7F2EB;border:1px solid #DDD6CC;"></div>
+        <p class="swatch-name">크림 배경</p>
+        <p class="swatch-hex">#F7F2EB</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1C1917;"></div>
+        <p class="swatch-name">차콜</p>
+        <p class="swatch-hex">#1C1917</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#B45309;"></div>
+        <p class="swatch-name">앰버 포인트</p>
+        <p class="swatch-hex">#B45309</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#57534E;"></div>
+        <p class="swatch-name">브라운 텍스트</p>
+        <p class="swatch-hex">#57534E</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#DDD6CC;"></div>
+        <p class="swatch-name">보더</p>
+        <p class="swatch-hex">#DDD6CC</p>
+      </div>
+      <div class="swatch" style="margin-left:24px;">
+        <div class="swatch-color" style="background:#312E2B;"></div>
+        <p class="swatch-name">상위리더</p>
+        <p class="swatch-hex">에스프레소</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1B3250;"></div>
+        <p class="swatch-name">그룹장</p>
+        <p class="swatch-hex">딥 네이비</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1A3D30;"></div>
+        <p class="swatch-name">파트장</p>
+        <p class="swatch-hex">딥 포레스트</p>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6B3B1D;"></div>
+        <p class="swatch-name">부서원</p>
+        <p class="swatch-hex">딥 앰버</p>
+      </div>
+    </div>
+    <div class="design-note" style="margin-top:16px;">
+      <p>역할 4색을 <strong>채도 낮은 딥 토너</strong>로 재정비합니다. 기존 인디고·블루·틸·앰버보다 훨씬 고급스럽고, 크림 배경과 자연스럽게 어울립니다.</p>
+    </div>
+  </div>
+
+  <!-- 타이포그래피 -->
+  <div class="section">
+    <p class="section-label">타이포그래피 — 기존 vs 제안</p>
+    <div class="typo-row">
+      <div class="typo-box">
+        <p class="typo-box-label">기존 — Pretendard 단독</p>
+        <p class="typo-sans-h">오현철 CCO</p>
+        <p class="typo-sans-sub">그룹 경영진</p>
+        <p class="typo-sample">일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다. 대형 유통그룹 CCO로 DX통합본부 전체를 관장한다.</p>
+      </div>
+      <div class="typo-box">
+        <p class="typo-box-label">신규 — Noto Serif KR 헤딩 + Pretendard 본문</p>
+        <p class="typo-serif-h">오현철 CCO</p>
+        <p class="typo-serif-sub">그룹 경영진</p>
+        <p class="typo-sample">일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다. 대형 유통그룹 CCO로 DX통합본부 전체를 관장한다.</p>
+      </div>
+    </div>
+    <div class="design-note">
+      <p>이름·직책 등 캐릭터 아이덴티티에 <strong>Noto Serif KR</strong>을 적용하면 격조와 인간적 온기가 동시에 살아납니다. 본문은 Pretendard 유지로 가독성 보장.</p>
+    </div>
+  </div>
+
+  <!-- 카드 비교 -->
+  <div class="section">
+    <p class="section-label">캐릭터 카드 — Before / After</p>
+    <div class="compare">
+      <div class="compare-box">
+        <span class="compare-label before">BEFORE — 현재</span>
+        <div class="old-card">
+          <div class="old-card-header">
+            <span class="old-badge">상위리더</span>
+            <span style="font-size:11px;color:#9ca3af;">NO. 01</span>
+          </div>
+          <p class="old-name">오현철 CCO</p>
+          <p class="old-dept">그룹 경영진</p>
+          <p class="old-mindset">"일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다."</p>
+        </div>
+      </div>
+      <div class="compare-box" style="background:var(--cream);">
+        <span class="compare-label after">AFTER — 제안</span>
+        <div class="new-card">
+          <div class="new-card-bar"></div>
+          <div class="new-card-body">
+            <div class="new-card-meta">
+              <span class="new-card-emoji">🏢</span>
+              <span class="new-card-role">상위리더 · 01</span>
+            </div>
+            <p class="new-card-name">오현철 CCO</p>
+            <p class="new-card-dept">그룹 경영진 · DX통합본부 총괄</p>
+            <p class="new-card-mindset">"일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다."</p>
+          </div>
+          <div class="new-card-footer">
+            <span class="new-card-hint">클릭해서 자세히 보기</span>
+            <span class="new-card-cta">이 역할 맡기 →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 비교 -->
+  <div class="section">
+    <p class="section-label">캐릭터 상세 모달 — Before / After</p>
+
+    <!-- Before -->
+    <div class="compare-box" style="margin-bottom:20px;">
+      <span class="compare-label before">BEFORE — 현재 (1열, 각 섹션 1~2줄)</span>
+      <div class="old-modal" style="max-width:500px;">
+        <div class="old-modal-bar"></div>
+        <div class="old-modal-body">
+          <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">상위리더</p>
+          <p class="old-modal-name">🏢 오현철 CCO</p>
+          <p class="old-modal-dept">그룹 경영진</p>
+          <blockquote class="old-modal-mindset">"일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다."</blockquote>
+          <div class="old-section">
+            <p class="old-section-lbl">배경 · 경력</p>
+            <p class="old-section-txt">대형 유통그룹 CCO. 12년 전 프로젝트 지연으로 시장 기회를 잃은 트라우마 보유.</p>
+          </div>
+          <div class="old-divider"></div>
+          <div class="old-section">
+            <p class="old-section-lbl">핵심 가치관 · 말투</p>
+            <p class="old-section-txt">일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다.</p>
+          </div>
+          <div class="old-divider"></div>
+          <div class="old-section">
+            <p class="old-section-lbl">직면한 압박 · 갈등</p>
+            <p class="old-section-txt">외부에 이미 공표된 전환 일정, 경영진 체면, IT·데이터 비전문가로서의 한계</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- After -->
+    <div class="compare-box" style="background:var(--cream);">
+      <span class="compare-label after">AFTER — 제안 (2열 분리, 정보 풍부화)</span>
+      <div class="new-modal">
+        <!-- 왼쪽: 아이덴티티 패널 -->
+        <div class="new-modal-left">
+          <span class="new-modal-emoji">🏢</span>
+          <span class="new-modal-role-tag">상위리더</span>
+          <p class="new-modal-name">오현철<br>CCO</p>
+          <p class="new-modal-dept">그룹 경영진<br>DX통합본부 총괄</p>
+          <div class="new-modal-divider"></div>
+          <p class="new-modal-mindset-left">"일정은 신뢰다. 한 번 미루면 이 조직은 계속 미룬다."</p>
+        </div>
+        <!-- 오른쪽: 상세 정보 -->
+        <div class="new-modal-right">
+          <div class="new-modal-section">
+            <p class="new-modal-section-lbl"><span class="dot"></span>배경 · 경력</p>
+            <p class="new-modal-section-txt">SKY대 경제학과 졸업 후 롯데유통 기획팀 입사. 2012년 신선식품 SCM 디지털화 프로젝트 PM으로 6개월 지연 → 경쟁사에 선점당한 트라우마. 그 이후 "약속한 날짜는 반드시 지킨다"가 조직 문화로 굳어짐. 2021년 CCO 취임.</p>
+          </div>
+          <div class="new-modal-divider2"></div>
+          <div class="new-modal-section">
+            <p class="new-modal-section-lbl"><span class="dot"></span>말투 · 발화 스타일</p>
+            <p class="new-modal-section-txt">단호하고 간결. 질문보다 결론 먼저. "그래서 언제까지요?" "숫자로 주세요." 감정 표현 절제, 압박은 침묵과 기다림으로 전달.</p>
+          </div>
+          <div class="new-modal-divider2"></div>
+          <div class="new-modal-section">
+            <p class="new-modal-section-lbl"><span class="dot"></span>직면한 압박</p>
+            <p class="new-modal-section-txt">이사회에 "Q3 말 전환 완료" 공언. IT 비전문가라 팀 보고를 100% 신뢰 못 함. 경쟁사 오픈런 뉴스가 매주 들어옴.</p>
+          </div>
+          <div class="new-modal-divider2"></div>
+          <div class="new-modal-section">
+            <p class="new-modal-section-lbl"><span class="dot"></span>이 역할로 말문 트기</p>
+            <p class="new-modal-section-txt" style="font-style:italic;">"오늘 권고안 꼭 받아야 해요. 내일 이사회라." / "지금까지 뭘 한 건데요?"</p>
+          </div>
+          <button class="new-modal-cta">이 역할 맡기 →</button>
+        </div>
+      </div>
+    </div>
+    <div class="design-note">
+      <p><strong>2열 분리 모달의 효과:</strong> 왼쪽 아이덴티티 패널(딥 컬러)이 "이 캐릭터가 어떤 인물인가"를 즉각 각인시킵니다. 오른쪽 스크롤 패널은 롤플레잉에 필요한 구체 정보를 풍부하게 담습니다. 학습자가 "이 사람처럼 될 수 있겠다"는 느낌을 받을 때까지 정보 밀도를 올립니다.</p>
+    </div>
+  </div>
+
+  <!-- 최종 노트 -->
+  <div class="section">
+    <p class="section-label">구현 계획</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="design-note">
+        <p><strong>CSS 변경 범위:</strong> design-system.css 색상 변수 재정의 + Noto Serif KR 추가 (helmet CSP 업데이트 필요). 개별 page CSS 전수 리뉴얼. 코드 길이 500줄 이내 준수.</p>
+      </div>
+      <div class="design-note">
+        <p><strong>모달 UI 확장:</strong> character-select.html + JS에 speech_style·relationships·emotional_states 3섹션 추가. 2열 레이아웃으로 재구성. 카리나 DB 풍부화와 병렬.</p>
+      </div>
+    </div>
+    <div class="design-note" style="margin-top:16px;border-left-color:var(--r1);">
+      <p style="font-family:var(--serif);font-size:15px;font-weight:600;color:var(--charcoal);">대장님 컨펌 후 전면 적용합니다. 위 방향이 맞으면 즉시 CSS 재설계 착수 — ETA 60분.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
