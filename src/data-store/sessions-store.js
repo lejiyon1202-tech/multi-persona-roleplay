@@ -11,10 +11,20 @@ export async function upsertLearner({ name, department = '', email }) {
   return found[0].id;
 }
 
-export async function createSession({ learner_id, scenario_id, character_id }) {
+export async function createSession({
+  learner_id, scenario_id,
+  character_id = null,
+  learner_character_id = null,
+  dialogue_partner_ids = null,
+}) {
+  const partnerJson = dialogue_partner_ids ? JSON.stringify(
+    Array.isArray(dialogue_partner_ids) ? dialogue_partner_ids : [dialogue_partner_ids]
+  ) : null;
   const [result] = await pool.query(
-    'INSERT INTO sessions (learner_id, scenario_id, character_id) VALUES (?, ?, ?)',
-    [learner_id, scenario_id, character_id]
+    `INSERT INTO sessions
+     (learner_id, scenario_id, character_id, learner_character_id, dialogue_partner_ids)
+     VALUES (?, ?, ?, ?, ?)`,
+    [learner_id, scenario_id, character_id, learner_character_id, partnerJson]
   );
   return result.insertId;
 }

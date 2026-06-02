@@ -22,30 +22,51 @@ router.post('/learners', async (req, res) => {
   }
 });
 
-// 세션 시작
+// 세션 시작 — Phase C v3 (learner_character_id + dialogue_partner_ids) 및 구형 (character_id) 지원
 router.post('/sessions', async (req, res) => {
-  const { learner_id, scenario_id, character_id } = req.body;
-  if (!learner_id || !scenario_id || !character_id) {
-    return res.status(400).json({ error: 'learner_id, scenario_id, character_id 필수' });
+  const { learner_id, scenario_id, character_id, learner_character_id, dialogue_partner_ids } = req.body;
+  if (!learner_id || !scenario_id) {
+    return res.status(400).json({ error: 'learner_id, scenario_id 필수' });
   }
   try {
-    const char = await getCharacter(character_id);
-    if (!char) return res.status(404).json({ error: '캐릭터 없음' });
-    if (!char.is_selectable) return res.status(400).json({ error: '선택 불가 캐릭터' });
+    if (learner_character_id) {
+      // v3 모드: 학습자가 캐릭터를 연기하는 방식
+      const partners = Array.isArray(dialogue_partner_ids)
+        ? dialogue_partner_ids
+        : String(dialogue_partner_ids || '').split(',').map(Number).filter(Boolean);
+      if (!partners.length) {
+        return res.status(400).json({ error: 'dialogue_partner_ids 필수' });
+      }
+      const learnerChar = await getCharacter(learner_character_id);
+      if (!learnerChar) return res.status(404).json({ error: '학습자 캐릭터 없음' });
 
-    const session_id = await createSession({ learner_id, scenario_id, character_id });
-    res.json({ session_id });
+      const session_id = await createSession({
+        learner_id, scenario_id, learner_character_id, dialogue_partner_ids: partners,
+      });
+      res.json({ session_id });
+    } else {
+      // v2 구형 모드
+      if (!character_id) {
+        return res.status(400).json({ error: 'character_id 또는 learner_character_id 필수' });
+      }
+      const char = await getCharacter(character_id);
+      if (!char) return res.status(404).json({ error: '캐릭터 없음' });
+
+      const session_id = await createSession({ learner_id, scenario_id, character_id });
+      res.json({ session_id });
+    }
   } catch (err) {
     console.error('[POST /api/sessions]', err.message);
     res.status(500).json({ error: 'DB 오류' });
   }
 });
 
-// 채팅 (SSE 스트리밍)
+// 채팅 (SSE 스트리밍) — A안: target_character_id 지목 방식
 router.post('/chat', async (req, res) => {
-  const { session_id, user_message } = req.body;
-  if (!session_id || !user_message) {
-    return res.status(400).json({ error: 'session_id, user_message 필수' });
+  const { session_id, message, user_message, target_character_id } = req.body;
+  const userMsg = message || user_message;
+  if (!session_id || !userMsg) {
+    return res.status(400).json({ error: 'session_id, message 필수' });
   }
 
   let session;
@@ -53,14 +74,29 @@ router.post('/chat', async (req, res) => {
     session = await getSession(session_id);
     if (!session) return res.status(404).json({ error: '세션 없음' });
     if (session.status !== 'active') return res.status(400).json({ error: '종료된 세션' });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: 'DB 오류' });
   }
 
-  const turn = session.turn_count + 1;
+  // 대화 대상 캐릭터 결정 (A안: 지목 → 첫 파트너 fallback → 구형 character_id fallback)
+  let targetCharId;
+  if (target_character_id) {
+    targetCharId = Number(target_character_id);
+  } else if (session.dialogue_partner_ids) {
+    const partners = typeof session.dialogue_partner_ids === 'string'
+      ? JSON.parse(session.dialogue_partner_ids)
+      : session.dialogue_partner_ids;
+    targetCharId = partners[0];
+  } else {
+    targetCharId = session.character_id;
+  }
 
-  // 사용자 메시지 저장
-  await addMessage({ session_id, role: 'user', content: user_message, turn_number: turn });
+  if (!targetCharId) {
+    return res.status(400).json({ error: '대화 대상 캐릭터를 특정할 수 없음' });
+  }
+
+  const turn = session.turn_count + 1;
+  await addMessage({ session_id, role: 'user', content: userMsg, turn_number: turn });
   await incrementTurnCount(session_id);
 
   // SSE 헤더
@@ -70,18 +106,17 @@ router.post('/chat', async (req, res) => {
 
   let fullResponse = '';
   try {
-    const char = await getCharacter(session.character_id);
+    const char = await getCharacter(targetCharId);
     const history = await getMessages(session_id);
     const messages = history.map(m => ({ role: m.role, content: m.content }));
 
     for await (const chunk of invokeChat(messages, char.persona_prompt)) {
       fullResponse += chunk;
-      res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+      res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
     }
 
-    // AI 응답 저장
     await addMessage({ session_id, role: 'assistant', content: fullResponse, turn_number: turn });
-    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true, character_id: targetCharId })}\n\n`);
   } catch (err) {
     console.error('[POST /api/chat]', err.message);
     res.write(`data: ${JSON.stringify({ error: 'AI 응답 오류' })}\n\n`);

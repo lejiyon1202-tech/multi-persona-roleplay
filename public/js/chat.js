@@ -1,8 +1,14 @@
 ﻿/* ── 상태 ── */
 const params = new URLSearchParams(location.search);
-const SCENARIO_ID  = params.get('scenario_id');
-const CHARACTER_ID = params.get('character');
-const SESSION_ID   = params.get('session_id') || null;
+const SCENARIO_ID      = params.get('scenario_id');
+const CHARACTER_ID     = params.get('character');           // v2 구형
+const LEARNER_CHAR_ID  = params.get('learner_char') || null; // v3 신규
+const PARTNER_IDS      = (params.get('partners') || '').split(',').filter(Boolean); // v3 신규
+const IS_V3            = !!LEARNER_CHAR_ID;
+const SESSION_ID       = params.get('session_id') || null;
+
+// v3: 현재 대화 중인 파트너 ID (단일), v2: CHARACTER_ID
+let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 
 const ROLE_COLORS = { executive: '#312e81', manager: '#1e3a8a', lead: '#134e4a', member: '#78350f' };
 
@@ -40,8 +46,9 @@ document.getElementById('endChatBtn').addEventListener('click', endChat);
 
 /* ── 캐릭터 정보 로드 ── */
 async function loadCharacter() {
+  const charId = IS_V3 ? activePartnerId : CHARACTER_ID;
   try {
-    const res  = await fetch(`/api/scenarios/${SCENARIO_ID}/characters/${CHARACTER_ID}`);
+    const res  = await fetch(`/api/scenarios/${SCENARIO_ID}/characters/${charId}`);
     const data = await res.json();
     charData = data.character;
     applyCharacterUI(charData);
@@ -83,10 +90,19 @@ function applyDemoCharacter() {
 async function initSession() {
   if (sessionId) return;
   try {
+    const body = IS_V3
+      ? {
+          learner_id: 1,
+          scenario_id: SCENARIO_ID,
+          learner_character_id: Number(LEARNER_CHAR_ID),
+          dialogue_partner_ids: PARTNER_IDS.map(Number),
+        }
+      : { learner_id: 1, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID };
+
     const res  = await fetch('/api/sessions', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ learner_id: 1, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID })
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     sessionId = data.session_id;
@@ -109,10 +125,13 @@ async function sendMessage() {
   showTyping(true);
 
   try {
+    const chatBody = { session_id: sessionId, message: text };
+    if (IS_V3 && activePartnerId) chatBody.target_character_id = Number(activePartnerId);
+
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ session_id: sessionId, message: text })
+      body: JSON.stringify(chatBody),
     });
 
     if (!res.ok) throw new Error('Chat API error');
