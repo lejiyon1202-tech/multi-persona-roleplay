@@ -63,6 +63,9 @@
   --z-modal:  100;
   --z-toast:  200;
 
+  /* 강조 색상 (기본: lead 계열) */
+  --accent-color: var(--role-lead);
+
   /* 폰트 */
   --font:      'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
   --font-mono: 'Pretendard', ui-monospace, monospace;
