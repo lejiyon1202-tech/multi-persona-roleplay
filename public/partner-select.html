@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대화 상대 선택</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/partner-select.css">
+</head>
+<body>
+
+<!-- ── 헤더 ── -->
+<div class="page-header">
+  <div class="header-meta">
+    <p class="scenario-label" id="scenarioLabel">로딩 중...</p>
+    <div class="step-indicator">
+      <span class="step done">1단계 내 역할 ✓</span>
+      <span class="step-arrow">→</span>
+      <span class="step active">2단계 대화 상대</span>
+      <span class="step-arrow">→</span>
+      <span class="step">대화 시작</span>
+    </div>
+  </div>
+
+  <h1 class="scenario-title">누구와 대화할까요?</h1>
+
+  <!-- 선택한 내 역할 표시 -->
+  <div class="my-role-card" id="myRoleCard">
+    <div class="my-role-inner">
+      <span class="my-role-label">내 역할</span>
+      <div class="my-role-info">
+        <span class="my-role-emoji" id="myRoleEmoji">—</span>
+        <div>
+          <p class="my-role-name" id="myRoleName">로딩 중...</p>
+          <p class="my-role-dept" id="myRoleDept">—</p>
+        </div>
+      </div>
+    </div>
+    <button class="change-role-btn" id="changeRoleBtn">역할 바꾸기</button>
+  </div>
+
+  <p class="partner-hint">한 명 또는 여러 명을 선택할 수 있습니다 (최대 3명)</p>
+</div>
+
+<!-- ── 파트너 카드 그리드 ── -->
+<div class="card-grid" id="cardGrid">
+  <div class="loading-state grid-span-full" id="loadingState">
+    <div class="spinner"></div>
+    <p>캐릭터 정보를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- ── 하단 선택 바 ── -->
+<div class="partner-bar hidden" id="partnerBar">
+  <div class="partner-bar-left">
+    <span class="partner-bar-label">선택된 상대</span>
+    <div class="selected-partners" id="selectedPartners"></div>
+  </div>
+  <button class="start-chat-btn" id="startChatBtn">
+    대화 시작
+    <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+</div>
+
+<script src="js/partner-select.js" defer></script>
+</body>
+</html>

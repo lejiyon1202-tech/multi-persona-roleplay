@@ -1,0 +1,376 @@
+/* ═══════════════════════════════════════════════
+   partner-select.css — 대화 상대 선택 화면
+   ═══════════════════════════════════════════════ */
+
+/* ── 헤더 ── */
+.page-header {
+  padding: 24px 40px 20px;
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.scenario-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.step {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.step.active {
+  color: var(--role-lead);
+  font-weight: 700;
+}
+.step.done {
+  color: var(--success);
+  font-weight: 600;
+}
+.step-arrow {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.scenario-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ── 내 역할 표시 카드 ── */
+.my-role-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+.my-role-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.my-role-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+.my-role-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.my-role-emoji { font-size: 22px; }
+.my-role-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.my-role-dept {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.change-role-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-quote);
+  color: var(--text-sub);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.change-role-btn:hover { border-color: var(--border-hover); }
+
+.partner-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── 카드 그리드 ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 40px 100px;
+}
+@media (max-width: 1023px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 767px)  { .card-grid { grid-template-columns: 1fr; padding: 0 16px 100px; } }
+
+/* ── 파트너 카드 ── */
+.partner-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.4s ease both;
+}
+.partner-card:nth-child(1) { animation-delay: 0.04s; }
+.partner-card:nth-child(2) { animation-delay: 0.08s; }
+.partner-card:nth-child(3) { animation-delay: 0.12s; }
+.partner-card:nth-child(4) { animation-delay: 0.16s; }
+.partner-card:nth-child(5) { animation-delay: 0.20s; }
+.partner-card:nth-child(6) { animation-delay: 0.24s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.partner-card:not(.is-learner):hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 선택 상태 */
+.partner-card.selected {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 내 역할 카드 */
+.partner-card.is-learner {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
+.is-learner .learner-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 4px;
+  background: var(--bg-quote);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* 체크박스 */
+.partner-checkbox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.partner-card.selected .partner-checkbox {
+  border-color: currentColor;
+  background: currentColor;
+}
+.checkbox-inner {
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  background: #fff;
+  border-radius: 50%;
+}
+.partner-card.selected .checkbox-inner { opacity: 1; }
+
+/* 액센트 바 */
+.partner-card-accent {
+  height: 4px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* 카드 본문 */
+.card-body {
+  padding: 16px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.card-emoji { font-size: 20px; }
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+.card-number {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+.card-identity .char-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.card-identity .char-dept {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.card-mindset-short {
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--text-sub);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.card-situation-short {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* 역할별 색상 */
+.role-executive .partner-card-accent { background: var(--role-executive); }
+.role-executive .role-badge           { background: var(--role-executive); }
+.role-executive.selected              { border-color: var(--role-executive); color: var(--role-executive); }
+.role-manager  .partner-card-accent  { background: var(--role-manager); }
+.role-manager  .role-badge            { background: var(--role-manager); }
+.role-manager.selected                { border-color: var(--role-manager); color: var(--role-manager); }
+.role-lead     .partner-card-accent  { background: var(--role-lead); }
+.role-lead     .role-badge            { background: var(--role-lead); }
+.role-lead.selected                   { border-color: var(--role-lead); color: var(--role-lead); }
+.role-member   .partner-card-accent  { background: var(--role-member); }
+.role-member   .role-badge            { background: var(--role-member); }
+.role-member.selected                 { border-color: var(--role-member); color: var(--role-member); }
+
+/* ── 하단 선택 바 ── */
+.partner-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 40px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+.partner-bar:not(.hidden) { transform: translateY(0); }
+
+.partner-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.partner-bar-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.selected-partners {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.partner-chip {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.start-chat-btn {
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 10px;
+  background: var(--role-lead);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.start-chat-btn:hover { filter: brightness(1.08); transform: scale(1.02); }
+.start-chat-btn svg { width: 15px; height: 15px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+@media (max-width: 767px) {
+  .page-header { padding: 16px 16px 12px; }
+  .scenario-title { font-size: 22px; white-space: normal; }
+  .partner-bar { padding: 12px 16px; }
+}
