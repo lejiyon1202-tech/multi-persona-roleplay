@@ -15,11 +15,14 @@ const RADIAL_LINE_CLASS = {
   '상위':     'hierarchy',
   '부하':     'hierarchy',
   '상사':     'hierarchy',
+  '간접 상사': 'hierarchy',
+  '경영진':   'hierarchy',
   '동료':     'colleague',
   '선배':     'colleague',
   '갈등':     'conflict',
   '간접영향': 'indirect',
   '간접 관리': 'indirect',
+  '간접 연관': 'indirect',
 };
 
 /* relationships_structured type → 짧은 라벨 */
@@ -124,6 +127,17 @@ function _peerCoordsOrganic(peers, center) {
 /* relationships_structured → 중복 제거 관계 배열 */
 function _parseRelations(chars) {
   const idByName = new Map(chars.map(c => [c.name, c.id]));
+
+  /* target_name이 축약형일 때 전체 이름으로 폴백 매칭 */
+  function _resolveId(targetName) {
+    const exact = idByName.get(targetName);
+    if (exact) return exact;
+    for (const [name, id] of idByName) {
+      if (name.startsWith(targetName) || targetName.startsWith(name)) return id;
+    }
+    return undefined;
+  }
+
   const seen = new Set();
   const out  = [];
   chars.forEach(c => {
@@ -133,7 +147,7 @@ function _parseRelations(chars) {
     const rels = ld?.relationships_structured;
     if (!Array.isArray(rels)) return;
     rels.forEach(r => {
-      const tid = idByName.get(r.target_name);
+      const tid = _resolveId(r.target_name);
       if (!tid) return;
       const dedupeKey = [c.id, tid].sort((a, b) => a - b).join('-') + ':' + r.type;
       if (seen.has(dedupeKey)) return;
