@@ -137,7 +137,8 @@ function openModal(charId) {
   renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
   renderIconRows('modalMission', ld.mission || c.mission, 'check');
   renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
-  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, '🧑‍💼', c.name);
+  const HUMAN_C = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
+  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, HUMAN_C[c.role_level] || '🧑‍💼', c.name);
   renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
 
   // 첫 발화 힌트 (3 → 5개로 확장)
@@ -284,102 +285,91 @@ function renderRelations(id, structured, fallback, lEmoji, lName) {
     return;
   }
 
-  const W = 360, H = 260, CX = 180, CY = 115, R = 95, RC = 30, RN = 22;
-  const NS = 'http://www.w3.org/2000/svg';
   const n = structured.length;
+  const R = n <= 3 ? 36 : n <= 5 ? 34 : 30; // % 단위 반경
 
+  // 래퍼 (position:relative)
+  const wrap = document.createElement('div');
+  wrap.className = 'rel-diagram-wrap';
+  wrap.setAttribute('role', 'img');
+  wrap.setAttribute('aria-label', `${lName || '캐릭터'} 관계 구조도 — ${n}명`);
+
+  // SVG 선 레이어 (aria-hidden)
+  const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `${lName || '학습자'} 관계 구조도 — ${n}명`);
-  svg.className = 'relation-diagram';
+  svg.className = 'rel-svg-lines';
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('preserveAspectRatio', 'none');
 
-  // 도움말 텍스트 (스크린리더용)
-  const title = document.createElementNS(NS, 'title');
-  title.textContent = `${lName} 관계 구조도`;
-  svg.appendChild(title);
-
-  // 외부 노드
   structured.forEach((r, i) => {
     const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
-    const x = CX + R * Math.cos(angle);
-    const y = CY + R * Math.sin(angle);
-    const { stroke, sw, dash } = getLineStyle(r.type);
-
-    // 연결선 (data-type으로 CSS 스타일 제어)
+    const x = 50 + R * Math.cos(angle);
+    const y = 50 + R * Math.sin(angle);
     const line = document.createElementNS(NS, 'line');
-    line.setAttribute('x1', CX); line.setAttribute('y1', CY);
-    line.setAttribute('x2', x);  line.setAttribute('y2', y);
+    line.setAttribute('x1', '50'); line.setAttribute('y1', '50');
+    line.setAttribute('x2', String(x.toFixed(1)));
+    line.setAttribute('y2', String(y.toFixed(1)));
     line.setAttribute('data-type', r.type || '연결');
-    line.setAttribute('aria-hidden', 'true');
     svg.appendChild(line);
+  });
+  wrap.appendChild(svg);
 
-    // 관계 타입 라벨 (중간)
+  // 외부 노드들 (HTML div)
+  const HUMAN = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
+  structured.forEach((r, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    const x = 50 + R * Math.cos(angle);
+    const y = 50 + R * Math.sin(angle);
+
+    const found = allChars.find(ch => ch.name === r.target_name);
+    const nodeEmoji = HUMAN[found?.role_level] || '👤';
+
+    const node = document.createElement('div');
+    node.className = 'rel-node';
+    node.style.left = x.toFixed(1) + '%';
+    node.style.top  = y.toFixed(1) + '%';
+
+    const circ = document.createElement('div');
+    circ.className = 'rel-node-circle';
+    circ.textContent = nodeEmoji;
+
+    const nm = document.createElement('div');
+    nm.className = 'rel-node-name';
+    nm.textContent = (r.target_name || '').split(' ').slice(0, 2).join('\n');
+
+    node.appendChild(circ);
+    node.appendChild(nm);
+
     if (r.type) {
-      const mx = CX + (R * 0.52) * Math.cos(angle);
-      const my = CY + (R * 0.52) * Math.sin(angle);
-      const lbl = document.createElementNS(NS, 'text');
-      lbl.setAttribute('x', mx); lbl.setAttribute('y', my);
-      lbl.setAttribute('text-anchor', 'middle');
-      lbl.setAttribute('dominant-baseline', 'middle');
-      lbl.setAttribute('aria-hidden', 'true');
-      lbl.className = 'rel-type-lbl';
-      lbl.textContent = r.type;
-      svg.appendChild(lbl);
+      const tp = document.createElement('div');
+      tp.className = 'rel-node-type';
+      tp.textContent = r.type;
+      node.appendChild(tp);
     }
 
-    // 외부 노드 원 — A안: 사람 이모지 (역할별)
-    const found = allChars.find(ch => ch.name === r.target_name);
-    const HUMAN = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
-    const nodeEmoji = HUMAN[found?.role_level] || '👤';
-    const circle = document.createElementNS(NS, 'circle');
-    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', RN);
-    circle.setAttribute('aria-hidden', 'true');
-    circle.className = 'rel-node-circle';
-    svg.appendChild(circle);
-
-    // 이모지
-    const em = document.createElementNS(NS, 'text');
-    em.setAttribute('x', x); em.setAttribute('y', y);
-    em.setAttribute('text-anchor', 'middle');
-    em.setAttribute('dominant-baseline', 'middle');
-    em.setAttribute('aria-hidden', 'true');
-    em.className = 'rel-node-emoji';
-    em.textContent = nodeEmoji;
-    svg.appendChild(em);
-
-    // 이름 라벨
-    const nm = document.createElementNS(NS, 'text');
-    nm.setAttribute('x', x); nm.setAttribute('y', y + RN + 12);
-    nm.setAttribute('text-anchor', 'middle');
-    nm.className = 'rel-node-name';
-    nm.textContent = (r.target_name || '').split(' ').slice(0, 2).join(' ');
-    svg.appendChild(nm);
+    wrap.appendChild(node);
   });
 
-  // 중앙 노드 (학습자)
-  const cCircle = document.createElementNS(NS, 'circle');
-  cCircle.setAttribute('cx', CX); cCircle.setAttribute('cy', CY); cCircle.setAttribute('r', RC);
-  cCircle.className = 'rel-center-circle';
-  cCircle.setAttribute('aria-hidden', 'true');
-  svg.appendChild(cCircle);
+  // 중앙 노드 (클릭한 캐릭터)
+  const center = document.createElement('div');
+  center.className = 'rel-center';
+  center.style.left = '50%';
+  center.style.top  = '50%';
 
-  const cEm = document.createElementNS(NS, 'text');
-  cEm.setAttribute('x', CX); cEm.setAttribute('y', CY);
-  cEm.setAttribute('text-anchor', 'middle'); cEm.setAttribute('dominant-baseline', 'middle');
-  cEm.className = 'rel-center-emoji';
-  cEm.setAttribute('aria-hidden', 'true');
-  cEm.textContent = lEmoji || '👤';
-  svg.appendChild(cEm);
+  const cCirc = document.createElement('div');
+  cCirc.className = 'rel-center-circle';
+  cCirc.textContent = lEmoji || '🧑‍💼';
 
-  const cNm = document.createElementNS(NS, 'text');
-  cNm.setAttribute('x', CX); cNm.setAttribute('y', CY + RC + 13);
-  cNm.setAttribute('text-anchor', 'middle');
+  const cNm = document.createElement('div');
   cNm.className = 'rel-center-name';
-  cNm.textContent = '나';
-  svg.appendChild(cNm);
+  cNm.textContent = (lName || '나').split(' ').slice(0, 2).join(' ');
 
-  el.appendChild(svg);
+  center.appendChild(cCirc);
+  center.appendChild(cNm);
+  wrap.appendChild(center);
+
+  el.appendChild(wrap);
 }
 
 function renderEmotionTimeline(id, states) {
