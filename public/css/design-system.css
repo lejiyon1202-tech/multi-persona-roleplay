@@ -5,21 +5,27 @@
 
 /* ───── 역할 4색 코딩 (테마 공통) ───── */
 :root {
-  --role-executive:     #312e81;
-  --role-executive-bg:  #eef2ff;
-  --role-executive-mid: #818cf8;
+  /* 크림 페이퍼 딥 토너 4색 */
+  --role-executive:     #312E2B;
+  --role-executive-bg:  #F0EAE6;
+  --role-executive-mid: #9B8D84;
 
-  --role-manager:       #1e3a8a;
-  --role-manager-bg:    #dbeafe;
-  --role-manager-mid:   #60a5fa;
+  --role-manager:       #1B3250;
+  --role-manager-bg:    #E2EAF0;
+  --role-manager-mid:   #6B90B4;
 
-  --role-lead:          #134e4a;
-  --role-lead-bg:       #ccfbf1;
-  --role-lead-mid:      #2dd4bf;
+  --role-lead:          #1A3D30;
+  --role-lead-bg:       #E0EDEA;
+  --role-lead-mid:      #5D9478;
 
-  --role-member:        #78350f;
-  --role-member-bg:     #fef3c7;
-  --role-member-mid:    #fbbf24;
+  --role-member:        #6B3B1D;
+  --role-member-bg:     #F5E9DE;
+  --role-member-mid:    #C47A42;
+
+  /* 앰버 포인트 */
+  --amber:     #B45309;
+  --amber-mid: #D97706;
+  --amber-lt:  #FEF3C7;
 
   /* 반경 */
   --radius-card:     16px;
@@ -66,31 +72,32 @@
 
 
   /* 폰트 */
-  --font:      'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
-  --font-mono: 'Pretendard', ui-monospace, monospace;
+  --font:       'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --font-serif: 'Noto Serif KR', Georgia, serif;
+  --font-mono:  'Pretendard', ui-monospace, monospace;
 }
 
 /* ───── 라이트 테마 ───── */
 [data-theme="light"] {
-  --bg:              #f2f4f8;
-  --bg-card:         #ffffff;
-  --bg-quote:        #f7f9ff;
-  --bg-input:        #f9fafb;
-  --border:          #e2e5ef;
-  --border-hover:    #a5b4fc;
-  --border-focus:    #4f46e5;
-  --text-primary:    #0f172a;
-  --text-sub:        #374151;
-  --text-muted:      #6b7280;
-  --text-placeholder:#9ca3af;
-  --shadow-sm:       0 1px 4px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
-  --shadow:          0 2px 10px rgba(15,23,42,0.08), 0 1px 4px rgba(15,23,42,0.04);
-  --shadow-md:       0 6px 20px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.06);
-  --shadow-hover:    0 16px 40px rgba(15,23,42,0.14), 0 4px 12px rgba(15,23,42,0.06);
-  --shadow-card:     0 1px 3px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.06);
-  --shadow-lg:       0 12px 36px rgba(15,23,42,0.14), 0 4px 12px rgba(15,23,42,0.08);
-  --shadow-xl:       0 24px 64px rgba(15,23,42,0.18), 0 8px 24px rgba(15,23,42,0.10);
-  --divider:         #e8eaf0;
+  --bg:              #F7F2EB;
+  --bg-card:         #FFFFFF;
+  --bg-quote:        #F2EDE6;
+  --bg-input:        #FDFBF8;
+  --border:          #DDD6CC;
+  --border-hover:    #C47A42;
+  --border-focus:    #B45309;
+  --text-primary:    #1C1917;
+  --text-sub:        #3D2F28;
+  --text-muted:      #78716C;
+  --text-placeholder:#A8A29E;
+  --shadow-sm:       0 1px 4px rgba(28,25,23,0.06), 0 1px 2px rgba(28,25,23,0.04);
+  --shadow:          0 2px 10px rgba(28,25,23,0.08), 0 1px 4px rgba(28,25,23,0.04);
+  --shadow-md:       0 6px 20px rgba(28,25,23,0.10), 0 2px 6px rgba(28,25,23,0.06);
+  --shadow-hover:    0 16px 40px rgba(28,25,23,0.14), 0 4px 12px rgba(28,25,23,0.06);
+  --shadow-card:     0 1px 3px rgba(28,25,23,0.05), 0 8px 24px rgba(28,25,23,0.05);
+  --shadow-lg:       0 12px 36px rgba(28,25,23,0.12), 0 4px 12px rgba(28,25,23,0.07);
+  --shadow-xl:       0 24px 64px rgba(28,25,23,0.16), 0 8px 24px rgba(28,25,23,0.09);
+  --divider:         #DDD6CC;
   --overlay:         rgba(15,23,42,0.45);
   --success:         #059669;
   --warning:         #d97706;
@@ -170,7 +177,7 @@ input, textarea, select { font-family: var(--font); }
   border: none;
 }
 .btn-primary {
-  background: var(--role-lead);
+  background: var(--amber);
   color: #fff;
 }
 .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -269,7 +276,7 @@ input, textarea, select { font-family: var(--font); }
    UTILITY
    ═══════════════════════════════════════════════════ */
 .hidden { display: none !important; }
-.avatar-lead { background: #134e4a; }
+.avatar-lead { background: var(--role-lead); }
 /* ── 역할별 색상 바 (innerHTML 동적 생성용) ── */
 .role-bar { height: 3px; }
 .role-bar.executive { background: var(--role-executive); }

@@ -1,12 +1,9 @@
-
 /* ───────────────────────────────────────────────
-   START BUTTON (선택 후)
+   START BAR (선택 후)
 ──────────────────────────────────────────────── */
 .start-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 16px 40px;
   background: var(--bg-card);
   border-top: 1px solid var(--border);
@@ -16,30 +13,18 @@
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 -4px 20px rgba(28,25,23,0.08);
 }
-
 .start-bar.visible { transform: translateY(0); }
 
-.selected-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
+.selected-info { display: flex; align-items: center; gap: 12px; }
 .selected-avatar {
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: #fff;
-  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #fff; font-weight: 700;
 }
-
-.selected-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.selected-name { font-family: var(--font-serif); font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .selected-role { font-size: 12px; color: var(--text-muted); }
 
 .start-btn {
@@ -53,137 +38,180 @@
   color: #fff;
   cursor: pointer;
   transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
-.start-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+.start-btn:hover { filter: brightness(1.08); transform: scale(1.02); }
 .start-btn svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
 
 /* ───────────────────────────────────────────────
-   캐릭터 상세 모달
+   모달 오버레이
 ──────────────────────────────────────────────── */
 .char-modal-overlay {
   position: fixed;
   inset: 0;
-  background: var(--overlay);
+  background: rgba(28,25,23,0.55);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   animation: fadeIn 0.18s ease;
+  backdrop-filter: blur(4px);
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .char-modal-overlay.hidden { display: none; }
 
+/* ───────────────────────────────────────────────
+   모달 — 2열 분리 레이아웃
+──────────────────────────────────────────────── */
 .char-modal {
+  display: grid;
+  grid-template-columns: 220px 1fr;
   background: var(--bg-card);
-  border-radius: 20px;
-  width: 520px;
+  border-radius: 22px;
+  width: 760px;
   max-width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  max-height: 88vh;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(28,25,23,0.28);
   position: relative;
-  animation: slideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideUp 0.24s cubic-bezier(0.4, 0, 0.2, 1);
 }
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1.5px solid var(--border);
-  background: var(--bg-quote);
-  color: var(--text-muted);
+/* ───────────────────────────────────────────────
+   왼쪽: 아이덴티티 패널
+──────────────────────────────────────────────── */
+.modal-left-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--transition);
-  z-index: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px 24px 24px;
+  position: relative;
+  overflow: hidden;
+  /* 배경은 JS에서 역할 컬러로 동적 적용 */
+  background: var(--role-lead);
 }
-.modal-close:hover { border-color: var(--border-hover); color: var(--text-sub); }
-.modal-close svg { width: 14px; height: 14px; }
-
-.modal-accent-bar { height: 4px; border-radius: 20px 20px 0 0; }
-
-.modal-body { padding: 24px 24px 0; }
-
-.modal-identity { margin-bottom: 16px; }
-.modal-identity .role-badge {
-  margin-bottom: 8px;
-  display: inline-flex;
+/* 미세 노이즈 텍스처 오버레이 */
+.modal-left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
 }
+.modal-left-panel > * { position: relative; z-index: 1; }
+
+/* 역할 배지 (왼쪽 패널 내) */
+.modal-left-panel .role-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.12);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
 .modal-name {
-  font-size: 22px;
-  font-weight: 900;
-  color: var(--text-primary);
-  line-height: 1.2;
-  margin-bottom: 3px;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  margin-top: 4px;
 }
 .modal-dept {
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+
+.modal-panel-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.15);
+  margin: 4px 0;
 }
 
 .modal-mindset {
-  background: var(--bg-quote);
-  border-left: 3px solid var(--border);
-  border-radius: 0 8px 8px 0;
-  padding: 12px 16px;
-  font-size: 15px;
+  font-size: 12.5px;
   font-style: italic;
-  color: var(--text-sub);
+  color: rgba(255,255,255,0.82);
   line-height: 1.7;
-  margin-bottom: 18px;
   quotes: "\201C" "\201D";
 }
-.modal-mindset::before { content: open-quote; margin-right: 2px; opacity: 0.6; }
-.modal-mindset::after  { content: close-quote; margin-left: 2px; opacity: 0.6; }
+.modal-mindset::before { content: open-quote; opacity: 0.7; margin-right: 1px; }
+.modal-mindset::after  { content: close-quote; opacity: 0.7; margin-left: 1px; }
 
-.modal-section { margin-bottom: 16px; }
+/* ───────────────────────────────────────────────
+   오른쪽: 상세 정보 패널
+──────────────────────────────────────────────── */
+.modal-right-panel {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-section {
+  padding: 14px 22px;
+}
 .modal-section-label {
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  color: var(--amber);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.modal-section-label::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  display: inline-block;
+  flex-shrink: 0;
 }
 .modal-section-text {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-sub);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
-.modal-divider { height: 1px; background: var(--divider); margin: 12px 0; }
+.modal-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 22px;
+}
 
-/* 첫 발화 힌트 */
+/* 힌트 */
 .modal-hint-wrap { }
 .modal-hint-item {
   background: var(--bg-quote);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 7px;
+  padding: 7px 11px;
   font-size: 13px;
   color: var(--text-sub);
-  margin-bottom: 6px;
-  line-height: 1.5;
+  margin-bottom: 5px;
+  line-height: 1.55;
   font-style: italic;
 }
-.modal-hint-item::before { content: '"'; color: var(--text-muted); margin-right: 2px; }
-.modal-hint-item::after  { content: '"'; color: var(--text-muted); margin-left: 2px; }
+.modal-hint-item::before { content: '"'; color: var(--amber); margin-right: 1px; }
+.modal-hint-item::after  { content: '"'; color: var(--amber); margin-left: 1px; }
 
-/* 모달 CTA */
+/* CTA */
 .modal-cta {
-  padding: 16px 24px 20px;
+  padding: 16px 22px 20px;
+  margin-top: auto;
 }
 .modal-start-btn {
   width: 100%;
@@ -200,12 +228,43 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  background: var(--amber);
 }
 .modal-start-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .modal-start-btn svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
 .modal-context-note {
   text-align: center;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-muted);
-  padding: 12px 0;
+  padding: 10px 0 16px;
+}
+
+/* 닫기 버튼 */
+.modal-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 10;
+}
+.modal-close:hover { background: rgba(255,255,255,0.22); color: #fff; }
+.modal-close svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+/* 반응형 */
+@media (max-width: 767px) {
+  .char-modal { grid-template-columns: 1fr; }
+  .modal-left-panel { padding: 24px 20px; min-height: 180px; }
+  .modal-name { font-size: 22px; }
+  .modal-close {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.15);
+  }
+  .start-bar { padding: 12px 16px; }
 }

@@ -19,12 +19,12 @@
   margin-bottom: 12px;
 }
 .hero-title {
+  font-family: var(--font-serif);
   font-size: 38px;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text-primary);
   line-height: 1.15;
   margin-bottom: 14px;
-  letter-spacing: -0.02em;
 }
 .hero-desc {
   font-size: 17px;
@@ -132,8 +132,9 @@
 
 /* 카드 본문 */
 .scenario-title {
-  font-size: 22px;
-  font-weight: 800;
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
 }
