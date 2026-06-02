@@ -78,7 +78,7 @@ async function loadCharacters() {
       mount.innerHTML = '<p class="empty-state">등록된 캐릭터가 없습니다.</p>';
       return;
     }
-    renderOrgTree(allChars.sort((a, b) => a.card_number - b.card_number), scenarioId);
+    renderRadialNetwork(allChars.sort((a, b) => a.card_number - b.card_number), scenarioId);
     document.dispatchEvent(new Event('charactersLoaded'));
   } catch {
     const el = document.getElementById('orgChart') || document.getElementById('cardGrid');
