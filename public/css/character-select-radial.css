@@ -73,8 +73,18 @@
   box-shadow: none;
 }
 
-/* 역할별 색상 배경 제거 (radial 컨텍스트 override) */
-.org-radial-wrap .org-node .org-illust { background: none; }
+/* 역할별 배경·그림자·크기 정정 (radial 컨텍스트 override) */
+.org-radial-wrap .org-node .org-illust {
+  background: none;
+  box-shadow: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+.org-radial-wrap .org-node.is-center .org-illust {
+  width: 84px;
+  height: 84px;
+}
 
 /* 이름·배지 — catch 54호: 오버플로우 정정 */
 .org-radial-wrap .org-node-name {
