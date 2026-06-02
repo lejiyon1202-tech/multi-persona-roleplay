@@ -10,3 +10,5 @@ build/
 *.sqlite-journal
 data/uploads/
 *.swp
+
+*.alyac
