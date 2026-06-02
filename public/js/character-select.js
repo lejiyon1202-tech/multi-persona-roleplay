@@ -137,7 +137,7 @@ function openModal(charId) {
   renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
   renderIconRows('modalMission', ld.mission || c.mission, 'check');
   renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
-  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships);
+  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, '🧑‍💼', c.name);
   renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
 
   // 첫 발화 힌트 (3 → 5개로 확장)
@@ -265,35 +265,124 @@ function renderIconRows(id, text, iconType) {
   el.appendChild(row);
 }
 
-function renderRelations(id, structured, fallback) {
+function getLineStyle(type) {
+  if (!type) return { stroke: '#A1A1AA', sw: 1.5, dash: '5,3' };
+  const t = type.trim();
+  if (/상사|경영진|본부장|CCO/.test(t))   return { stroke: '#09090B', sw: 2,   dash: '' };
+  if (/동료|그룹장|파트장/.test(t))         return { stroke: '#52525B', sw: 1.5, dash: '' };
+  if (/부하|후배|CL|팀원/.test(t))          return { stroke: '#A1A1AA', sw: 1.5, dash: '4,3' };
+  return { stroke: '#A1A1AA', sw: 1.5, dash: '5,3' };
+}
+
+function renderRelations(id, structured, fallback, lEmoji, lName) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = '';
-  if (Array.isArray(structured) && structured.length > 0) {
-    const grid = document.createElement('div');
-    grid.className = 'relation-grid';
-    structured.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'relation-card';
-      const top = document.createElement('div');
-      top.className = 'relation-card-top';
-      const name = document.createElement('span');
-      name.className = 'relation-name';
-      name.textContent = r.target_name || r.name || '';
-      const type = document.createElement('span');
-      type.className = 'relation-type';
-      type.textContent = r.type || '';
-      top.appendChild(name);
-      top.appendChild(type);
-      const desc = document.createElement('p');
-      desc.className = 'relation-desc';
-      desc.textContent = r.description || '';
-      card.appendChild(top);
-      card.appendChild(desc);
-      grid.appendChild(card);
-    });
-    el.appendChild(grid);
+
+  if (!Array.isArray(structured) || structured.length === 0) {
+    el.textContent = (typeof fallback === 'string' && fallback) ? fallback : '—';
     return;
+  }
+
+  const W = 360, H = 260, CX = 180, CY = 115, R = 95, RC = 30, RN = 22;
+  const NS = 'http://www.w3.org/2000/svg';
+  const n = structured.length;
+
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', `${lName || '학습자'} 관계 구조도 — ${n}명`);
+  svg.className = 'relation-diagram';
+
+  // 도움말 텍스트 (스크린리더용)
+  const title = document.createElementNS(NS, 'title');
+  title.textContent = `${lName} 관계 구조도`;
+  svg.appendChild(title);
+
+  // 외부 노드
+  structured.forEach((r, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    const x = CX + R * Math.cos(angle);
+    const y = CY + R * Math.sin(angle);
+    const { stroke, sw, dash } = getLineStyle(r.type);
+
+    // 연결선
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', CX); line.setAttribute('y1', CY);
+    line.setAttribute('x2', x);  line.setAttribute('y2', y);
+    line.setAttribute('stroke', stroke);
+    line.setAttribute('stroke-width', sw);
+    if (dash) line.setAttribute('stroke-dasharray', dash);
+    line.setAttribute('aria-hidden', 'true');
+    svg.appendChild(line);
+
+    // 관계 타입 라벨 (중간)
+    if (r.type) {
+      const mx = CX + (R * 0.52) * Math.cos(angle);
+      const my = CY + (R * 0.52) * Math.sin(angle);
+      const lbl = document.createElementNS(NS, 'text');
+      lbl.setAttribute('x', mx); lbl.setAttribute('y', my);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('dominant-baseline', 'middle');
+      lbl.setAttribute('aria-hidden', 'true');
+      lbl.className = 'rel-type-lbl';
+      lbl.textContent = r.type;
+      svg.appendChild(lbl);
+    }
+
+    // 외부 노드 원 — A안: 사람 이모지 (역할별)
+    const found = allChars.find(ch => String(ch.id) === String(r.character_id));
+    const HUMAN = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
+    const nodeEmoji = HUMAN[found?.role_level] || '👤';
+    const circle = document.createElementNS(NS, 'circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', RN);
+    circle.setAttribute('aria-hidden', 'true');
+    circle.className = 'rel-node-circle';
+    svg.appendChild(circle);
+
+    // 이모지
+    const em = document.createElementNS(NS, 'text');
+    em.setAttribute('x', x); em.setAttribute('y', y);
+    em.setAttribute('text-anchor', 'middle');
+    em.setAttribute('dominant-baseline', 'middle');
+    em.setAttribute('aria-hidden', 'true');
+    em.className = 'rel-node-emoji';
+    em.textContent = nodeEmoji;
+    svg.appendChild(em);
+
+    // 이름 라벨
+    const nm = document.createElementNS(NS, 'text');
+    nm.setAttribute('x', x); nm.setAttribute('y', y + RN + 12);
+    nm.setAttribute('text-anchor', 'middle');
+    nm.className = 'rel-node-name';
+    nm.textContent = (r.target_name || '').split(' ').slice(0, 2).join(' ');
+    svg.appendChild(nm);
+  });
+
+  // 중앙 노드 (학습자)
+  const cCircle = document.createElementNS(NS, 'circle');
+  cCircle.setAttribute('cx', CX); cCircle.setAttribute('cy', CY); cCircle.setAttribute('r', RC);
+  cCircle.className = 'rel-center-circle';
+  cCircle.setAttribute('aria-hidden', 'true');
+  svg.appendChild(cCircle);
+
+  const cEm = document.createElementNS(NS, 'text');
+  cEm.setAttribute('x', CX); cEm.setAttribute('y', CY);
+  cEm.setAttribute('text-anchor', 'middle'); cEm.setAttribute('dominant-baseline', 'middle');
+  cEm.className = 'rel-center-emoji';
+  cEm.setAttribute('aria-hidden', 'true');
+  cEm.textContent = lEmoji || '👤';
+  svg.appendChild(cEm);
+
+  const cNm = document.createElementNS(NS, 'text');
+  cNm.setAttribute('x', CX); cNm.setAttribute('y', CY + RC + 13);
+  cNm.setAttribute('text-anchor', 'middle');
+  cNm.className = 'rel-center-name';
+  cNm.textContent = '나';
+  svg.appendChild(cNm);
+
+  el.appendChild(svg);
+  return;
   }
   el.textContent = (typeof fallback === 'string' && fallback) ? fallback : '—';
 }

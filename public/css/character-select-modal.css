@@ -325,41 +325,45 @@
 .modal-icon svg { width: 16px; height: 16px; }
 .modal-icon-text { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
 
-/* 관계 카드 그리드 */
-.relation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+/* 관계 구조도 SVG */
+.relation-diagram {
+  width: 100%;
+  max-height: 260px;
+  display: block;
+  font-family: var(--font);
 }
-.relation-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: var(--bg-card);
+.rel-node-circle {
+  fill: var(--bg-quote);
+  stroke: var(--border);
+  stroke-width: 1.5;
 }
-.relation-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 5px;
+.rel-center-circle {
+  fill: #09090B;
 }
-.relation-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
+.rel-node-emoji {
+  font-size: 18px;
+  dominant-baseline: middle;
 }
-.relation-type {
+.rel-center-emoji {
+  font-size: 20px;
+  dominant-baseline: middle;
+}
+.rel-node-name {
+  font-size: 9.5px;
+  fill: var(--text-muted);
+  font-family: var(--font);
+}
+.rel-center-name {
   font-size: 10px;
+  fill: #fff;
   font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg-quote);
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-family: var(--font);
 }
-.relation-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.5;
+.rel-type-lbl {
+  font-size: 8.5px;
+  fill: var(--text-muted);
+  font-family: var(--font);
+  background: var(--bg-card);
 }
 
 /* 감정 흐름 타임라인 */
