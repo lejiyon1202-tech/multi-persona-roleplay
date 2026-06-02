@@ -2,13 +2,48 @@
 const ROLE_CLASS  = { '상위리더': 'role-executive', '그룹장': 'role-manager', '파트장': 'role-lead', '부서원': 'role-member' };
 const ROLE_COLORS = { 'role-executive': '#312E2B', 'role-manager': '#1B3250', 'role-lead': '#1A3D30', 'role-member': '#6B3B1D' };
 
+/* 시나리오별 히어로 인포그래픽 메타 (배경 톤·갈등 구조·헤드라인) */
+const SCENE_META = {
+  1: { tone: 'office-conflict',    conflict: 'AI 도입 압박', vs: '팀원 저항',       headline: 'AI혁신센터, 경영진 압박과 현장이 충돌하다',         org: '6인 조직 · 3계층' },
+  2: { tone: 'deadline-pressure',  conflict: 'KPI D-14 압박', vs: '현장 번아웃',     headline: 'AI 성과 보고 D-14, 조직 번아웃 임계점',             org: '6인 조직 · 3계층' },
+  4: { tone: 'crisis-cdp',         conflict: 'CDP 전환 D-30', vs: '치명적 오류 발견', headline: '147억 투자 CDP, D-30에 치명적 오류가 발견됐다',    org: '6인 조직 · 4계층' },
+};
+
 const params     = new URLSearchParams(location.search);
 const scenarioId = params.get('scenario_id') || '1';
 
 let allChars = [];
 
+/* ── 히어로 인포그래픽 주입 ── */
+function injectSceneHero(sid) {
+  const hero = document.getElementById('sceneHero');
+  if (!hero) return;
+  const id   = parseInt(sid, 10);
+  const meta = SCENE_META[id];
+  if (!meta) { hero.classList.add('hidden'); return; }
+
+  hero.classList.remove('hidden');
+  hero.classList.add(`scene-${meta.tone}`);
+
+  hero.innerHTML = `
+    <div class="hero-inner">
+      <div class="hero-org" aria-label="조직 구성">${esc(meta.org)}</div>
+      <h2 class="hero-main-title">${esc(meta.headline)}</h2>
+      <div class="hero-conflict" role="img" aria-label="핵심 갈등 구조: ${esc(meta.conflict)} 대 ${esc(meta.vs)}">
+        <div class="conflict-node--a">${esc(meta.conflict)}</div>
+        <div class="conflict-arrow" aria-hidden="true">↔</div>
+        <div class="conflict-node--b">${esc(meta.vs)}</div>
+      </div>
+    </div>
+    <div class="hero-prompt-bar">
+      <span class="hero-prompt-text">이 상황에서 누구를 연기하시겠습니까?</span>
+      <div class="hero-prompt-divider" aria-hidden="true"></div>
+    </div>`;
+}
+
 /* ── 초기화 ── */
 async function initPage() {
+  injectSceneHero(scenarioId);
   await Promise.all([loadScenarioInfo(), loadCharacters()]);
   document.getElementById('loadingState')?.remove();
   bindCardEvents();

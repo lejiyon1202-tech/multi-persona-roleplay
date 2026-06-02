@@ -9,9 +9,13 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link rel="stylesheet" href="css/design-system.css">
 <link rel="stylesheet" href="css/character-select.css">
+<link rel="stylesheet" href="css/character-select-hero.css">
 <link rel="stylesheet" href="css/character-select-modal.css">
 </head>
 <body>
+
+<!-- ── 시나리오 히어로 (JS 주입) ── -->
+<div id="sceneHero" class="scenario-hero hidden" aria-label="시나리오 상황 개요"></div>
 
 <!-- ── 헤더 ── -->
 <div class="page-header">
@@ -46,11 +50,13 @@
 </div>
 
 <!-- ── 카드 그리드 (JS 동적 렌더) ── -->
+<div class="card-grid-wrap">
 <div class="card-grid" id="cardGrid">
   <div class="loading-state grid-span-full" id="loadingState">
     <div class="spinner"></div>
     <p>캐릭터 정보를 불러오는 중...</p>
   </div>
+</div>
 </div>
 
 <!-- ── 캐릭터 상세 모달 (2열 분리: 아이덴티티 + 상세정보) ── -->

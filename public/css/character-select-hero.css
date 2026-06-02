@@ -1,0 +1,114 @@
+/* ── 시나리오 히어로 인포그래픽 ── */
+.scenario-hero {
+  width: 100%;
+  overflow: hidden;
+  padding-bottom: 48px;
+}
+.scene-office-conflict {
+  background: linear-gradient(145deg, #1B3250 0%, #2A2018 70%, #312E2B 100%);
+}
+.scene-deadline-pressure {
+  background: linear-gradient(145deg, #312E2B 0%, #4A2510 70%, #78350F 100%);
+}
+.scene-crisis-cdp {
+  background: linear-gradient(145deg, #1A3D30 0%, #0F2A1E 70%, #14532D 100%);
+}
+/* accent (JS에서 CSS 변수 주입) */
+.scenario-hero { --accent: #60A5FA; }
+.scene-deadline-pressure { --accent: #FCD34D; }
+.scene-crisis-cdp { --accent: #F87171; }
+.conflict-node { border-color: rgba(255,255,255,0.18); }
+.hero-prompt-divider { background: var(--accent, rgba(255,255,255,0.12)); opacity: 0.3; }
+
+.hero-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 44px 40px 32px;
+  color: #fff;
+}
+.hero-org {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 10px;
+}
+.hero-main-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+.hero-situation {
+  font-size: 16px;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.65;
+  max-width: 600px;
+  margin-bottom: 28px;
+}
+/* 갈등 메타포 */
+.hero-conflict {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.conflict-node,
+.conflict-node--a,
+.conflict-node--b {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.conflict-arrow {
+  font-size: 20px;
+  color: rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+/* 히어로 하단 프롬프트 */
+.hero-prompt-bar {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-prompt-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.hero-prompt-divider {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+/* 카드 그리드 floating — 히어로 위로 올라오는 효과 */
+.card-grid-wrap {
+  max-width: 1160px;
+  margin: -36px auto 0;
+  padding: 0 40px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 반응형 */
+@media (max-width: 767px) {
+  .hero-inner       { padding: 32px 16px 20px; }
+  .hero-main-title  { font-size: 24px; }
+  .hero-situation   { font-size: 15px; }
+  .hero-conflict    { gap: 8px; }
+  .conflict-node    { font-size: 13px; padding: 6px 12px; }
+  .hero-prompt-bar  { padding: 0 16px; }
+  .card-grid-wrap   { padding: 0 16px 60px; margin-top: -24px; }
+}
