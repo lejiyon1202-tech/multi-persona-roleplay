@@ -104,8 +104,8 @@
   align-items: center;
   margin-bottom: 6px;
 }
-.score-bar-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-.score-bar-val   { font-size: 13px; color: var(--text-muted); }
+.score-bar-label { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.score-bar-val   { font-size: 14px; color: var(--text-muted); }
 .score-bar-track {
   height: 8px;
   background: var(--bg-quote);
@@ -149,7 +149,7 @@
 }
 .feedback-card-header:hover { background: var(--bg-quote); }
 .feedback-card-left { display: flex; align-items: center; gap: 10px; }
-.feedback-axis { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.feedback-axis { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .feedback-score-badge {
   height: 20px;
   padding: 0 8px;
@@ -169,10 +169,10 @@
 .feedback-card.open .feedback-chevron { transform: rotate(180deg); }
 .feedback-card-body {
   display: none;
-  padding: 0 16px 14px;
-  font-size: 14px;
+  padding: 0 18px 16px;
+  font-size: 15px;
   color: var(--text-sub);
-  line-height: 1.65;
+  line-height: 1.75;
 }
 .feedback-card.open .feedback-card-body { display: block; }
 
