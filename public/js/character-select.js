@@ -329,7 +329,7 @@ function renderRelations(id, structured, fallback, lEmoji, lName) {
     }
 
     // 외부 노드 원 — A안: 사람 이모지 (역할별)
-    const found = allChars.find(ch => String(ch.id) === String(r.character_id));
+    const found = allChars.find(ch => ch.name === r.target_name);
     const HUMAN = { '상위리더': '👨‍💼', '그룹장': '👩‍💼', '파트장': '🧑‍💼', '부서원': '👤' };
     const nodeEmoji = HUMAN[found?.role_level] || '👤';
     const circle = document.createElementNS(NS, 'circle');
