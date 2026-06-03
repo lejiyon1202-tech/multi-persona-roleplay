@@ -41,7 +41,7 @@ async function loadReport() {
 
 function renderReport(data) {
   const total = data.total_score || 0;
-  const grade = data.grade || (total >= 23.75 ? '됐어!' : total >= 19 ? '아쉽지만...' : '느낌이 안 와');
+  const grade = data.grade || (total >= 23.75 ? '됐어!' : total >= 20 ? '아쉽지만...' : '느낌이 안 와');
   const gradeClass = grade === '됐어!' ? 'pass' : grade === '아쉽지만...' ? 'partial' : 'fail';
 
   document.getElementById('scoreNum').textContent = total.toFixed(1);

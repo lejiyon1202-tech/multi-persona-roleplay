@@ -199,7 +199,7 @@ ${partnerDesc}
 - R-27 (0~5점): 셀프 러닝 적합성 — 학습자의 자기 성찰, 재도전 의지
 - R-28 (0~5점): AI 캐릭터 페르소나 일관성 + 감정 단계 변화 반영도
 - total_score = R-26 + R-27 + R-28 (최대 25점)
-- grade 기준: 됐어!(≥23.75) / 아쉽지만...(≥19) / 느낌이 안 와(<19)
+- grade 기준: 됐어!(≥23.75) / 아쉽지만...(≥20) / 느낌이 안 와(<20)
 
 [다음 도전 후보 — next_challenges 에서만 선택]
 ${challengeList}
@@ -283,7 +283,7 @@ router.post('/evaluate', async (req, res) => {
     const r27 = Number(scores.r27) || 0;
     const r28 = Number(scores.r28) || 0;
     const total = parseFloat((r26 + r27 + r28).toFixed(2));
-    const grade = total >= 23.75 ? '됐어!' : total >= 19 ? '아쉽지만...' : '느낌이 안 와';
+    const grade = total >= 23.75 ? '됐어!' : total >= 20 ? '아쉽지만...' : '느낌이 안 와';
 
     await saveEvaluation({
       session_id,
