@@ -123,7 +123,7 @@
 @media (max-width: 767px) {
   .org-radial-wrap {
     max-width: 100%;
-    margin: 8px auto 8px;
+    margin: 60px auto 8px; /* 상위리더 노드가 컨테이너 위로 ~45px overflow → 히어로와 겹침 방지 */
   }
   .org-radial-wrap .org-avatar-img { width: 44px !important; height: 44px !important; }
   .org-radial-wrap .org-node.is-center .org-avatar-img { width: 56px !important; height: 56px !important; }
