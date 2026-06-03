@@ -172,7 +172,7 @@ function applyCharacterUI(char) {
   document.getElementById('typingAvatar').style.background = color;
   document.getElementById('miniName').textContent = char.name || '—';
   document.getElementById('miniRole').textContent = char.role_level || '—';
-  document.title = `${char.name}과 대화 — AI 롤플레잉`;
+  document.title = `${char.name}과 대화 — AI 대화 학습`;
   document.querySelectorAll('.send-btn').forEach(b => b.style.background = color);
 
   if (char.emotion_stages?.length > 0) {
