@@ -303,8 +303,9 @@
     display: flex;
     flex-direction: column;
   }
-  /* 탭 패널 — 내부 스크롤 */
-  .modal-tab-panel { min-height: 0; overflow-y: auto; }
+  /* 탭 패널 — 내부 스크롤바 명시 */
+  .modal-tab-panel { min-height: 0; overflow-y: scroll; scrollbar-width: thin; }
+  .modal-cta { flex-shrink: 0; }
   .modal-name { font-size: 20px; }
   .modal-close {
     border-color: rgba(255,255,255,0.2);
