@@ -141,9 +141,10 @@
    오른쪽: 탭 분할 패널
 ──────────────────────────────────────────────── */
 .modal-right-panel {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 /* 탭 버튼 */
@@ -266,8 +267,8 @@
 .modal-close:hover { border-color: var(--text-primary); color: var(--text-primary); }
 .modal-close svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.5; fill: none; }
 
-/* 반응형 */
-@media (max-width: 767px) {
+/* 반응형 — 1023px 이하 fullscreen (모바일+태블릿+작은 데스크톱) */
+@media (max-width: 1023px) {
   /* 오버레이 — 패딩 없이 fullscreen */
   .char-modal-overlay { padding: 0; align-items: stretch; }
   /* 모달 — fullscreen */
