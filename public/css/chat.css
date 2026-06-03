@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════
    채팅 화면 전용 스타일
    ═══════════════════════════════════════════════ */
-body { display: flex; flex-direction: column; height: 100dvh; min-height: -webkit-fill-available; overflow: hidden; }
+body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
 
 /* ── 채팅 헤더 ── */
 .chat-header {
