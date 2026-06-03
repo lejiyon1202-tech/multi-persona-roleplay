@@ -119,22 +119,14 @@
   word-break: keep-all;
 }
 
-/* ── 반응형 세로 스택 fallback (catch 31호) ── */
+/* ── 반응형 모바일 — 방사형 유지, 크기 축소 ── */
 @media (max-width: 767px) {
   .org-radial-wrap {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding-bottom: 16px;
+    max-width: 100%;
+    margin: 8px auto 8px;
   }
-  .org-radial-svg { display: none; }
-  .org-radial-wrap .org-node {
-    position: static !important;
-    transform: none !important;
-  }
-  .org-radial-wrap .org-node:hover { transform: none !important; }
-  .org-radial-wrap .org-avatar-img { width: 56px !important; height: 56px !important; }
-  .org-radial-wrap .org-node.is-center .org-avatar-img { width: 68px !important; height: 68px !important; }
+  .org-radial-wrap .org-avatar-img { width: 44px !important; height: 44px !important; }
+  .org-radial-wrap .org-node.is-center .org-avatar-img { width: 56px !important; height: 56px !important; }
+  .org-radial-wrap .org-node-name { font-size: 9px; max-width: 72px; }
+  .org-radial-wrap .org-node-dept { font-size: 8px; max-width: 72px; padding: 1px 4px; }
 }
