@@ -174,9 +174,15 @@
 .modal-tab-panel {
   display: none;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: scroll;
   flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
+.modal-tab-panel::-webkit-scrollbar { width: 5px; }
+.modal-tab-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .modal-tab-panel.active { display: flex; }
 
 .modal-section {
@@ -221,7 +227,9 @@
 /* CTA */
 .modal-cta {
   padding: 16px 22px 20px;
-  margin-top: auto;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
 }
 .modal-start-btn {
   width: 100%;
