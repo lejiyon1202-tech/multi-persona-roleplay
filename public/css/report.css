@@ -92,9 +92,24 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .score-retry-btn:hover { border-color: var(--role-lead); color: var(--role-lead); }
 .score-retry-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+/* 모바일 — score-hero 세로 정렬 */
+@media (max-width: 767px) {
+  .score-hero {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+  }
+  .score-info { width: 100%; text-align: center; }
+  .score-char { justify-content: center; flex-wrap: wrap; }
+  .score-retry-btn { width: 100%; justify-content: center; }
+}
 
 /* ── 점수 바 ── */
 .score-bars { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
