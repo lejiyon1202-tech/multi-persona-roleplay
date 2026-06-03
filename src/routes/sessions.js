@@ -122,6 +122,14 @@ router.post('/chat', async (req, res) => {
 [대화 맥락 — 반드시 준수]
 지금 당신과 대화하는 상대는 ${learnerChar.name}(${learnerChar.role_level})입니다.
 상대를 "${learnerChar.name}" 또는 "${learnerChar.role_level}"로 호칭하십시오. 임의로 이름을 지어내지 마십시오.`;
+
+        if (learnerChar.learner_detail) {
+          const detail = typeof learnerChar.learner_detail === 'string'
+            ? JSON.parse(learnerChar.learner_detail) : learnerChar.learner_detail;
+          if (detail?.inner_conflict) {
+            systemPrompt += `\n\n[상대방 숨겨진 심리 — 반응에만 반영, 직접 언급 금지]\n${detail.inner_conflict}`;
+          }
+        }
       }
     }
 
