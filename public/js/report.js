@@ -93,14 +93,14 @@ function renderFeedback(feedback) {
            <div class="feedback-card-header"><div class="feedback-card-left"><span class="feedback-axis">종합 피드백</span></div></div>
            <div class="feedback-card-body">${escHtml(overall)}</div>
          </div>`
-      : '<p style="color:var(--text-muted);font-size:14px;">피드백 데이터가 없습니다.</p>';
+      : '<p class="feedback-empty">피드백 데이터가 없습니다.</p>';
     return;
   }
 
   // Legacy array format
   const items = Array.isArray(feedback) ? feedback : [];
   if (!items.length) {
-    container.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">피드백 데이터가 없습니다.</p>';
+    container.innerHTML = '<p class="feedback-empty">피드백 데이터가 없습니다.</p>';
     return;
   }
   container.innerHTML = items.map(item => {
@@ -193,7 +193,6 @@ function renderEmotionTrack(tracks) {
   const STAGES = ['방어','저항','수용'];
   const ICONS  = {'방어':'🛡️','저항':'⚡','수용':'🤝'};
   const wrap = document.getElementById('emotionTrack');
-  wrap.style.cssText = 'display:flex;flex-direction:column;gap:16px;';
   wrap.innerHTML = tracks.map(track => {
     const reached = new Set([...(track.stages_reached || []), track.final_stage].filter(Boolean));
     const row = STAGES.map(s => {
@@ -206,8 +205,8 @@ function renderEmotionTrack(tracks) {
       </div>`;
     }).join('');
     return `<div>
-      <p style="font-size:12px;font-weight:700;color:var(--text-sub);margin-bottom:8px;">${escHtml(track.character)}</p>
-      <div style="display:flex;align-items:center;gap:0;">${row}</div>
+      <p class="emotion-char-label">${escHtml(track.character)}</p>
+      <div class="emotion-stages-row">${row}</div>
     </div>`;
   }).join('');
   document.getElementById('emotionTrackSection').classList.remove('hidden');
@@ -216,11 +215,11 @@ function renderEmotionTrack(tracks) {
 function renderNextChallenges(challenges) {
   document.getElementById('nextGrid').innerHTML = challenges.map(c =>
     `<div class="next-card">
-       <div class="next-card-avatar" style="background:var(--role-lead);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;">
+       <div class="next-card-avatar next-card-avatar--initial">
          ${escHtml((c.character_name || '?')[0])}
        </div>
        <p class="next-card-name">${escHtml(c.character_name)}</p>
-       <p class="next-card-reason">${escHtml(c.reason)}${c.difficulty ? `<br><span style="font-size:11px;opacity:.7;">난이도: ${c.difficulty}</span>` : ''}</p>
+       <p class="next-card-reason">${escHtml(c.reason)}${c.difficulty ? `<br><span class="next-difficulty">난이도: ${c.difficulty}</span>` : ''}</p>
      </div>`).join('');
   document.getElementById('nextSection').classList.remove('hidden');
 }

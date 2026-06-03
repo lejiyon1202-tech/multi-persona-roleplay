@@ -367,9 +367,14 @@
   border-radius: 12px;
   padding: 20px 24px;
   display: flex;
-  align-items: center;
-  gap: 0;
+  flex-direction: column;
+  gap: 16px;
 }
+.emotion-stages-row { display: flex; align-items: center; gap: 0; }
+.emotion-char-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+.next-card-avatar--initial { display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; background: var(--role-lead); }
+.next-difficulty { font-size: 11px; opacity: .7; display: inline-block; }
+.feedback-empty { color: var(--text-muted); font-size: 14px; }
 .emotion-stage {
   display: flex;
   flex-direction: column;
