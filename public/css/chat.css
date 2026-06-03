@@ -103,6 +103,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
 .messages-wrap {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 28px 32px;
   display: flex;
   flex-direction: column;
