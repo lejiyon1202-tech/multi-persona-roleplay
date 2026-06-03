@@ -11,18 +11,47 @@ router.get('/sessions/:id/report', async (req, res) => {
     const session = await getSession(Number(req.params.id));
     if (!session) return res.status(404).json({ error: '세션 없음' });
 
-    const [evaluation, character, messages] = await Promise.all([
+    const [evaluation, messages] = await Promise.all([
       getEvaluation(session.id),
-      getCharacter(session.character_id),
       getMessages(session.id),
     ]);
 
+    // v3 세션: character_id = null, dialogue_partner_ids 에서 첫 파트너 로드
+    let character = null;
+    if (session.character_id) {
+      character = await getCharacter(session.character_id);
+    } else if (session.dialogue_partner_ids) {
+      const ids = typeof session.dialogue_partner_ids === 'string'
+        ? JSON.parse(session.dialogue_partner_ids)
+        : session.dialogue_partner_ids;
+      if (ids && ids.length > 0) character = await getCharacter(ids[0]);
+    }
+
+    // evaluation flatten — scores/feedback JSON 파싱 후 top-level 전개
+    let scores = {};
+    let feedback = {};
+    let total_score = 0;
+    let grade = '느낌이 안 와';
+
+    if (evaluation) {
+      scores = typeof evaluation.scores === 'string'
+        ? JSON.parse(evaluation.scores) : (evaluation.scores ?? {});
+      feedback = typeof evaluation.feedback === 'string'
+        ? JSON.parse(evaluation.feedback) : (evaluation.feedback ?? {});
+      total_score = Number(evaluation.total_score) || 0;
+      grade = evaluation.grade ?? '느낌이 안 와';
+    }
+
     res.json({
-      session,
+      session_id: session.id,
+      scenario_id: session.scenario_id,
       character: character
         ? { id: character.id, name: character.name, role_level: character.role_level }
         : null,
-      evaluation,
+      scores,
+      feedback,
+      total_score,
+      grade,
       turn_count: messages.length,
     });
   } catch (err) {

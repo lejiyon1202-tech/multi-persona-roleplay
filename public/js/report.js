@@ -49,10 +49,8 @@ function renderReport(data) {
   document.getElementById('scoreGrade').textContent = gradeText;
 
   if (data.character) {
-    const roleKey = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' }[data.character.role_level] || 'lead';
     document.getElementById('charBadge').textContent = data.character.role_level || '—';
     document.getElementById('charNameDisplay').textContent = data.character.name || '—';
-    document.getElementById('retryBtn').dataset.scenarioId = data.scenario_id;
   }
 
   const scores = data.scores || {};
@@ -60,7 +58,8 @@ function renderReport(data) {
   animateBar('r27Bar', 'r27Val', scores.r27 || 0, 5);
   animateBar('r28Bar', 'r28Val', scores.r28 || 0, 5);
 
-  renderFeedback(data.feedback || []);
+  renderFeedback(data.feedback);
+  renderRichSections(data);
 }
 
 function renderDemoReport() {
@@ -83,27 +82,156 @@ function animateBar(barId, valId, value, max) {
   });
 }
 
-function renderFeedback(items) {
+function renderFeedback(feedback) {
   const container = document.getElementById('feedbackCards');
+
+  // New object format: { overall, highlight_positive, ... }
+  if (feedback && typeof feedback === 'object' && !Array.isArray(feedback)) {
+    const overall = feedback.overall || '';
+    container.innerHTML = overall
+      ? `<div class="feedback-card open">
+           <div class="feedback-card-header"><div class="feedback-card-left"><span class="feedback-axis">종합 피드백</span></div></div>
+           <div class="feedback-card-body">${escHtml(overall)}</div>
+         </div>`
+      : '<p style="color:var(--text-muted);font-size:14px;">피드백 데이터가 없습니다.</p>';
+    return;
+  }
+
+  // Legacy array format
+  const items = Array.isArray(feedback) ? feedback : [];
   if (!items.length) {
-    container.innerHTML = '<p class="text-muted-body">피드백 데이터가 없습니다.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">피드백 데이터가 없습니다.</p>';
     return;
   }
   container.innerHTML = items.map(item => {
-    const scoreClass = item.score >= 0.8 ? 'good' : item.score >= 0.5 ? 'mid' : 'low';
-    const scoreLabel = item.score >= 0.8 ? '우수' : item.score >= 0.5 ? '보통' : '미흡';
-    return `
-      <div class="feedback-card">
-        <div class="feedback-card-header">
-          <div class="feedback-card-left">
-            <span class="feedback-axis">${escHtml(item.axis)}</span>
-            <span class="feedback-score-badge ${scoreClass}">${scoreLabel} (${item.score.toFixed(1)})</span>
-          </div>
-          <svg class="feedback-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    const sc = item.score >= 0.8 ? 'good' : item.score >= 0.5 ? 'mid' : 'low';
+    const sl = item.score >= 0.8 ? '우수' : item.score >= 0.5 ? '보통' : '미흡';
+    return `<div class="feedback-card">
+      <div class="feedback-card-header">
+        <div class="feedback-card-left">
+          <span class="feedback-axis">${escHtml(item.axis)}</span>
+          <span class="feedback-score-badge ${sc}">${sl} (${item.score.toFixed(1)})</span>
         </div>
-        <div class="feedback-card-body">${escHtml(item.text)}</div>
-      </div>`;
+        <svg class="feedback-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="feedback-card-body">${escHtml(item.text)}</div>
+    </div>`;
   }).join('');
+}
+
+/* ── Rich 섹션 렌더러 (Phase D-2) ── */
+
+function renderRichSections(data) {
+  const fb = data.feedback || {};
+  if (data.scores?.axes)               renderRadar(data.scores.axes);
+  if (fb.highlight_positive || fb.highlight_improve) renderHighlights(fb.highlight_positive, fb.highlight_improve);
+  if (fb.emotion_track?.length)        renderEmotionTrack(fb.emotion_track);
+  if (fb.next_challenges?.length)      renderNextChallenges(fb.next_challenges);
+  if (fb.guide_items?.length)          renderGuideItems(fb.guide_items);
+}
+
+function renderRadar(axes) {
+  const CX = 110, CY = 110, R = 82;
+  const keys = ['경청과공감','이해관계조정','목표설정지원','동기부여소통','갈등조율'];
+  const N = keys.length;
+  const ang = i => (i * 2 * Math.PI / N) - Math.PI / 2;
+  const pt  = (v, r) => [+(CX + r * Math.cos(ang(v))).toFixed(2), +(CY + r * Math.sin(ang(v))).toFixed(2)];
+
+  let svg = '';
+  // Grid rings
+  for (let ring = 1; ring <= 5; ring++) {
+    const pts = keys.map((_, i) => pt(i, ring / 5 * R).join(',')).join(' ');
+    svg += `<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="1" opacity="0.6"/>`;
+  }
+  // Axis lines
+  for (let i = 0; i < N; i++) {
+    const [x, y] = pt(i, R);
+    svg += `<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="1" opacity="0.5"/>`;
+  }
+  // Data polygon
+  const vals = keys.map(k => Math.min(Math.max(Number(axes[k]) || 0, 0), 1));
+  svg += `<polygon points="${vals.map((v, i) => pt(i, v * R).join(',')).join(' ')}" fill="var(--role-lead)" fill-opacity="0.2" stroke="var(--role-lead)" stroke-width="2"/>`;
+  vals.forEach((v, i) => {
+    const [x, y] = pt(i, v * R);
+    svg += `<circle cx="${x}" cy="${y}" r="4" fill="var(--role-lead)"/>`;
+  });
+  // Labels
+  keys.forEach((k, i) => {
+    const [lx, ly] = pt(i, R + 17);
+    const anc = lx < CX - 4 ? 'end' : lx > CX + 4 ? 'start' : 'middle';
+    svg += `<text x="${lx}" y="${ly}" text-anchor="${anc}" font-size="9" fill="var(--text-muted)" font-family="'Pretendard',sans-serif">${k}</text>`;
+  });
+
+  document.getElementById('radarChart').innerHTML = svg;
+  document.getElementById('radarLegend').innerHTML = keys.map((k, i) =>
+    `<div class="radar-legend-item">
+       <div class="radar-legend-dot"></div>
+       <span class="radar-legend-label">${k}</span>
+       <span class="radar-legend-score">${(vals[i] * 100).toFixed(0)}%</span>
+     </div>`).join('');
+  document.getElementById('radarSection').classList.remove('hidden');
+}
+
+function renderHighlights(pos, imp) {
+  const cards = [...(pos || []).map(h => ({...h, type:'good'})), ...(imp || []).map(h => ({...h, type:'bad'}))];
+  if (!cards.length) return;
+  document.getElementById('highlightGrid').innerHTML = cards.map(h =>
+    `<div class="highlight-card highlight-card--${h.type}">
+       <div class="highlight-card-head">
+         <span class="highlight-card-icon">${h.type === 'good' ? '✅' : '💡'}</span>
+         ${h.type === 'good' ? '우수 발화' : '개선 포인트'} · ${h.turn}번 발화
+       </div>
+       <div class="highlight-card-body">
+         <p class="highlight-quote">"${escHtml(h.quote)}"</p>
+         <p class="highlight-comment">${escHtml(h.reason)}</p>
+       </div>
+     </div>`).join('');
+  document.getElementById('highlightSection').classList.remove('hidden');
+}
+
+function renderEmotionTrack(tracks) {
+  const STAGES = ['방어','저항','수용'];
+  const ICONS  = {'방어':'🛡️','저항':'⚡','수용':'🤝'};
+  const wrap = document.getElementById('emotionTrack');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:16px;';
+  wrap.innerHTML = tracks.map(track => {
+    const reached = new Set([...(track.stages_reached || []), track.final_stage].filter(Boolean));
+    const row = STAGES.map(s => {
+      const ok = reached.has(s);
+      const turn = (ok && s === track.final_stage && track.reached_at_turn) ? `${track.reached_at_turn}턴` : (ok ? '도달' : '—');
+      return `<div class="emotion-stage${ok ? ' reached' : ''}">
+        <div class="emotion-stage-icon">${ICONS[s] || '○'}</div>
+        <div class="emotion-stage-label">${s}</div>
+        <div class="emotion-stage-turn">${turn}</div>
+      </div>`;
+    }).join('');
+    return `<div>
+      <p style="font-size:12px;font-weight:700;color:var(--text-sub);margin-bottom:8px;">${escHtml(track.character)}</p>
+      <div style="display:flex;align-items:center;gap:0;">${row}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('emotionTrackSection').classList.remove('hidden');
+}
+
+function renderNextChallenges(challenges) {
+  document.getElementById('nextGrid').innerHTML = challenges.map(c =>
+    `<div class="next-card">
+       <div class="next-card-avatar" style="background:var(--role-lead);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;">
+         ${escHtml((c.character_name || '?')[0])}
+       </div>
+       <p class="next-card-name">${escHtml(c.character_name)}</p>
+       <p class="next-card-reason">${escHtml(c.reason)}${c.difficulty ? `<br><span style="font-size:11px;opacity:.7;">난이도: ${c.difficulty}</span>` : ''}</p>
+     </div>`).join('');
+  document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function renderGuideItems(items) {
+  document.getElementById('guideBox').innerHTML = items.map((tip, i) =>
+    `<div class="guide-item">
+       <span class="guide-item-num">${String(i + 1).padStart(2, '0')}</span>
+       ${escHtml(tip)}
+     </div>`).join('');
+  document.getElementById('guideSection').classList.remove('hidden');
 }
 
 /* ── 비교 리포트 ── */

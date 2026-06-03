@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCharacter } from '../data-store/scenarios-store.js';
+import { getCharacter, getScenario, getCharacters } from '../data-store/scenarios-store.js';
 import {
   upsertLearner, createSession, getSession,
   addMessage, getMessages, incrementTurnCount, completeSession,
@@ -148,6 +148,99 @@ router.post('/chat', async (req, res) => {
   }
 });
 
+// ── 평가 헬퍼 ──
+
+function buildTranscript(messages, learnerChar, partnerChars) {
+  const learnerLabel = learnerChar
+    ? `${learnerChar.name}(${learnerChar.role_level})`
+    : '학습자';
+  const partnerLabel = partnerChars.length === 1
+    ? `${partnerChars[0].name}(${partnerChars[0].role_level})`
+    : 'AI 파트너';
+  return messages.map((m, i) => {
+    const label = m.role === 'user' ? learnerLabel : partnerLabel;
+    return `[${label}](${i + 1}번 발화)\n${m.content}`;
+  }).join('\n\n---\n\n');
+}
+
+function buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars) {
+  const title   = scenario?.title ?? '(미지정)';
+  const context = scenario?.context_description ?? '';
+  const learnerLabel = learnerChar
+    ? `${learnerChar.name}(${learnerChar.role_level})`
+    : '그룹장';
+
+  const partnerDesc = partnerChars.length
+    ? partnerChars.map(c => `  - ${c.name}(${c.role_level}): ${c.core_mindset ?? ''}`).join('\n')
+    : '  (정보 없음)';
+
+  const others = selectableChars.filter(c => !partnerChars.find(p => p.id === c.id));
+  const challengeList = others.length
+    ? others.map(c => `  - ${c.name}(${c.role_level})`).join('\n')
+    : '  (추가 캐릭터 없음)';
+
+  return `당신은 기업 리더십 교육 전문 평가관입니다. 아래 대화를 평가하세요.
+
+[시나리오] ${title}
+[상황] ${context}
+[학습자 역할] ${learnerLabel}
+[대화 상대 캐릭터]
+${partnerDesc}
+
+[역량 5축 정의]
+- 경청과공감: 상대 감정·상황 인식 후 공감 표현 비율
+- 이해관계조정: 서로 다른 이해관계 파악 후 절충 시도
+- 목표설정지원: 공동 목표 제시 또는 합의 유도
+- 동기부여소통: 상대 동기·의지를 높이는 구체적 발화
+- 갈등조율: 갈등 장면에서 건설적 전환 시도
+
+[채점 기준]
+- R-26 (0~15점): 5개 역량 축의 종합 점수 × 3
+- R-27 (0~5점): 셀프 러닝 적합성 — 학습자의 자기 성찰, 재도전 의지
+- R-28 (0~5점): AI 캐릭터 페르소나 일관성 + 감정 단계 변화 반영도
+- total_score = R-26 + R-27 + R-28 (최대 25점)
+- grade 기준: 됐어!(≥23.75) / 아쉽지만...(≥19) / 느낌이 안 와(<19)
+
+[다음 도전 후보 — next_challenges 에서만 선택]
+${challengeList}
+
+반드시 아래 JSON 형식으로만 응답하세요 (마크다운 코드블록 포함, JSON 외 텍스트 절대 금지):
+\`\`\`json
+{
+  "scores": {
+    "r26": <0~15, 소수점 1자리>,
+    "r27": <0~5, 소수점 1자리>,
+    "r28": <0~5, 소수점 1자리>,
+    "axes": {
+      "경청과공감": <0.0~1.0>,
+      "이해관계조정": <0.0~1.0>,
+      "목표설정지원": <0.0~1.0>,
+      "동기부여소통": <0.0~1.0>,
+      "갈등조율": <0.0~1.0>
+    }
+  },
+  "feedback": {
+    "overall": "<종합 피드백 2~3문장>",
+    "highlight_positive": [
+      {"turn": <발화 순서번호>, "quote": "<실제 학습자 발화 인용>", "reason": "<칭찬 이유>"}
+    ],
+    "highlight_improve": [
+      {"turn": <발화 순서번호>, "quote": "<실제 학습자 발화 인용>", "reason": "<개선 이유>"}
+    ],
+    "emotion_track": [
+      {"character": "<캐릭터 이름>", "stages_reached": ["방어","저항"], "final_stage": "<최종 도달 단계>", "reached_at_turn": <발화번호>}
+    ],
+    "next_challenges": [
+      {"character_name": "<위 목록에서 이름>", "reason": "<추천 이유>", "difficulty": "<상|중|하>"}
+    ],
+    "guide_items": ["<팁1>", "<팁2>", "<팁3>"]
+  },
+  "total_score": <r26+r27+r28 합산>,
+  "grade": "<됐어!|아쉽지만...|느낌이 안 와>"
+}
+\`\`\``;
+}
+
 // 평가
 router.post('/evaluate', async (req, res) => {
   const { session_id } = req.body;
@@ -158,27 +251,50 @@ router.post('/evaluate', async (req, res) => {
     if (!session) return res.status(404).json({ error: '세션 없음' });
 
     const messages = await getMessages(session_id);
-    const transcript = messages
-      .map(m => `[${m.role === 'user' ? '학습자' : 'AI'}] ${m.content}`)
-      .join('\n');
+    const scenario = await getScenario(session.scenario_id);
 
-    const evalPrompt = `다음 대화를 평가하고 JSON 형식으로 결과를 반환하세요.
-형식: {"scores": {"커뮤니케이션": 0.8, "문제해결": 0.7}, "feedback": {"strengths": [], "improvements": [], "overall": ""}, "total_score": 0.75, "grade": "B"}`;
+    let learnerChar = null;
+    let partnerChars = [];
+    let selectableChars = [];
 
-    const result = await invokeEvaluate(transcript, evalPrompt);
-    const total = result.total_score ?? 0;
-    const grade = result.grade ?? (total >= 0.9 ? 'A' : total >= 0.7 ? 'B' : 'C');
+    if (session.learner_character_id) {
+      const [lc, allChars] = await Promise.all([
+        getCharacter(session.learner_character_id),
+        getCharacters(session.scenario_id),
+      ]);
+      learnerChar = lc;
+      const partnerIds = typeof session.dialogue_partner_ids === 'string'
+        ? JSON.parse(session.dialogue_partner_ids)
+        : (session.dialogue_partner_ids || []);
+      const charMap = new Map(allChars.map(c => [c.id, c]));
+      partnerChars = partnerIds.map(id => charMap.get(id)).filter(Boolean);
+      selectableChars = allChars.filter(c => c.is_selectable);
+    } else if (session.character_id) {
+      const char = await getCharacter(session.character_id);
+      if (char) partnerChars = [char];
+    }
+
+    const transcript = buildTranscript(messages, learnerChar, partnerChars);
+    const evalPrompt = buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars);
+    const result = await invokeEvaluate(transcript, evalPrompt, 4096);
+
+    const scores = result.scores ?? {};
+    const r26 = Number(scores.r26) || 0;
+    const r27 = Number(scores.r27) || 0;
+    const r28 = Number(scores.r28) || 0;
+    const total = parseFloat((r26 + r27 + r28).toFixed(2));
+    const grade = total >= 23.75 ? '됐어!' : total >= 19 ? '아쉽지만...' : '느낌이 안 와';
 
     await saveEvaluation({
       session_id,
-      scores: result.scores ?? {},
+      scores,
       feedback: result.feedback ?? {},
       total_score: total,
       grade,
     });
     await completeSession(session_id);
 
-    res.json({ ...result, session_id });
+    res.json({ scores, feedback: result.feedback ?? {}, total_score: total, grade, session_id });
   } catch (err) {
     console.error('[POST /api/evaluate]', err.message);
     res.status(500).json({ error: '평가 오류' });

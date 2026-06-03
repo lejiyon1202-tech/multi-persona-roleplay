@@ -54,7 +54,7 @@ export async function* invokeChat(messages, systemPrompt) {
  * @param {string} transcript      세션 대화 내용 (텍스트)
  * @param {string} evalPrompt      평가 프롬프트 (채점 기준 포함)
  */
-export async function invokeEvaluate(transcript, evalPrompt) {
+export async function invokeEvaluate(transcript, evalPrompt, maxTokens = 4096) {
   const command = new InvokeModelCommand({
     modelId: MODEL_ID,
     contentType: 'application/json',
@@ -62,7 +62,7 @@ export async function invokeEvaluate(transcript, evalPrompt) {
     body: buildBody(
       [{ role: 'user', content: transcript }],
       evalPrompt,
-      2048
+      maxTokens
     ),
   });
 
