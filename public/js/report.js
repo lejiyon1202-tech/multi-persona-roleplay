@@ -41,12 +41,12 @@ async function loadReport() {
 
 function renderReport(data) {
   const total = data.total_score || 0;
-  const gradeClass = total >= 23.75 ? 'pass' : total >= 20 ? 'partial' : 'fail';
-  const gradeText  = total >= 23.75 ? '됐어! 🎉' : total >= 20 ? '아쉽지만...' : '느낌이 안 와';
+  const grade = data.grade || (total >= 23.75 ? '됐어!' : total >= 19 ? '아쉽지만...' : '느낌이 안 와');
+  const gradeClass = grade === '됐어!' ? 'pass' : grade === '아쉽지만...' ? 'partial' : 'fail';
 
   document.getElementById('scoreNum').textContent = total.toFixed(1);
   document.getElementById('scoreCircle').className = `score-circle ${gradeClass}`;
-  document.getElementById('scoreGrade').textContent = gradeText;
+  document.getElementById('scoreGrade').textContent = grade;
 
   if (data.character) {
     document.getElementById('charBadge').textContent = data.character.role_level || '—';
