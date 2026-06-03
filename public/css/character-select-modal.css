@@ -268,9 +268,35 @@
 
 /* 반응형 */
 @media (max-width: 767px) {
-  .char-modal { grid-template-columns: 1fr; }
-  .modal-left-panel { padding: 24px 20px; min-height: 180px; }
-  .modal-name { font-size: 22px; }
+  /* 오버레이 — 패딩 없이 fullscreen */
+  .char-modal-overlay { padding: 0; align-items: stretch; }
+  /* 모달 — fullscreen */
+  .char-modal {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    overflow: hidden;
+  }
+  /* 왼쪽 패널 — 최소 높이·compact */
+  .modal-left-panel {
+    padding: 16px 20px 12px;
+    min-height: auto;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  /* 오른쪽 패널 — 나머지 공간 차지·스크롤 허용 */
+  .modal-right-panel {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  /* 탭 패널 — 내부 스크롤 */
+  .modal-tab-panel { min-height: 0; overflow-y: auto; }
+  .modal-name { font-size: 20px; }
   .modal-close {
     border-color: rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.15);
