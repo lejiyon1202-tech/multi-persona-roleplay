@@ -127,6 +127,7 @@
   }
   .org-radial-wrap .org-avatar-img { width: 44px !important; height: 44px !important; }
   .org-radial-wrap .org-node.is-center .org-avatar-img { width: 56px !important; height: 56px !important; }
-  .org-radial-wrap .org-node-name { font-size: 9px; max-width: 72px; }
-  .org-radial-wrap .org-node-dept { font-size: 8px; max-width: 72px; padding: 1px 4px; }
+  /* 이름/배지 숨김 — 모바일 텍스트 겹침 방지 (탭→모달로 확인) */
+  .org-radial-wrap .org-node-name { display: none !important; }
+  .org-radial-wrap .org-node-dept { display: none !important; }
 }
