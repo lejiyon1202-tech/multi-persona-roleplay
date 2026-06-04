@@ -2,7 +2,7 @@ import pool from './db.js';
 
 export async function listScenarios() {
   const [rows] = await pool.query(
-    'SELECT id, title, case_name, learner_role, created_at FROM scenarios ORDER BY id'
+    'SELECT id, title, case_name, context_description, learner_role, created_at FROM scenarios ORDER BY id'
   );
   return rows;
 }
