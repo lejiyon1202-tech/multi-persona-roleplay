@@ -72,8 +72,8 @@ export async function invokeSelectResponders({ userMessage, characters, history 
 5. 특정 캐릭터의 침묵도 자연스러울 수 있음 — 전체 0명일 때만 fallback 적용
 6. 같은 맥락에서 유사하게 선별하되 완전히 결정적이지 않게 (소폭 변동 허용)
 
-반드시 JSON 형식으로만 응답하세요:
-{"responders": [캐릭터ID배열], "reasoning": "선별 이유 한 줄"}`;
+반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력. reasoning은 10단어 이내로 짧게:
+{"responders": [캐릭터ID배열], "reasoning": "10단어 이내"}`;
 
   const messages = [
     ...history.slice(-4).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content })),
@@ -87,15 +87,16 @@ export async function invokeSelectResponders({ userMessage, characters, history 
     modelId: MODEL_ID,
     contentType: 'application/json',
     accept: 'application/json',
-    body: buildBody(messages, systemPrompt, 256),
+    body: buildBody(messages, systemPrompt, 1024),
   });
 
   try {
     const response = await client.send(command);
     const raw  = JSON.parse(new TextDecoder().decode(response.body));
     const text = raw.content?.[0]?.text ?? '';
+    console.log('[SELECT raw]', text.slice(0, 300));
     const jsonMatch = text.match(/\{[\s\S]+\}/);
-    if (!jsonMatch) return [];
+    if (!jsonMatch) { console.error('[SELECT] JSON 파싱 실패 — jsonMatch null'); return []; }
     const parsed = JSON.parse(jsonMatch[0]);
     const ids = Array.isArray(parsed.responders)
       ? parsed.responders.map(Number).filter(n => n > 0)
