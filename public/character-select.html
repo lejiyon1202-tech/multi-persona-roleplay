@@ -34,6 +34,15 @@
   <h1 class="scenario-title">당신이 연기할 캐릭터를 선택하세요</h1>
   <p class="scenario-subtitle">선택한 캐릭터로 상황에 몰입해 대화합니다. 캐릭터의 배경·가치관·미션을 읽고 선택하세요.</p>
 
+  <!-- 상황 요약 카드 (D-3·JS 주입) -->
+  <div class="situation-summary hidden" id="situationSummary">
+    <div class="situation-chips" id="situationChips"></div>
+    <a class="situation-detail-link" id="situationDetailLink" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      상황 브리핑 자세히 보기
+    </a>
+  </div>
+
   <!-- 학습자 역할 브리핑 카드 -->
   <div class="learner-briefing" id="learnerBriefing">
     <div class="briefing-inner">
