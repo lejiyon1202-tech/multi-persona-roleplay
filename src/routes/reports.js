@@ -16,9 +16,11 @@ router.get('/sessions/:id/report', async (req, res) => {
       getMessages(session.id),
     ]);
 
-    // v3 세션: character_id = null, dialogue_partner_ids 에서 첫 파트너 로드
+    // v3 세션: learner_character_id 우선 → character_id → dialogue_partner_ids[0]
     let character = null;
-    if (session.character_id) {
+    if (session.learner_character_id) {
+      character = await getCharacter(session.learner_character_id);
+    } else if (session.character_id) {
       character = await getCharacter(session.character_id);
     } else if (session.dialogue_partner_ids) {
       const ids = typeof session.dialogue_partner_ids === 'string'
