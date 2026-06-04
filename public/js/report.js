@@ -293,7 +293,7 @@ function renderCompare(data) {
 
 function buildRadar(sessions, colors) {
   const W = 300, CX = 150, CY = 150, R = 110;
-  const axes = ['R-26\n(15점)', 'R-27\n(5점)', 'R-28\n(5점)', '페르소나\n일관성', '리포트\n정확성'];
+  const axes = ['R-26\n(15점)', 'R-27\n(5점)', 'R-28\n(5점)'];
   const N = axes.length;
   const angle = i => (i * 2 * Math.PI / N) - Math.PI / 2;
   const pt = (val, max, i) => {
@@ -313,15 +313,14 @@ function buildRadar(sessions, colors) {
   }
   // 축 선
   for (let i = 0; i < N; i++) {
-    const [x, y] = pt(1, 1, i);
     svg += `<line x1="${CX}" y1="${CY}" x2="${CX + R * Math.cos(angle(i))}" y2="${CY + R * Math.sin(angle(i))}" stroke="var(--border)" stroke-width="1"/>`;
   }
 
   // 데이터 폴리곤
-  const maxVals = [15, 5, 5, 1, 1];
+  const maxVals = [15, 5, 5];
   sessions.forEach((s, si) => {
     const scores = s.scores || {};
-    const vals   = [scores.r26 || 0, scores.r27 || 0, scores.r28 || 0, scores.r28 ? 0.8 : 0, 0.7];
+    const vals   = [scores.r26 || 0, scores.r27 || 0, scores.r28 || 0];
     const pts    = vals.map((v, i) => pt(v, maxVals[i], i).join(',')).join(' ');
     svg += `<polygon points="${pts}" fill="${colors[si]}" fill-opacity="0.15" stroke="${colors[si]}" stroke-width="2"/>`;
   });
