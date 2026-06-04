@@ -178,6 +178,11 @@ router.post('/chat', async (req, res) => {
         }
       }
 
+      // Bedrock Messages API: 마지막 메시지는 반드시 user — 이전 캐릭터 응답(assistant) 추가 후 user 재추가
+      if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant') {
+        chatHistory.push({ role: 'user', content: userMsg });
+      }
+
       let fullResponse = '';
       for await (const chunk of invokeChat(chatHistory, systemPrompt)) {
         fullResponse += chunk;
@@ -190,7 +195,7 @@ router.post('/chat', async (req, res) => {
       // 응답 완료 이벤트
       res.write(`data: ${JSON.stringify({ done: true, character_id: charId })}\n\n`);
 
-      // 다음 캐릭터 응답에 현재 응답 포함
+      // 다음 캐릭터 응답 context: 현재 응답 포함 (assistant로 끝남 → 다음 루프 시작에서 user 재추가)
       chatHistory.push({ role: 'assistant', content: fullResponse });
     }
 
