@@ -269,8 +269,18 @@ async function sendMessage() {
 }
 
 /* ── 대화 종료 ── */
-function endChat() {
+async function endChat() {
   if (turnCount < 3) return;
+  const endBtn = document.getElementById('endChatBtn');
+  endBtn.disabled = true;
+  endBtn.textContent = '평가 중...';
+  try {
+    await fetch('/api/evaluate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+  } catch { /* 평가 실패해도 리포트로 이동 */ }
   window.location.href = `report.html?session_id=${sessionId}`;
 }
 
