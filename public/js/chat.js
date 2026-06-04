@@ -273,6 +273,7 @@ async function endChat() {
   if (turnCount < 3) return;
   const endBtn = document.getElementById('endChatBtn');
   endBtn.disabled = true;
+  endBtn.classList.add('evaluating');
   endBtn.textContent = '평가 중...';
   try {
     await fetch('/api/evaluate', {
