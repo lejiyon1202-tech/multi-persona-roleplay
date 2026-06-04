@@ -1,10 +1,7 @@
--- Phase D-3: scenarios 테이블에 briefing JSON 컬럼 추가
--- RDS MySQL 8.0
-ALTER TABLE scenarios
-  ADD COLUMN briefing JSON NULL
-  COMMENT '{"background":"","stakeholders":"","conflict":"","learning_goal":"","before_start":""}';
+-- Phase D-3 fix: briefing 시드 정정 (002 메타 용어 제거 + id=4 추가 + 일관성)
+-- 002가 이미 실행된 환경에서 UPDATE로 정정
 
--- Case 1: AI 전환 압박 시나리오 브리핑 데이터
+-- Case 1: before_start 메타 용어("롤플레이·시뮬레이션") 삭제 + 문맥 개선
 UPDATE scenarios SET briefing = JSON_OBJECT(
   'background',    'AI혁신센터는 전사 AI 전환 프로젝트의 핵심 조직으로, 경영진의 강력한 추진 의지 아래 6개월 안에 주요 업무 프로세스 30%를 AI로 대체하는 목표를 부여받았습니다. 팀원들은 급격한 변화 속도에 피로감을 호소하며 심리적 저항감이 높아진 상태입니다.',
   'stakeholders',  '이임원 팀장(상위리더)은 경영진 KPI 달성을 최우선으로 보며 팀의 속도를 압박합니다. 김센터 그룹장(그룹장)은 팀원과 경영진 사이에서 중재 역할을 맡고 있습니다. 이모델·박수석·최데이터·신주니어(파트장·부서원)는 각자의 역할에서 변화 수용도와 우려 수준이 다릅니다.',
@@ -14,7 +11,7 @@ UPDATE scenarios SET briefing = JSON_OBJECT(
 )
 WHERE id = 1;
 
--- Case 2: AI 성과 보고 D-14 시나리오 브리핑 데이터
+-- Case 2: before_start 평가 조건 안내 추가 (일관성)
 UPDATE scenarios SET briefing = JSON_OBJECT(
   'background',    'AI 성과 보고 D-14 시점, AI혁신센터 팀원들의 번아웃이 임계점에 달했습니다. 경영진은 KPI 달성을 강하게 압박하고 있으며, 현장에서는 야근과 과부하로 인한 이탈 신호가 나타나고 있습니다.',
   'stakeholders',  '이임원 팀장은 성과 보고 기한을 절대 양보할 수 없다는 입장입니다. 김센터 그룹장은 팀원 보호와 성과 달성 사이에서 균형을 잡으려 합니다. 파트장·부서원들은 각자 번아웃 정도와 이탈 의사가 다릅니다.',
@@ -24,7 +21,7 @@ UPDATE scenarios SET briefing = JSON_OBJECT(
 )
 WHERE id = 2;
 
--- Case 4: CDP 전환 위기 시나리오 브리핑 데이터
+-- Case 4: CDP 전환 위기 시나리오 briefing 신규 시드
 UPDATE scenarios SET briefing = JSON_OBJECT(
   'background',    'DX통합본부는 147억 원이 투자된 CDP(고객 데이터 플랫폼) 전환 프로젝트를 진행 중입니다. 전환 D-30 시점에 데이터 정합성 관련 치명적 오류가 발견되었으며, 경영진은 일정을 절대 미룰 수 없다는 압박을 가하고 있습니다.',
   'stakeholders',  'CCO(최고고객책임자)는 147억 투자 성과와 일정을 최우선으로 요구합니다. DX통합본부장은 경영진과 현장 사이에서 최종 의사결정을 내려야 합니다. 아키텍처 수석은 기술적 리스크를 가장 명확히 파악하고 있으며, 팀장·팀원들은 각자의 관점에서 해결 방향이 다릅니다.',
