@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   시나리오 브리핑 화면 — 케이스 스터디 스타일
+   시나리오 브리핑 화면 — 케이스 스터디 스타일 (개편)
    ═══════════════════════════════════════════════ */
 
 /* ── 히어로 배경 ── */
@@ -9,18 +9,9 @@
   position: relative;
   overflow: hidden;
 }
-.briefing-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* 테마별 히어로 배경 */
-.briefing-hero.theme-ai { background: linear-gradient(145deg, #1B3250 0%, #2A2018 60%, #312E2B 100%); }
-.briefing-hero.theme-deadline { background: linear-gradient(145deg, #312E2B 0%, #4A2510 60%, #78350F 100%); }
-.briefing-hero.theme-crisis { background: linear-gradient(145deg, #1A3D30 0%, #0F2A1E 60%, #14532D 100%); }
+.briefing-hero.theme-ai       { background: linear-gradient(145deg, #1B3250 0%, #2A2018 60%, #312E2B 100%); }
+.briefing-hero.theme-deadline  { background: linear-gradient(145deg, #312E2B 0%, #4A2510 60%, #78350F 100%); }
+.briefing-hero.theme-crisis    { background: linear-gradient(145deg, #1A3D30 0%, #0F2A1E 60%, #14532D 100%); }
 
 .hero-inner {
   max-width: 840px;
@@ -65,7 +56,7 @@
   margin-bottom: 14px;
 }
 
-/* 제목 */
+/* 히어로 제목 */
 .hero-title {
   font-size: 30px;
   font-weight: 700;
@@ -75,12 +66,10 @@
   margin-bottom: 12px;
   word-break: keep-all;
 }
-
 .hero-sub {
   font-size: 16px;
   color: rgba(255,255,255,0.6);
   line-height: 1.55;
-  max-width: 560px;
 }
 
 /* ── 본문 래퍼 ── */
@@ -98,6 +87,7 @@
   padding: 14px 20px;
   background: var(--bg-quote);
   border: 1.5px solid var(--border);
+  border-left: 4px solid #09090B;
   border-radius: 10px;
   margin-bottom: 28px;
 }
@@ -116,75 +106,6 @@
   margin-bottom: 40px;
 }
 
-/* 첫 번째 카드 전체 너비 */
-.briefing-card:first-child {
-  grid-column: 1 / -1;
-}
-
-/* 카드 */
-.briefing-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  transition: var(--transition);
-  animation: cardIn 0.4s ease both;
-}
-.briefing-card:nth-child(1) { animation-delay: 0.05s; }
-.briefing-card:nth-child(2) { animation-delay: 0.12s; }
-.briefing-card:nth-child(3) { animation-delay: 0.19s; }
-.briefing-card:nth-child(4) { animation-delay: 0.26s; }
-.briefing-card:nth-child(5) { animation-delay: 0.33s; }
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.briefing-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow);
-}
-
-/* 카드 헤더 */
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.card-num {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: #09090B;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.card-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* 카드 본문 */
-.card-body {
-  font-size: 16px;
-  color: var(--text-sub);
-  line-height: 1.8;
-  word-break: keep-all;
-}
-
 /* 로딩 상태 */
 .briefing-loading {
   grid-column: 1 / -1;
@@ -195,6 +116,120 @@
   padding: 60px 24px;
   color: var(--text-muted);
   font-size: 14px;
+}
+
+/* ── 카드 기본 ── */
+.briefing-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: var(--transition);
+  animation: cardIn 0.4s ease both;
+  position: relative;
+  overflow: hidden;
+}
+/* 첫 번째 카드(background) = 전체 너비 */
+.briefing-card--full,
+.briefing-card:first-child {
+  grid-column: 1 / -1;
+}
+.briefing-card:nth-child(1) { animation-delay: 0.06s; }
+.briefing-card:nth-child(2) { animation-delay: 0.14s; }
+.briefing-card:nth-child(3) { animation-delay: 0.22s; }
+.briefing-card:nth-child(4) { animation-delay: 0.30s; }
+.briefing-card:nth-child(5) { animation-delay: 0.38s; }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.briefing-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* 5요소별 좌측 accent border */
+.briefing-card[data-key="background"]    { border-left: 4px solid #2563EB; }
+.briefing-card[data-key="stakeholders"]  { border-left: 4px solid #059669; }
+.briefing-card[data-key="conflict"]      { border-left: 4px solid #DC2626; }
+.briefing-card[data-key="learning_goal"] { border-left: 4px solid #7C3AED; }
+.briefing-card[data-key="before_start"]  { border-left: 4px solid #D97706; }
+
+/* accent 색 배지 */
+.briefing-card[data-key="background"]    .briefing-card-badge { background: #EFF6FF; color: #1D4ED8; }
+.briefing-card[data-key="stakeholders"]  .briefing-card-badge { background: #ECFDF5; color: #065F46; }
+.briefing-card[data-key="conflict"]      .briefing-card-badge { background: #FEF2F2; color: #991B1B; }
+.briefing-card[data-key="learning_goal"] .briefing-card-badge { background: #F5F3FF; color: #5B21B6; }
+.briefing-card[data-key="before_start"]  .briefing-card-badge { background: #FFFBEB; color: #92400E; }
+
+/* 카드 헤더 영역 */
+.briefing-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* 아이콘 — 크고 명확하게 */
+.briefing-card-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+  display: block;
+}
+
+/* 제목 + 배지 묶음 */
+.briefing-card-title-wrap {
+  flex: 1;
+}
+.briefing-card-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.briefing-card-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* 카드 본문 */
+.briefing-card-body {
+  font-size: 16px;
+  color: var(--text-sub);
+  line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 전체 너비 카드 — 2열 내부 */
+.briefing-card--full .briefing-card-inner,
+.briefing-card:first-child .briefing-card-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: flex-start;
+}
+.briefing-card--full .briefing-card-icon,
+.briefing-card:first-child .briefing-card-icon {
+  font-size: 48px;
+  margin-top: 4px;
+}
+.briefing-card--full .briefing-card-body,
+.briefing-card:first-child .briefing-card-body {
+  font-size: 17px;
 }
 
 /* ── CTA ── */
@@ -226,23 +261,32 @@
 .cta-btn:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
 .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .cta-btn svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2.5; fill: none; }
-.cta-hint {
-  font-size: 13px;
+.cta-hint { font-size: 13px; color: var(--text-muted); }
+
+/* ── 에러 ── */
+.briefing-error {
+  padding: 24px;
+  text-align: center;
   color: var(--text-muted);
+  font-size: 15px;
 }
 
 /* ── 반응형 ── */
 @media (max-width: 767px) {
-  .hero-inner { padding: 24px 20px 28px; }
-  .hero-title  { font-size: 22px; }
-  .hero-sub    { font-size: 15px; }
-  .briefing-wrap { padding: 20px 16px 60px; }
-  .briefing-grid { grid-template-columns: 1fr; }
+  .hero-inner       { padding: 24px 20px 28px; }
+  .hero-title       { font-size: 22px; }
+  .briefing-wrap    { padding: 20px 16px 60px; }
+  .briefing-grid    { grid-template-columns: 1fr; }
+  .briefing-card--full,
   .briefing-card:first-child { grid-column: 1 / 2; }
-  .card-body { font-size: 15px; }
+  .briefing-card--full .briefing-card-inner,
+  .briefing-card:first-child .briefing-card-inner { grid-template-columns: 1fr; }
+  .briefing-card--full .briefing-card-icon,
+  .briefing-card:first-child .briefing-card-icon { font-size: 36px; }
+  .briefing-card-body { font-size: 15px; }
   .cta-btn { height: 48px; font-size: 15px; width: 100%; justify-content: center; }
 }
 @media (max-width: 1023px) and (min-width: 768px) {
-  .hero-title { font-size: 26px; }
+  .hero-title    { font-size: 26px; }
   .briefing-wrap { padding: 24px 28px 60px; }
 }
