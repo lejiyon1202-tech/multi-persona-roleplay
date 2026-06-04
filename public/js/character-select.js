@@ -114,13 +114,8 @@ function getDefaultEmoji(roleLevel) {
   return map[roleLevel] || '👤';
 }
 
-/* ── 이벤트 바인딩 ── */
-function bindCardEvents() {
-  document.querySelectorAll('.char-card.selectable').forEach(card => {
-    card.addEventListener('click', () => openModal(card.dataset.charId));
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(card.dataset.charId); });
-  });
-}
+/* ── 이벤트 바인딩 (click/keydown은 radial-network.js _buildNode에서 직접 처리) ── */
+function bindCardEvents() {}
 
 /* ── 모달 오픈 ── */
 function openModal(charId) {
