@@ -34,17 +34,17 @@ export async function getSession(id) {
   return rows[0] ?? null;
 }
 
-export async function addMessage({ session_id, role, content, turn_number }) {
+export async function addMessage({ session_id, role, content, turn_number, character_id = null }) {
   const [result] = await pool.query(
-    'INSERT INTO messages (session_id, role, content, turn_number) VALUES (?, ?, ?, ?)',
-    [session_id, role, content, turn_number]
+    'INSERT INTO messages (session_id, role, content, turn_number, character_id) VALUES (?, ?, ?, ?, ?)',
+    [session_id, role, content, turn_number, character_id]
   );
   return result.insertId;
 }
 
 export async function getMessages(sessionId) {
   const [rows] = await pool.query(
-    'SELECT role, content, turn_number FROM messages WHERE session_id = ? ORDER BY turn_number',
+    'SELECT role, content, turn_number, character_id FROM messages WHERE session_id = ? ORDER BY turn_number, id',
     [sessionId]
   );
   return rows;

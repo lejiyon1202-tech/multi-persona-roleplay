@@ -12,11 +12,12 @@ let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 const ROLE_COLORS = { executive:'#312E2B', manager:'#1B3250', lead:'#1A3D30', member:'#6B3B1D' };
 const ROLE_MAP    = { '상위리더':'executive','그룹장':'manager','파트장':'lead','부서원':'member' };
 
-let sessionId   = SESSION_ID;
-let turnCount   = 0;
-let isWaiting   = false;
-let charData    = null;
-let partnersMap = {};   // v3: { charId: charObj }
+let sessionId      = SESSION_ID;
+let turnCount      = 0;
+let isWaiting      = false;
+let charData       = null;
+let partnersMap    = {};   // v3: { charId: charObj }
+let lastSpeakerId  = null; // Phase E B안: 발화자 연속 여부 추적
 
 /* ── 뒤로가기 ── */
 document.getElementById('backBtn').addEventListener('click', () => {
@@ -223,11 +224,8 @@ async function sendMessage() {
   appendMsg('user', text);
   showTyping(true);
 
-  const speakerId = IS_V3 ? activePartnerId : null;
-
   try {
     const chatBody = { session_id: sessionId, message: text };
-    if (IS_V3 && activePartnerId) chatBody.target_character_id = Number(activePartnerId);
 
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -238,11 +236,11 @@ async function sendMessage() {
 
     const reader  = res.body.getReader();
     const decoder = new TextDecoder();
-    let aiText = '';
-    let msgEl  = null;
+    let aiText        = '';
+    let msgEl         = null;
+    let currentCharId = null;
 
-    showTyping(false);
-    msgEl = appendMsg('ai', '', true, speakerId);
+    showTyping(true);  // 서버 선별 중 초기 인디케이터
 
     while (true) {
       const { value, done } = await reader.read();
@@ -252,15 +250,40 @@ async function sendMessage() {
       for (const line of lines) {
         try {
           const json = JSON.parse(line.slice(5).trim());
-          if (json.token)         { aiText += json.token; updateMsgEl(msgEl, aiText); }
+
+          // 새 캐릭터 응답 시작 (character_id + character_name, token·done 없음)
+          if (json.character_id && json.character_name && !json.token && !json.done) {
+            showTyping(true, json.character_name);
+            if (IS_V3) switchPartner(json.character_id);
+            currentCharId = json.character_id;
+            aiText = '';
+            msgEl  = null;
+          }
+
+          // 토큰 스트리밍
+          if (json.token) {
+            if (!msgEl) {
+              showTyping(false);
+              msgEl = appendMsg('ai', '', true, currentCharId);
+            }
+            aiText += json.token;
+            updateMsgEl(msgEl, aiText);
+          }
+
+          // 캐릭터 응답 완료
+          if (json.done) {
+            if (!aiText && msgEl) updateMsgEl(msgEl, '(응답 없음)');
+            aiText = '';
+            msgEl  = null;
+          }
+
           if (json.emotion_stage) updateEmotionBadge(json.emotion_stage);
         } catch { /* partial chunk */ }
       }
     }
-    if (!aiText) updateMsgEl(msgEl, '(응답 없음)');
   } catch (err) {
     showTyping(false);
-    appendMsg('ai', `데모 응답입니다. 실제 서버에 연결하면 AI 캐릭터의 응답이 여기에 표시됩니다. (오류: ${err.message})`, false, speakerId);
+    appendMsg('ai', `데모 응답입니다. 실제 서버에 연결하면 AI 캐릭터의 응답이 여기에 표시됩니다. (오류: ${err.message})`, false, null);
   }
 
   isWaiting = false;
@@ -299,6 +322,16 @@ function appendMsg(role, text, streaming = false, speakerCharId = null) {
 
   const div = document.createElement('div');
   div.className = `msg ${role}`;
+
+  // Phase E B안: 발화자 전환 여부에 따라 CSS 클래스 적용 (기안84 단톡방 디자인)
+  if (role === 'ai') {
+    if (lastSpeakerId !== null && speakerCharId === lastSpeakerId) {
+      div.classList.add('msg-continuous');  // 같은 캐릭터 연속 발화
+    } else if (lastSpeakerId !== null) {
+      div.classList.add('msg-new-char');    // 다른 캐릭터로 전환
+    }
+    lastSpeakerId = speakerCharId;
+  }
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
@@ -349,9 +382,13 @@ function addSystemMsg(text) {
   wrap.scrollTop = 999999;
 }
 
-function showTyping(show) {
+function showTyping(show, charName) {
   document.getElementById('typingIndicator').classList.toggle('hidden', !show);
-  if (show) document.getElementById('messagesWrap').scrollTop = 999999;
+  if (show) {
+    const nameEl = document.getElementById('typingCharName');
+    if (nameEl) nameEl.textContent = charName ? `${charName}이 입력 중...` : '';
+    document.getElementById('messagesWrap').scrollTop = 999999;
+  }
 }
 
 function updateEmotionBadge(stage) {

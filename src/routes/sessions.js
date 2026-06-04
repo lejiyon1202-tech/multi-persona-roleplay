@@ -5,7 +5,7 @@ import {
   addMessage, getMessages, incrementTurnCount, completeSession,
 } from '../data-store/sessions-store.js';
 import { saveEvaluation } from '../data-store/eval-store.js';
-import { invokeChat, invokeEvaluate } from '../services/bedrock-service.js';
+import { invokeChat, invokeEvaluate, invokeSelectResponders } from '../services/bedrock-service.js';
 
 const router = Router();
 
@@ -61,9 +61,9 @@ router.post('/sessions', async (req, res) => {
   }
 });
 
-// 채팅 (SSE 스트리밍) — A안: target_character_id 지목 방식
+// 채팅 (SSE 스트리밍) — Phase E B안: LLM 맥락 선별 + 순차 응답
 router.post('/chat', async (req, res) => {
-  const { session_id, message, user_message, target_character_id } = req.body;
+  const { session_id, message, user_message } = req.body;
   const userMsg = message || user_message;
   if (!session_id || !userMsg) {
     return res.status(400).json({ error: 'session_id, message 필수' });
@@ -78,25 +78,19 @@ router.post('/chat', async (req, res) => {
     return res.status(500).json({ error: 'DB 오류' });
   }
 
-  // 대화 대상 캐릭터 결정 (A안: 지목 → 첫 파트너 fallback → 구형 character_id fallback)
-  let targetCharId;
-  if (target_character_id) {
-    targetCharId = Number(target_character_id);
-  } else if (session.dialogue_partner_ids) {
-    const partners = typeof session.dialogue_partner_ids === 'string'
-      ? JSON.parse(session.dialogue_partner_ids)
-      : session.dialogue_partner_ids;
-    targetCharId = partners[0];
-  } else {
-    targetCharId = session.character_id;
-  }
+  // 파트너 목록 파싱
+  const partnerIds = session.dialogue_partner_ids
+    ? (typeof session.dialogue_partner_ids === 'string'
+        ? JSON.parse(session.dialogue_partner_ids)
+        : session.dialogue_partner_ids)
+    : (session.character_id ? [session.character_id] : []);
 
-  if (!targetCharId) {
-    return res.status(400).json({ error: '대화 대상 캐릭터를 특정할 수 없음' });
+  if (!partnerIds.length) {
+    return res.status(400).json({ error: '대화 파트너 없음' });
   }
 
   const turn = session.turn_count + 1;
-  await addMessage({ session_id, role: 'user', content: userMsg, turn_number: turn });
+  await addMessage({ session_id, role: 'user', content: userMsg, turn_number: turn, character_id: null });
   await incrementTurnCount(session_id);
 
   // SSE 헤더
@@ -104,16 +98,53 @@ router.post('/chat', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  let fullResponse = '';
   try {
-    const char = await getCharacter(targetCharId);
-    const history = await getMessages(session_id);
-    const messages = history.map(m => ({ role: m.role, content: m.content }));
+    const history  = await getMessages(session_id);
+    const allChars = await Promise.all(partnerIds.map(id => getCharacter(id)));
+    const charMap  = new Map(allChars.filter(Boolean).map(c => [c.id, c]));
 
-    // v3: 학습자 캐릭터 정보를 시스템 프롬프트에 추가 — 이름 환각 방지
-    let systemPrompt = char.persona_prompt;
+    let learnerChar = null;
     if (session.learner_character_id) {
-      const learnerChar = await getCharacter(session.learner_character_id);
+      learnerChar = await getCharacter(session.learner_character_id);
+    }
+
+    // ① B안 선별 LLM: 반응할 캐릭터 ID 배열 결정
+    let selectedIds = await invokeSelectResponders({
+      userMessage: userMsg,
+      characters: allChars.filter(Boolean).map(c => ({
+        id: c.id, name: c.name, role_level: c.role_level, core_mindset: c.core_mindset,
+      })),
+      history: history.slice(-6),
+    });
+
+    // 과소응답 fallback: 0명이면 첫 번째 파트너
+    if (selectedIds.length === 0) {
+      selectedIds = [partnerIds[0]];
+      console.log('[CHAT] fallback: 0명 선별 → 첫 파트너', partnerIds[0]);
+    }
+
+    // 과다응답 제한: 4명 이상이면 상위 3명
+    if (selectedIds.length > 3) {
+      selectedIds = selectedIds.slice(0, 3);
+      console.log('[CHAT] 과다응답 제한: 상위 3명만 선택');
+    }
+
+    // 유효한 파트너 ID만 필터
+    selectedIds = selectedIds.filter(id => charMap.has(id));
+    if (!selectedIds.length) selectedIds = [partnerIds[0]];
+
+    // ② 선별된 캐릭터별 순차 SSE 스트리밍
+    const chatHistory = history.map(m => ({ role: m.role, content: m.content }));
+
+    for (const charId of selectedIds) {
+      const char = charMap.get(charId);
+      if (!char) continue;
+
+      // 응답 시작 이벤트 (기안84 타이핑 인디케이터용)
+      res.write(`data: ${JSON.stringify({ character_id: charId, character_name: char.name })}\n\n`);
+
+      // 시스템 프롬프트 구성
+      let systemPrompt = char.persona_prompt;
       if (learnerChar) {
         systemPrompt = `${char.persona_prompt}
 
@@ -131,15 +162,23 @@ router.post('/chat', async (req, res) => {
           }
         }
       }
+
+      let fullResponse = '';
+      for await (const chunk of invokeChat(chatHistory, systemPrompt)) {
+        fullResponse += chunk;
+        res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
+      }
+
+      // DB 저장 (character_id 포함)
+      await addMessage({ session_id, role: 'assistant', content: fullResponse, turn_number: turn, character_id: charId });
+
+      // 응답 완료 이벤트
+      res.write(`data: ${JSON.stringify({ done: true, character_id: charId })}\n\n`);
+
+      // 다음 캐릭터 응답에 현재 응답 포함
+      chatHistory.push({ role: 'assistant', content: fullResponse });
     }
 
-    for await (const chunk of invokeChat(messages, systemPrompt)) {
-      fullResponse += chunk;
-      res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
-    }
-
-    await addMessage({ session_id, role: 'assistant', content: fullResponse, turn_number: turn });
-    res.write(`data: ${JSON.stringify({ done: true, character_id: targetCharId })}\n\n`);
   } catch (err) {
     console.error('[POST /api/chat]', err.message);
     res.write(`data: ${JSON.stringify({ error: 'AI 응답 오류' })}\n\n`);

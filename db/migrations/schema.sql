@@ -82,12 +82,15 @@ CREATE TABLE IF NOT EXISTS messages (
   role            ENUM('user','assistant') NOT NULL,
   content         LONGTEXT      NOT NULL,
   turn_number     SMALLINT UNSIGNED NOT NULL,
+  character_id    INT UNSIGNED  NULL DEFAULT NULL
+    COMMENT 'Phase E B안: AI 발화자 캐릭터 ID (user 발화는 NULL)',
   created_at      DATETIME      NOT NULL DEFAULT (NOW()),
   CONSTRAINT fk_msg_session
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE INDEX idx_msg_session ON messages (session_id, turn_number);
+CREATE INDEX idx_msg_session   ON messages (session_id, turn_number);
+CREATE INDEX idx_msg_character ON messages (character_id);
 
 -- ── 6. 평가 ──────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS evaluations (
