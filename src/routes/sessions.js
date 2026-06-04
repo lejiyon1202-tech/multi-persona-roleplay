@@ -193,11 +193,15 @@ function buildTranscript(messages, learnerChar, partnerChars) {
   const learnerLabel = learnerChar
     ? `${learnerChar.name}(${learnerChar.role_level})`
     : '학습자';
-  const partnerLabel = partnerChars.length === 1
-    ? `${partnerChars[0].name}(${partnerChars[0].role_level})`
-    : 'AI 파트너';
+  const charMap = new Map(partnerChars.map(c => [c.id, c]));
   return messages.map((m, i) => {
-    const label = m.role === 'user' ? learnerLabel : partnerLabel;
+    let label;
+    if (m.role === 'user') {
+      label = learnerLabel;
+    } else {
+      const c = charMap.get(m.character_id);
+      label = c ? `${c.name}(${c.role_level})` : 'AI 파트너';
+    }
     return `[${label}](${i + 1}번 발화)\n${m.content}`;
   }).join('\n\n---\n\n');
 }
