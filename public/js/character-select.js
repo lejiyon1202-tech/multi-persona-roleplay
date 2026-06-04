@@ -63,6 +63,24 @@ async function loadScenarioInfo() {
     const missionEl = document.getElementById('learnerMission');
     if (briefEl)   briefEl.textContent   = s.context_description?.slice(0, 120) + (s.context_description?.length > 120 ? '...' : '') || '—';
     if (missionEl) missionEl.textContent = s.learner_mission || '캐릭터를 선택하고 그 역할로 대화를 시작하세요.';
+
+    // 상황 요약 카드 (D-3)
+    const summaryEl = document.getElementById('situationSummary');
+    const chipsEl   = document.getElementById('situationChips');
+    const linkEl    = document.getElementById('situationDetailLink');
+    if (summaryEl && chipsEl && linkEl) {
+      const id   = parseInt(scenarioId, 10);
+      const meta = SCENE_META[id];
+      const chips = meta
+        ? [meta.conflict, meta.vs, meta.org]
+        : [s.case_name || s.title || ''];
+      chipsEl.innerHTML = chips
+        .filter(Boolean)
+        .map(t => `<span class="situation-chip">${esc(t)}</span>`)
+        .join('');
+      linkEl.href = `scenario-briefing.html?scenario_id=${scenarioId}`;
+      summaryEl.classList.remove('hidden');
+    }
   } catch {
     const label = document.getElementById('scenarioLabel');
     if (label) label.textContent = 'Case Study';

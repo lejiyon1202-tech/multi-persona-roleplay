@@ -105,7 +105,7 @@ function bindScenarioEvents() {
 }
 
 function goToCharacterSelect(scenarioId) {
-  window.location.href = `character-select.html?scenario_id=${scenarioId}`;
+  window.location.href = `scenario-briefing.html?scenario_id=${scenarioId}`;
 }
 
 function escHtml(str) {

@@ -37,20 +37,23 @@ export async function getCharacter(id) {
 
 // ── Admin CRUD ───────────────────────────────────────────────────────────────
 
-export async function createScenario({ title, case_name, context_description, learner_role }) {
+export async function createScenario({ title, case_name, context_description, learner_role, briefing = null }) {
   const [result] = await pool.query(
-    'INSERT INTO scenarios (title, case_name, context_description, learner_role) VALUES (?, ?, ?, ?)',
-    [title, case_name, context_description, learner_role]
+    'INSERT INTO scenarios (title, case_name, context_description, learner_role, briefing) VALUES (?, ?, ?, ?, ?)',
+    [title, case_name, context_description, learner_role, briefing ? JSON.stringify(briefing) : null]
   );
   return result.insertId;
 }
 
 export async function updateScenario(id, fields) {
-  const allowed = ['title', 'case_name', 'context_description', 'learner_role'];
+  const allowed = ['title', 'case_name', 'context_description', 'learner_role', 'briefing'];
   const sets = [];
   const vals = [];
   for (const key of allowed) {
-    if (key in fields) { sets.push(`${key} = ?`); vals.push(fields[key]); }
+    if (key in fields) {
+      sets.push(`${key} = ?`);
+      vals.push(key === 'briefing' && fields[key] !== null ? JSON.stringify(fields[key]) : fields[key]);
+    }
   }
   if (!sets.length) return 0;
   vals.push(id);
