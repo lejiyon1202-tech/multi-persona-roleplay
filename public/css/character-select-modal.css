@@ -183,8 +183,8 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.modal-tab-panel::-webkit-scrollbar { width: 6px; background: var(--bg-quote); }
-.modal-tab-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.modal-tab-panel::-webkit-scrollbar { width: 8px; background: #f4f4f5; }
+.modal-tab-panel::-webkit-scrollbar-thumb { background: #a1a1aa; border-radius: 4px; min-height: 40px; }
 .modal-tab-panel.active { display: flex; }
 
 .modal-section {
