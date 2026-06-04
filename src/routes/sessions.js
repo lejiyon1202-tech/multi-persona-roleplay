@@ -61,6 +61,21 @@ router.post('/sessions', async (req, res) => {
   }
 });
 
+// 세션 메시지 조회 — Phase E B안 평가 검증용
+router.get('/sessions/:id/messages', async (req, res) => {
+  const sessionId = Number(req.params.id);
+  if (!sessionId) return res.status(400).json({ error: 'session id 필수' });
+  try {
+    const session = await getSession(sessionId);
+    if (!session) return res.status(404).json({ error: '세션 없음' });
+    const messages = await getMessages(sessionId);
+    res.json({ session_id: sessionId, messages });
+  } catch (err) {
+    console.error('[GET /api/sessions/:id/messages]', err.message);
+    res.status(500).json({ error: 'DB 오류' });
+  }
+});
+
 // 채팅 (SSE 스트리밍) — Phase E B안: LLM 맥락 선별 + 순차 응답
 router.post('/chat', async (req, res) => {
   const { session_id, message, user_message } = req.body;
