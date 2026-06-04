@@ -285,6 +285,27 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
 .end-chat-btn:hover { border-color: var(--danger); color: var(--danger); }
 .end-chat-btn svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.5; fill: none; }
 .end-chat-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* 평가 중 로딩 상태 */
+.end-chat-btn.evaluating {
+  opacity: 1 !important;
+  background: #09090B;
+  color: #fff;
+  border-color: #09090B;
+  cursor: wait;
+  position: relative;
+  overflow: hidden;
+}
+.end-chat-btn.evaluating::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+  animation: evalShimmer 1.4s ease infinite;
+}
+@keyframes evalShimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
 
 /* ── v3 파트너 스트립 ── */
 .partners-strip {
