@@ -127,7 +127,8 @@ function renderRichSections(data) {
   if (fb.highlight_positive || fb.highlight_improve) renderHighlights(fb.highlight_positive, fb.highlight_improve);
   if (fb.emotion_track?.length)        renderEmotionTrack(fb.emotion_track);
   if (fb.next_challenges?.length)      renderNextChallenges(fb.next_challenges);
-  if (fb.guide_items?.length)          renderGuideItems(fb.guide_items);
+  if (fb.self_learning)                renderSelfLearning(fb.self_learning);
+  else if (fb.guide_items?.length)     renderGuideItems(fb.guide_items);
 }
 
 function renderRadar(axes) {
@@ -219,9 +220,23 @@ function renderNextChallenges(challenges) {
          ${escHtml((c.character_name || '?')[0])}
        </div>
        <p class="next-card-name">${escHtml(c.character_name)}</p>
-       <p class="next-card-reason">${escHtml(c.reason)}${c.difficulty ? `<br><span class="next-difficulty">난이도: ${c.difficulty}</span>` : ''}</p>
+       <p class="next-card-reason">${escHtml(c.reason)}${c.difficulty ? `<br><span class="next-difficulty">난이도: ${c.difficulty}</span>` : ''}${c.job_perspective ? `<br><span class="next-job-perspective">${escHtml(c.job_perspective)}</span>` : ''}</p>
      </div>`).join('');
   document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function renderSelfLearning(sl) {
+  const items = [
+    { label: '돌아보기', text: sl.reflection_question },
+    { label: '핵심 배움', text: sl.key_learning },
+    { label: '다음 집중', text: sl.retry_tip },
+  ].filter(i => i.text);
+  document.getElementById('guideBox').innerHTML = items.map((item, i) =>
+    `<div class="guide-item">
+       <span class="guide-item-num">${escHtml(item.label)}</span>
+       ${escHtml(item.text)}
+     </div>`).join('');
+  document.getElementById('guideSection').classList.remove('hidden');
 }
 
 function renderGuideItems(items) {
