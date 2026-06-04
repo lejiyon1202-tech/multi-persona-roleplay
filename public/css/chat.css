@@ -391,7 +391,16 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
   margin-bottom: 3px;
   letter-spacing: 0.01em;
   color: var(--text-muted);
+  padding-left: 2px;
 }
+
+/* Phase E B안 — 단톡방 연속 발화 (같은 캐릭터) */
+.msg.ai.msg-continuous { margin-top: 2px; }
+.msg.ai.msg-continuous .msg-avatar { visibility: hidden; }
+.msg.ai.msg-continuous .msg-speaker-name { display: none; }
+
+/* Phase E B안 — 캐릭터 그룹 구분 (다른 캐릭터 전환) */
+.msg.ai.msg-new-char { margin-top: 14px; }
 
 /* ── Phase E B안 — 타이핑 인디케이터 캐릭터 이름 ── */
 .typing-content {
