@@ -1,10 +1,10 @@
 const THEME_MAP = { 1: 'theme-ai', 2: 'theme-deadline', 4: 'theme-crisis' };
 const BRIEFING_LABELS = {
-  background:    { icon: '🏢', title: '상황 배경' },
-  stakeholders:  { icon: '👥', title: '등장인물 관계' },
-  conflict:      { icon: '⚡', title: '핵심 갈등' },
-  learning_goal: { icon: '🎯', title: '학습 목표' },
-  before_start:  { icon: '📌', title: '시작 전 알아둘 것' },
+  background:    { icon: '🏢', badge: '배경',    title: '상황 배경' },
+  stakeholders:  { icon: '👥', badge: '인물관계', title: '등장인물 관계' },
+  conflict:      { icon: '⚡', badge: '핵심 갈등', title: '핵심 갈등' },
+  learning_goal: { icon: '🎯', badge: '학습 목표', title: '학습 목표' },
+  before_start:  { icon: '📌', badge: '시작 전',  title: '시작 전 알아둘 것' },
 };
 const KEY_ORDER = ['background', 'stakeholders', 'conflict', 'learning_goal', 'before_start'];
 
@@ -53,8 +53,13 @@ async function loadBriefing() {
         const text = briefing[key] || '';
         return `
           <div class="briefing-card${idx === 0 ? ' briefing-card--full' : ''}" data-key="${key}">
-            <div class="briefing-card-icon">${meta.icon}</div>
-            <h3 class="briefing-card-title">${escHtml(meta.title)}</h3>
+            <div class="briefing-card-inner">
+              <div class="briefing-card-icon">${meta.icon}</div>
+              <div class="briefing-card-title-wrap">
+                <span class="briefing-card-badge">${escHtml(meta.badge)}</span>
+                <h3 class="briefing-card-title">${escHtml(meta.title)}</h3>
+              </div>
+            </div>
             <p class="briefing-card-body">${escHtml(text)}</p>
           </div>`;
       }).join('');
