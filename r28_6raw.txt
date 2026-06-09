@@ -1,0 +1,9 @@
+=== session 53 messages raw 전수 (assistant 개수·character_id 다양성) ===
+총 6개
+[0] turn=1 role=user char_id=None len=27
+[1] turn=1 role=assistant char_id=4 len=216
+[2] turn=2 role=user char_id=None len=27
+[3] turn=2 role=assistant char_id=4 len=378
+[4] turn=3 role=user char_id=None len=26
+[5] turn=3 role=assistant char_id=4 len=216
+assistant 총 3개·character_id 분포=[4, 4, 4]·고유={4}

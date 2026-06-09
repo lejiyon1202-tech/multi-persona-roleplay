@@ -1,0 +1,2 @@
+scenario 1: 환각잔존=[] / characters 6명중 stakeholders미언급=[]
+scenario 4: 환각잔존=[] / characters 6명중 stakeholders미언급=[]

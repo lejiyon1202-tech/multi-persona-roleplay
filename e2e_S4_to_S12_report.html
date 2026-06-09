@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<title>통합 e2e S4~S12 결과</title>
+<style>
+body{font-family:'Noto Sans KR',sans-serif;max-width:960px;margin:40px auto;padding:0 20px;background:#f8f9fa}
+h1{font-size:1.4rem;color:#212529}
+.summary{display:flex;gap:16px;margin:16px 0}
+.badge{padding:8px 20px;border-radius:8px;font-weight:700;font-size:1.1rem}
+.pass{background:#d8f3dc;color:#1b4332}
+.fail{background:#ffe8e8;color:#c1121f}
+.score{background:#e3f2fd;color:#1565c0}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+th{background:#343a40;color:#fff;padding:10px 12px;text-align:left;font-size:.85rem}
+td{padding:8px 12px;border-bottom:1px solid #dee2e6;font-size:.85rem}
+</style></head><body>
+<h1>통합 e2e S4~S12 — 역할선택·채팅·평가·리포트·360도·admin·재현성</h1>
+<p style="color:#6c757d;font-size:.85rem">실행: 2026-06-03 00:00 KST | 서버: https://persona.3.39.80.158.nip.io</p>
+<div class="summary">
+  <span class="badge pass">PASS 51</span>
+  <span class="badge fail">FAIL 1</span>
+  <span class="badge score">총 52건 98.1%</span>
+</div>
+<table><thead><tr><th>결과</th><th>태그</th><th>내용</th></tr></thead><tbody>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S4]</td><td>Case 1 캐릭터 6명 수신</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S4]</td><td>selectable=4 / context-only=2</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S4]</td><td>학습자 캐릭터 확정: 김센터 그룹장 (id=2)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S4]</td><td>파트너 후보 IDs: [3, 4, 5, 6]</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S5]</td><td>학습자 등록: learner_id=10</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S5]</td><td>1:1 세션 생성: session_id=32, partner=3</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-1]</td><td>턴1: 408자 수신 (char_id=3)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-1]</td><td>턴1 괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-1]</td><td>턴1 메타 용어 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-2]</td><td>턴2: 610자 수신 (char_id=3)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-2]</td><td>턴2 괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-2]</td><td>턴2 메타 용어 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-3]</td><td>턴3: 576자 수신 (char_id=3)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-3]</td><td>턴3 괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-3]</td><td>턴3 메타 용어 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-4]</td><td>턴4: 523자 수신 (char_id=3)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-4]</td><td>턴4 괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-4]</td><td>턴4 메타 용어 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-5]</td><td>턴5: 596자 수신 (char_id=3)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-5]</td><td>턴5 괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S6-5]</td><td>턴5 메타 용어 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S7]</td><td>평가 완료: total_score=0.88 grade=A</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S7]</td><td>세부 점수 필드 존재: ['커뮤니케이션', '문제해결', '전문성', '협상력', '리더십']</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S7]</td><td>feedback 필드 존재</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S8]</td><td>리포트 수신: session=32</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S8]</td><td>evaluation 포함: grade=A</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S8]</td><td>turn_count=10</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>1:N 세션 생성: session_id=33, partners=[3, 4]</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-1]</td><td>partner=3→cid=3: 345자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-1]</td><td>target 일치 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-1]</td><td>괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-2]</td><td>partner=4→cid=4: 158자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-2]</td><td>target 일치 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-2]</td><td>괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-3]</td><td>partner=3→cid=3: 360자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-3]</td><td>target 일치 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-3]</td><td>괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-4]</td><td>partner=4→cid=4: 310자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-4]</td><td>target 일치 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9-4]</td><td>괄호 지문 0건 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>파트너 A·B 응답 다름 — 페르소나 차별 확인 ✓</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10]</td><td>2nd 세션 생성: session_id=34, partner=5</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10-chat1]</td><td>305자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10-chat2]</td><td>450자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10-chat3]</td><td>499자</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10]</td><td>2nd 세션 평가 완료</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10]</td><td>360도 compare: 4개 세션</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S11]</td><td>admin.html 로드 + 인증 오버레이: auth=1 pwd=1</td></tr>
+<tr><td style="color:#c1121f;font-weight:bold">FAIL</td><td>[S11]</td><td>ADMIN_TOKEN 없음 — admin API 스킵 (환경 변수 설정 필요)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S12]</td><td>세션A 점수: 0.84</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S12]</td><td>세션B 점수: 0.85</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S12]</td><td>점수 차이 0.010 (허용 0.2 이내)</td></tr>
+
+</tbody></table>
+</body></html>

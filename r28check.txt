@@ -1,0 +1,14 @@
+=== scenario 1 ===
+characters DB: ['이임원 팀장', '김센터 그룹장', '박수석 파트장', '박보안 파트장', '이책임 CL3', '정인라 CL2']
+stakeholders 언급 인물: ['이임원', '김센터', '신주니어']
+환각 후보(stakeholders엔 있고 DB엔 없음): ['신주니어']
+
+=== scenario 2 ===
+characters DB: ['이임원 팀장', '김센터 그룹장', '박수석 파트장', '박보안 파트장', '이책임 CL3', '정인라 CL2']
+stakeholders 언급 인물: []
+환각 후보(stakeholders엔 있고 DB엔 없음): []
+
+=== scenario 4 ===
+characters DB: ['오현철 CCO', '최준호 이커머스본부장', '강민경 고객경험팀장', '박기훈 운영전략팀장', '윤서준 데이터분석 수석', '이동현 시스템통합 책임']
+stakeholders 언급 인물: []
+환각 후보(stakeholders엔 있고 DB엔 없음): []

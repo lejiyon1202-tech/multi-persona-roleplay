@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<title>통합 e2e — Phase B·C 결과</title>
+<style>
+body{font-family:'Noto Sans KR',sans-serif;max-width:900px;margin:40px auto;padding:0 20px;background:#f8f9fa}
+h1{font-size:1.4rem;color:#212529}
+.summary{display:flex;gap:16px;margin:16px 0}
+.badge{padding:8px 20px;border-radius:8px;font-weight:700;font-size:1.1rem}
+.pass{background:#d8f3dc;color:#1b4332}
+.fail{background:#ffe8e8;color:#c1121f}
+.score{background:#e3f2fd;color:#1565c0}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+th{background:#343a40;color:#fff;padding:10px 12px;text-align:left;font-size:.85rem}
+td{padding:8px 12px;border-bottom:1px solid #dee2e6;font-size:.85rem}
+</style></head><body>
+<h1>통합 e2e 결과 — Phase B(8) + Phase C(S9~S12)</h1>
+<p style="color:#6c757d;font-size:.85rem">실행: 2026-06-02 08:29 KST | 서버: https://persona.3.39.80.158.nip.io</p>
+<div class="summary">
+  <span class="badge pass">PASS 28</span>
+  <span class="badge fail">FAIL 0</span>
+  <span class="badge score">총 28건 100.0%</span>
+</div>
+<table><thead><tr><th>결과</th><th>태그</th><th>내용</th></tr></thead><tbody>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-1]</td><td>시나리오 카드 로드: 3개</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-1]</td><td>index.html 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-2]</td><td>data-theme 속성 존재: light</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-2]</td><td>inline <style> 0건: 0건</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-2]</td><td>inline <script> 0건: 0건</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-3]</td><td>index.html 모바일(375px) 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-4]</td><td>Case 1 캐릭터 카드 6개 (선택 가능 4 / 컨텍스트 2)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-4]</td><td>character-select.html Case 1 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-5]</td><td>chat.html 헤더 + 입력창: header=1 input=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-5]</td><td>chat.html 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-6]</td><td>report.html 탭 2개</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-6]</td><td>report.html 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-7]</td><td>admin.html 인증 오버레이: auth=1 pwd=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-7]</td><td>admin.html 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-8]</td><td>CSP 헤더 존재: default-src 'self';script-src 'self';style-src 'self' https:...</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-8]</td><td>CSP 차단 에러 0건: 0건</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[B-8]</td><td>총 콘솔 에러: 0건</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>시나리오 B 헤더: 'CASE 3: 시스템 전환 위기 — 30일의 선택'</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>시나리오 B 캐릭터 6개 (선택 가능 4 / 컨텍스트 2)</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>시나리오 B character-select 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>Card 3 (강민경) chat 진입: header=1 input=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S9]</td><td>Card 3 (강민경) chat 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10]</td><td>Card 4 (박기훈) chat 진입: header=1 input=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S10]</td><td>Card 4 (박기훈) chat 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S11]</td><td>Card 5 (윤서준) chat 진입: header=1 input=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S11]</td><td>Card 5 (윤서준) chat 스크린샷</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S12]</td><td>Card 6 (이동현) chat 진입: header=1 input=1</td></tr>
+<tr><td style="color:#2d6a4f;font-weight:bold">PASS</td><td>[S12]</td><td>Card 6 (이동현) chat 스크린샷</td></tr>
+
+</tbody></table>
+</body></html>
