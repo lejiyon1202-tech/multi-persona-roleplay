@@ -14,6 +14,7 @@ app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT) || 3011;
 
 // ── 미들웨어 ─────────────────────────────────────────────────────────────────
+const isProd = process.env.NODE_ENV === 'production';
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -22,8 +23,12 @@ app.use(helmet({
       styleSrc:   ["'self'", 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
       fontSrc:    ["'self'", 'https://cdn.jsdelivr.net', 'https://fonts.gstatic.com'],
       imgSrc:     ["'self'", 'data:'],
+      // 로컬(내부망 IP·http) 접속 시 브라우저가 CSS/JS를 https로 강제 업그레이드 → 로드 실패 방지
+      ...(isProd ? {} : { upgradeInsecureRequests: null }),
     },
   },
+  // 로컬 http 접속 호환 (production은 기존 동작 유지)
+  ...(isProd ? {} : { hsts: false }),
 }));
 app.use(cors());
 app.use(express.json());
