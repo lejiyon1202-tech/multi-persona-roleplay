@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getEvaluation, getSessionsForCompare } from '../data-store/eval-store.js';
 import { getSession, getMessages } from '../data-store/sessions-store.js';
-import { getCharacter } from '../data-store/scenarios-store.js';
+import { getCharacter, getScenario } from '../data-store/scenarios-store.js';
 
 const router = Router();
 
@@ -51,10 +51,12 @@ router.get('/sessions/:id/report', async (req, res) => {
 
     // 신규(v2) 학습자용 — 내부 척도(R-26/27/28·total_score) 노출 0 (매트릭스 ①)
     if (schema_version >= 2) {
+      const scenario = await getScenario(session.scenario_id);
       return res.json({
         schema_version: 2,
         session_type: scores.session_type || 'single',
         scenario_id: session.scenario_id,
+        scenario_title: scenario?.title || '',
         character: characterObj,
         overall_level: feedback.overall_level || '발전중',
         axes: feedback.axes || [],

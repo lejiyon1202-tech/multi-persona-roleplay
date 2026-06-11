@@ -40,6 +40,17 @@ async function loadReport() {
 }
 
 function renderReport(data) {
+  // schema_version 2 → 신규 학습자용 리포트 / 1·없음 → 구버전 레이아웃 + "이전 버전 평가" 배너
+  if (Number(data.schema_version) >= 2) {
+    document.getElementById('reportV2')?.classList.remove('hidden');
+    document.getElementById('reportLegacy')?.classList.add('hidden');
+    renderReportV2(data);
+    return;
+  }
+  document.getElementById('reportV2')?.classList.add('hidden');
+  document.getElementById('reportLegacy')?.classList.remove('hidden');
+  document.getElementById('legacyBanner')?.classList.remove('hidden');
+
   const total = data.total_score || 0;
   const grade = data.grade || (total >= 23.75 ? '됐어!' : total >= 20 ? '아쉽지만...' : '느낌이 안 와');
   const gradeClass = grade === '됐어!' ? 'pass' : grade === '아쉽지만...' ? 'partial' : 'fail';
@@ -357,6 +368,82 @@ function buildRadar(sessions, colors) {
 
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── 신규 리포트 v2 (학습자용·내부 척도 0) ── */
+const V2_LV = { '탁월':'excellent', '안정적':'stable', '발전중':'growing' };
+const V2_FS = { '방어':'defend', '저항':'resist', '수용':'accept' };
+const V2_PCT = { '탁월':1.0, '안정적':0.6, '발전중':0.25 };
+function setTxt(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+
+function renderReportV2(data) {
+  const lvl = document.getElementById('overallLevel');
+  if (lvl) { lvl.textContent = data.overall_level || '발전중'; lvl.className = `level-badge-lg level-${V2_LV[data.overall_level] || 'growing'}`; }
+  setTxt('scenarioTitle', data.scenario_title || '');
+  setTxt('learnerRole', data.character?.role_level || '');
+  setTxt('learnerName', data.character?.name || '');
+
+  renderV2Radar(data.axes || [], data.session_type);
+  renderAxisLevels(data.axes || []);
+  renderStrengths(data.strengths || []);
+  renderOIS(data.improvements || []);
+  renderV2Next(data.next_challenges || []);
+  renderV2Compare(data.character_comparison || []);
+}
+
+function renderV2Radar(axes, sessionType) {
+  const el = document.getElementById('v2RadarChart');
+  if (!el || !axes.length) return;
+  setTxt('axisTypeLabel', sessionType === 'multi' ? '다자 토론 5축' : '1:1 코칭 5축');
+  const CX=110, CY=110, R=82, N=axes.length;
+  const ang = i => (i*2*Math.PI/N) - Math.PI/2;
+  const pt = (r,i) => [+(CX+r*Math.cos(ang(i))).toFixed(2), +(CY+r*Math.sin(ang(i))).toFixed(2)];
+  let svg='';
+  for (let ring=1; ring<=5; ring++) svg += `<polygon points="${axes.map((_,i)=>pt(ring/5*R,i).join(',')).join(' ')}" fill="none" stroke="var(--border)" stroke-width="1" opacity="0.6"/>`;
+  for (let i=0;i<N;i++){ const [x,y]=pt(R,i); svg+=`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="1" opacity="0.5"/>`; }
+  const vals = axes.map(a => V2_PCT[a.level] ?? 0.25);
+  svg += `<polygon points="${vals.map((v,i)=>pt(v*R,i).join(',')).join(' ')}" fill="var(--role-lead)" fill-opacity="0.2" stroke="var(--role-lead)" stroke-width="2"/>`;
+  vals.forEach((v,i)=>{ const [x,y]=pt(v*R,i); svg+=`<circle cx="${x}" cy="${y}" r="4" fill="var(--role-lead)"/>`; });
+  axes.forEach((a,i)=>{ const [lx,ly]=pt(R+17,i); const anc=lx<CX-4?'end':lx>CX+4?'start':'middle'; svg+=`<text x="${lx}" y="${ly}" text-anchor="${anc}" font-size="9" fill="var(--text-muted)">${escHtml(a.key)}</text>`; });
+  el.innerHTML = svg;
+  const lg = document.getElementById('v2RadarLegend');
+  if (lg) lg.innerHTML = axes.map(a=>`<div class="radar-legend-item"><div class="radar-legend-dot"></div><span class="radar-legend-label">${escHtml(a.key)}</span><span class="radar-legend-score">${escHtml(a.level)}</span></div>`).join('');
+}
+
+function renderAxisLevels(axes) {
+  const el = document.getElementById('axisLevelGrid');
+  if (!el) return;
+  el.innerHTML = axes.map(a=>`<div class="axis-level-card"><div class="axis-level-head"><span class="axis-level-name">${escHtml(a.key)}</span><span class="level-badge level-${V2_LV[a.level]||'growing'}">${escHtml(a.level)}</span></div><p class="axis-level-note">${escHtml(a.behavior_note||'')}</p></div>`).join('');
+}
+
+function renderStrengths(strengths) {
+  const el = document.getElementById('strengthGrid');
+  if (!el) return;
+  el.innerHTML = strengths.map(s=>`<div class="strength-card"><div class="strength-head">✅ ${escHtml(s.axis||'')} · ${s.turn}번 발화</div><p class="strength-quote">"${escHtml(s.quote||'')}"</p><p class="strength-why">${escHtml(s.why||'')}</p><p class="strength-keep">→ ${escHtml(s.keep||'')}</p></div>`).join('');
+}
+
+function renderOIS(improvements) {
+  const el = document.getElementById('oisList');
+  if (!el) return;
+  el.innerHTML = improvements.map(im=>{
+    const o=im.observation||{}, s=im.suggestion||{};
+    return `<div class="ois-card"><div class="ois-step ois-obs"><span class="ois-label">관찰</span><p>"${escHtml(o.quote||'')}" <span class="ois-turn">${o.turn}번 발화</span></p></div><div class="ois-step ois-impact"><span class="ois-label">영향</span><p>${escHtml(im.impact||'')}</p></div><div class="ois-step ois-suggest"><span class="ois-label">제안</span><p>${escHtml(s.alternative||'')}</p>${s.replay_scenario?`<p class="ois-replay">🔁 재연습: ${escHtml(s.replay_scenario)}</p>`:''}</div></div>`;
+  }).join('');
+}
+
+function renderV2Next(challenges) {
+  const el = document.getElementById('v2NextGrid');
+  if (!el) return;
+  el.innerHTML = challenges.map(c=>`<div class="next-card"><div class="next-card-avatar next-card-avatar--initial">${escHtml((c.character_name||'?')[0])}</div><p class="next-card-name">${escHtml(c.character_name||'')}</p><p class="next-card-reason">${escHtml(c.reason||'')}${c.difficulty?`<br><span class="next-difficulty">난이도: ${escHtml(c.difficulty)}</span>`:''}${c.job_perspective?`<br><span class="next-job-perspective">${escHtml(c.job_perspective)}</span>`:''}</p></div>`).join('');
+}
+
+function renderV2Compare(comparison) {
+  const grid = document.getElementById('compareGrid');
+  const empty = document.getElementById('compareEmpty');
+  if (!grid) return;
+  if (!comparison.length) { if (empty) empty.classList.remove('hidden'); return; }
+  if (empty) empty.classList.add('hidden');
+  grid.innerHTML = comparison.map(c=>`<div class="compare-card"><div class="compare-card-header"><p class="compare-name">${escHtml(c.character||'')}</p><span class="stage-badge stage-${V2_FS[c.final_stage]||'defend'}">${escHtml(c.final_stage||'')}</span></div><div class="compare-axes">${(c.axis_levels||[]).map(a=>`<div class="compare-axis-row"><span>${escHtml(a.key)}</span><span class="level-badge level-${V2_LV[a.level]||'growing'}">${escHtml(a.level)}</span></div>`).join('')}</div></div>`).join('');
 }
 
 loadReport();
