@@ -44,12 +44,34 @@ router.get('/sessions/:id/report', async (req, res) => {
       grade = evaluation.grade ?? '느낌이 안 와';
     }
 
+    const schema_version = Number(scores.schema_version) || 1;
+    const characterObj = character
+      ? { id: character.id, name: character.name, role_level: character.role_level }
+      : null;
+
+    // 신규(v2) 학습자용 — 내부 척도(R-26/27/28·total_score) 노출 0 (매트릭스 ①)
+    if (schema_version >= 2) {
+      return res.json({
+        schema_version: 2,
+        session_type: scores.session_type || 'single',
+        scenario_id: session.scenario_id,
+        character: characterObj,
+        overall_level: feedback.overall_level || '발전중',
+        axes: feedback.axes || [],
+        strengths: feedback.strengths || [],
+        improvements: feedback.improvements || [],
+        character_comparison: feedback.character_comparison || [],
+        next_challenges: feedback.next_challenges || [],
+        turn_count: messages.length,
+      });
+    }
+
+    // 구버전(schema_version 1 또는 미평가) — 기존 구조 그대로 (report.html이 legacy 레이아웃 + "이전 버전 평가" 라벨)
     res.json({
+      schema_version: 1,
       session_id: session.id,
       scenario_id: session.scenario_id,
-      character: character
-        ? { id: character.id, name: character.name, role_level: character.role_level }
-        : null,
+      character: characterObj,
       scores,
       feedback,
       total_score,

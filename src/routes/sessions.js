@@ -298,7 +298,33 @@ function buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars) {
     ? others.map(c => `  - ${c.name}(${c.role_level})`).join('\n')
     : '  (추가 캐릭터 없음)';
 
-  return `당신은 기업 리더십 교육 전문 평가관입니다. 아래 대화를 평가하세요.
+  // 세션 타입 분기 — 다자 토론 5축 / 1:1 코칭 5축 (박진영 루브릭 §1·§2)
+  const axesDef = multiParty
+    ? `[다자 토론 5축 — transcript 행동 증거로 단계(탁월/안정적/발전중) 판정 · 학습자 발화만 채점]
+- 입장파악력: 각 참석자 입장·이해관계를 정확히 지칭·재진술 (증거: 정확 재진술 수·오귀속 수)
+  · 탁월: 전원 입장 정확 재진술·오귀속 0 / 안정적: 과반 반영·오귀속 0 / 발전중: 일부만 또는 오귀속 1+
+- 조율중재력: 대립 입장 간 공통분모·절충안 제시 (증거: 공통점 명시·절충안 수)
+  · 탁월: 공통분모 + 구체 절충안(조건·기한) / 안정적: 절충 시도 1+ (구체성 부족) / 발전중: 한쪽 편들기·방치
+- 설득영향력: 근거 기반 주장·반박에 재논거 (증거: 근거 주장 수·무근거 단정 수·반박 수용 후 재논거 수)
+  · 탁월: 근거 + 반박 인정→재논거 / 안정적: 근거 있으나 반박 대응 약함 / 발전중: 무근거·반박 회피/굴복
+- 발언타이밍: 적절한 개입 시점·흐름 관리 (증거: 턴 분포·쟁점 전환/정리 발화)
+  · 탁월: 쟁점 정점 개입 + 정리·전환 / 안정적: 고른 참여(관리 부족) / 발전중: 독점 또는 방관
+- 관계인식: 직책·갈등 관계 고려한 발화 조절 (증거: 직책 호칭·체면 보존·공개 자리 조절)
+  · 탁월: 관계 구도 반영 + 체면 보존 / 안정적: 호칭·예법 정확(활용 부족) / 발전중: 상하 무시·공개 면박`
+    : `[1:1 코칭 5축 — transcript 행동 증거로 단계(탁월/안정적/발전중) 판정 · 학습자 발화만 채점]
+- 경청과공감: 상대 감정·상황 인식·공감 (탁월: 감정 반영+상황 재진술+입장 인정 2회+ / 안정적: 피상적 공감 또는 상황 인식만 / 발전중: 공감 없음·일방적)
+- 이해관계조정: 입장 파악 후 절충 (탁월: 이해관계 명시+공통점+조율안 / 안정적: 파악만 또는 절충만 / 발전중: 일방적 주장)
+- 목표설정지원: 공동 목표·합의 유도 (탁월: 구체 목표(수치/기한) 합의 유도 / 안정적: 방향성만 / 발전중: 목표 없음)
+- 동기부여소통: 상대 동기·의지 제고 (탁월: 강점 인정+기여 가치+지지 / 안정적: 격려·지지 중 1 / 발전중: 시도 없음)
+- 갈등조율: 갈등 건설적 전환 (탁월: 원인 명시+양측 수용+전환 제안 / 안정적: 완화 시도만 / 발전중: 심화·회피)`;
+
+  // 캐릭터별 비교 + 도달 감정 단계 (R-28-3·박진영 A안: final_stage 결합·emotion_track 섹션 대체)
+  // 1:1도 단일 entry로 통일 — 감정 단계 데이터 보존(OIS [영향] 참조·점프 0 게이트)
+  const compBlock = `\n  "character_comparison": [
+    {"character": "<참석자 이름>", "final_stage": "<방어|저항|수용>", "axis_levels": [{"key": "<축명>", "level": "탁월|안정적|발전중"}]}
+  ],`;
+
+  return `당신은 기업 리더십 교육 전문 평가관입니다. 아래 대화를 평가하세요. 관대화 금지 — 행동 증거가 없으면 발전중입니다.
 
 [시나리오] ${title}
 [상황] ${context}
@@ -306,39 +332,18 @@ function buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars) {
 [대화 상대 캐릭터]
 ${partnerDesc}
 
-[역량 5축 정의 및 행동 기준]
-- 경청과공감 (0.0~1.0): 상대 감정·상황을 인식하고 공감하는 발화
-  · 1.0: 감정 명시적 반영 + 상황 재진술 + 입장 인정 발화 2회+
-  · 0.5: 피상적 공감 또는 상황 인식만
-  · 0.0: 공감 표현 없음, 일방적 지시·요구
-- 이해관계조정 (0.0~1.0): 서로 다른 입장 파악 후 절충 시도
-  · 1.0: 상대 이해관계 명시적 언급 + 공통점 탐색 + 조율안 제시
-  · 0.5: 이해관계 파악만 하거나 절충 시도만
-  · 0.0: 일방적 주장, 상대 입장 무시
-- 목표설정지원 (0.0~1.0): 공동 목표 제시 또는 합의 유도
-  · 1.0: 구체적 목표(수치/기한) 포함 합의 유도 발화
-  · 0.5: 방향성 제시만 또는 막연한 합의
-  · 0.0: 목표 언급 없음
-- 동기부여소통 (0.0~1.0): 상대 동기·의지를 높이는 발화
-  · 1.0: 상대 강점 인정 + 기여 가치 표현 + 구체적 지지 발화
-  · 0.5: 격려 또는 지지 중 1가지만
-  · 0.0: 동기부여 시도 없음
-- 갈등조율 (0.0~1.0): 갈등 장면에서 건설적 전환 시도
-  · 1.0: 갈등 원인 명시 + 양측 입장 수용 + 전환 방향 제안
-  · 0.5: 갈등 인식 후 완화 시도만
-  · 0.0: 갈등 심화 발화 또는 회피
+${axesDef}
 
-[채점 기준]
-- R-26 (0~15점): 5축 합계(0.0~5.0) × 3 (소수점 1자리)
-- R-27 (0~5점): 셀프 러닝 품질
-  · 완결성(1점): 3턴+ 이상 논리적 흐름 유지
-  · 자기인식(1점): 역할 특성·미션 발화에 반영
-  · 직군 시각(1점): 선택 직책(${learnerLabel})의 관점이 발화에 구체적으로 드러남
-  · 재도전 의지(1점): 성찰적 발화 또는 개선 의지 표현
-  · 독립 학습 가능성(1점): 가이드 없이도 다음 시도에서 개선 가능한 패턴
-- R-28 (0~5점): AI 캐릭터 페르소나 일관성 + 감정 단계 변화 반영도
-- total_score = R-26 + R-27 + R-28 (최대 25점)
-- grade 기준: 됐어!(≥23.75) / 아쉽지만...(≥20) / 느낌이 안 와(<20)
+[채점 원칙 — 반드시 준수]
+1. 채점 단위 = 학습자(${learnerLabel}) 발화만. AI 발화는 평가 대상 아님.
+2. 각 축은 transcript의 셀 수 있는 행동 증거로만 판정 (내면 상태·인상 채점 금지).
+3. 숫자 점수를 내지 말고 각 축의 단계(탁월/안정적/발전중)만 판정. 행동 증거 개수를 evidence에 명시.
+4. R-27(0~5): 셀프러닝(완결성·자기인식·직군시각(${learnerLabel} 관점)·재도전의지·독립학습 각 1점) / R-28(0~5): AI 페르소나 일관성·감정 단계 반영도.
+
+[OIS 피드백 규칙]
+- 개선점 최소 2건: 각 건 = [관찰: 실제 학습자 발화 인용 + turn 번호] → [영향: 그 발화가 토론·상대에 미친 영향] → [제안: "~하라" 행동 동사 대안 발화 1개 + 재연습 시나리오/캐릭터 추천]
+- 강점 최소 2건: [인용 + turn] + [어떤 축의 어떤 행동 증거였나] + [유지·확장 행동 1줄]
+- 인용은 반드시 실제 transcript에 존재하는 발화 + 정확한 turn 번호 (환각 금지).
 
 [다음 도전 후보 — next_challenges 에서만 선택]
 ${challengeList}
@@ -346,45 +351,21 @@ ${challengeList}
 반드시 아래 JSON 형식으로만 응답하세요 (마크다운 코드블록 포함, JSON 외 텍스트 절대 금지):
 \`\`\`json
 {
-  "scores": {
-    "r26": <0~15, 소수점 1자리>,
-    "r27": <0~5, 소수점 1자리>,
-    "r28": <0~5, 소수점 1자리>,
-    "axes": {
-      "경청과공감": <0.0~1.0>,
-      "이해관계조정": <0.0~1.0>,
-      "목표설정지원": <0.0~1.0>,
-      "동기부여소통": <0.0~1.0>,
-      "갈등조율": <0.0~1.0>
-    }
-  },
-  "feedback": {
-    "overall": "<종합 피드백 2~3문장>",
-    "highlight_positive": [
-      {"turn": <발화 순서번호>, "quote": "<실제 학습자 발화 인용>", "reason": "<칭찬 이유>"}
-    ],
-    "highlight_improve": [
-      {"turn": <발화 순서번호>, "quote": "<실제 학습자 발화 인용>", "reason": "<개선 이유>"}
-    ],
-    "emotion_track": [
-      {"character": "<캐릭터 이름>", "stages_reached": ["방어","저항"], "final_stage": "<최종 도달 단계>", "reached_at_turn": <발화번호>}
-    ],
-    "next_challenges": [
-      {
-        "character_name": "<위 목록에서 이름>",
-        "reason": "<추천 이유>",
-        "difficulty": "<상|중|하>",
-        "job_perspective": "<이 직책 관점에서 배울 리더십 핵심 1문장>"
-      }
-    ],
-    "self_learning": {
-      "reflection_question": "<이번 대화를 돌아보는 자기 성찰 질문 1가지>",
-      "key_learning": "<이번 대화에서 가장 중요한 배움 1문장>",
-      "retry_tip": "<다음 시도 시 집중할 구체적 행동 1가지>"
-    }
-  },
-  "total_score": <r26+r27+r28 합산>,
-  "grade": "<됐어!|아쉽지만...|느낌이 안 와>"
+  "axes": [
+    {"key": "<축명>", "level": "탁월|안정적|발전중", "evidence": "<행동 증거 개수·근거>", "behavior_note": "<학습자에게 보일 행동 서술 1문장>"}
+  ],
+  "r27": <0~5, 소수점 1자리>,
+  "r28": <0~5, 소수점 1자리>,
+  "strengths": [
+    {"turn": <번호>, "quote": "<실제 발화>", "axis": "<축명>", "why": "<어떤 행동 증거>", "keep": "<유지·확장 1줄>"}
+  ],
+  "improvements": [
+    {"observation": {"turn": <번호>, "quote": "<실제 발화>"}, "impact": "<영향>", "suggestion": {"alternative": "<행동 동사 대안 발화>", "replay_scenario": "<재연습 추천>"}}
+  ],${compBlock}
+  "next_challenges": [
+    {"character_name": "<위 목록 이름>", "reason": "<추천 이유>", "difficulty": "<상|중|하>", "job_perspective": "<이 직책에서 배울 리더십 1문장>"}
+  ],
+  "overall_note": "<학습자용 종합 1~2문장 (메타 용어·점수 없이)>"
 }
 \`\`\``;
 }
@@ -426,23 +407,40 @@ router.post('/evaluate', async (req, res) => {
     const evalPrompt = buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars);
     const result = await invokeEvaluate(transcript, evalPrompt, 4096);
 
-    const scores = result.scores ?? {};
-    const r26 = Number(scores.r26) || 0;
-    const r27 = Number(scores.r27) || 0;
-    const r28 = Number(scores.r28) || 0;
+    const multiParty = partnerChars.length > 1;
+    // LLM 단계 판정 → R-26 백엔드 결정적 환산 (탁월 1.0·안정 0.6·발전중 0.2 × 3·단일 소스·#54)
+    const LEVEL_VAL = { '탁월': 1.0, '안정적': 0.6, '발전중': 0.2 };
+    const axes = Array.isArray(result.axes) ? result.axes : [];
+    const r26 = parseFloat((axes.reduce((s, a) => s + (LEVEL_VAL[a.level] ?? 0.2), 0) * 3).toFixed(1));
+    const r27 = Number(result.r27) || 0;
+    const r28 = Number(result.r28) || 0;
     const total = parseFloat((r26 + r27 + r28).toFixed(2));
     const grade = total >= 23.75 ? '됐어!' : total >= 20 ? '아쉽지만...' : '느낌이 안 와';
+    // 종합 학습자 레벨 — 분포 규칙 (박진영 §3): 탁월 4+ → 탁월 / 탁월+안정 4+ → 안정적 / 그 외 발전중
+    const cnt = axes.reduce((a, x) => { a[x.level] = (a[x.level] || 0) + 1; return a; }, {});
+    const overall_level = (cnt['탁월'] || 0) >= 4 ? '탁월'
+      : ((cnt['탁월'] || 0) + (cnt['안정적'] || 0)) >= 4 ? '안정적' : '발전중';
 
-    await saveEvaluation({
-      session_id,
-      scores,
-      feedback: result.feedback ?? {},
-      total_score: total,
-      grade,
-    });
+    // 내부 점수(게이트 보존) / 학습자 노출 데이터 분리 저장 (schema_version 2)
+    const scores = {
+      schema_version: 2,
+      session_type: multiParty ? 'multi' : 'single',
+      r26, r27, r28,
+      axes: axes.map(a => ({ key: a.key, level: a.level })),
+    };
+    const feedback = {
+      overall_level,
+      overall_note: result.overall_note ?? '',
+      axes,
+      strengths: result.strengths ?? [],
+      improvements: result.improvements ?? [],
+      character_comparison: result.character_comparison ?? [],
+      next_challenges: result.next_challenges ?? [],
+    };
+    await saveEvaluation({ session_id, scores, feedback, total_score: total, grade });
     await completeSession(session_id);
 
-    res.json({ scores, feedback: result.feedback ?? {}, total_score: total, grade, session_id });
+    res.json({ schema_version: 2, session_type: scores.session_type, overall_level, grade, session_id });
   } catch (err) {
     console.error('[POST /api/evaluate]', err.message);
     res.status(500).json({ error: '평가 오류' });
