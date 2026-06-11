@@ -515,6 +515,7 @@
 .level-badge.level-excellent { background: #ECFDF5; color: #047857; }
 .level-badge.level-stable    { background: #EFF6FF; color: #1D4ED8; }
 .level-badge.level-growing   { background: #FFFBEB; color: #B45309; }
+.level-badge.level-none      { background: var(--divider); color: var(--text-placeholder); }
 
 /* 종합 행동 레벨 히어로 */
 .level-hero {
