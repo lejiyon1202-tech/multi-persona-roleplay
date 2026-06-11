@@ -10,7 +10,10 @@ document.querySelectorAll('.report-tab').forEach(tab => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById(`tab${tab.dataset.tab === 'single' ? 'Single' : 'Compare'}`).classList.add('active');
-    if (tab.dataset.tab === 'compare') loadCompare();
+    if (tab.dataset.tab === 'compare') {
+      const isV2 = document.getElementById('reportV2') && !document.getElementById('reportV2').classList.contains('hidden');
+      if (!isV2) loadCompare();  // v2는 character_comparison 이미 렌더·legacy /compare 호출 안 함
+    }
   });
 });
 
@@ -373,7 +376,9 @@ function escHtml(str) {
 /* ── 신규 리포트 v2 (학습자용·내부 척도 0) ── */
 const V2_LV = { '탁월':'excellent', '안정적':'stable', '발전중':'growing' };
 const V2_FS = { '방어':'defend', '저항':'resist', '수용':'accept' };
-const V2_PCT = { '탁월':1.0, '안정적':0.6, '발전중':0.25 };
+const V2_PCT = { '탁월':1.0, '안정적':0.6, '발전중':0.25, '관찰부족':0 };
+const AXES5_MULTI = ['입장파악력','조율중재력','설득영향력','발언타이밍','관계인식'];
+const AXES5_SINGLE = ['경청과공감','이해관계조정','목표설정지원','동기부여소통','갈등조율'];
 function setTxt(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
 
 function renderReportV2(data) {
@@ -388,7 +393,7 @@ function renderReportV2(data) {
   renderStrengths(data.strengths || []);
   renderOIS(data.improvements || []);
   renderV2Next(data.next_challenges || []);
-  renderV2Compare(data.character_comparison || []);
+  renderV2Compare(data.character_comparison || [], data.session_type);
 }
 
 function renderV2Radar(axes, sessionType) {
@@ -437,13 +442,27 @@ function renderV2Next(challenges) {
   el.innerHTML = challenges.map(c=>`<div class="next-card"><div class="next-card-avatar next-card-avatar--initial">${escHtml((c.character_name||'?')[0])}</div><p class="next-card-name">${escHtml(c.character_name||'')}</p><p class="next-card-reason">${escHtml(c.reason||'')}${c.difficulty?`<br><span class="next-difficulty">난이도: ${escHtml(c.difficulty)}</span>`:''}${c.job_perspective?`<br><span class="next-job-perspective">${escHtml(c.job_perspective)}</span>`:''}</p></div>`).join('');
 }
 
-function renderV2Compare(comparison) {
+function renderV2Compare(comparison, sessionType) {
   const grid = document.getElementById('compareGrid');
   const empty = document.getElementById('compareEmpty');
   if (!grid) return;
-  if (!comparison.length) { if (empty) empty.classList.remove('hidden'); return; }
+  if (!comparison.length) { if (empty) empty.classList.remove('hidden'); grid.classList.add('hidden'); return; }
   if (empty) empty.classList.add('hidden');
-  grid.innerHTML = comparison.map(c=>`<div class="compare-card"><div class="compare-card-header"><p class="compare-name">${escHtml(c.character||'')}</p><span class="stage-badge stage-${V2_FS[c.final_stage]||'defend'}">${escHtml(c.final_stage||'')}</span></div><div class="compare-axes">${(c.axis_levels||[]).map(a=>`<div class="compare-axis-row"><span>${escHtml(a.key)}</span><span class="level-badge level-${V2_LV[a.level]||'growing'}">${escHtml(a.level)}</span></div>`).join('')}</div></div>`).join('');
+  grid.classList.remove('hidden');  // 빈 화면 방지 — hidden 해제 (catch: report.html 기본 hidden)
+  // 5축 고정 순회 + key 매핑 (비교 성립·윈터) — 미관찰/관찰부족 축은 "—" 회색(환각 0·박진영)
+  const axes5 = sessionType === 'multi' ? AXES5_MULTI : AXES5_SINGLE;
+  grid.innerHTML = comparison.map(c => {
+    const lvMap = {};
+    (c.axis_levels || []).forEach(a => { lvMap[a.key] = a.level; });
+    const rows = axes5.map(k => {
+      const lv = lvMap[k];
+      const unobs = !lv || lv === '관찰부족';
+      const cls = unobs ? 'none' : (V2_LV[lv] || 'growing');
+      const txt = unobs ? '—' : lv;
+      return `<div class="compare-axis-row"><span>${escHtml(k)}</span><span class="level-badge level-${cls}">${escHtml(txt)}</span></div>`;
+    }).join('');
+    return `<div class="compare-card"><div class="compare-card-header"><p class="compare-name">${escHtml(c.character||'')}</p><span class="stage-badge stage-${V2_FS[c.final_stage]||'defend'}">${escHtml(c.final_stage||'')}</span></div><div class="compare-axes">${rows}</div></div>`;
+  }).join('');
 }
 
 loadReport();

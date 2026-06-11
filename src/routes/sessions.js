@@ -321,8 +321,9 @@ function buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars) {
 
   // 캐릭터별 비교 + 도달 감정 단계 (R-28-3·박진영 A안: final_stage 결합·emotion_track 섹션 대체)
   // 1:1도 단일 entry로 통일 — 감정 단계 데이터 보존(OIS [영향] 참조·점프 0 게이트)
+  // 캐릭터마다 5축 전부 출력 — 해당 캐릭터와의 상호작용에 행동 증거 없는 축은 "관찰부족"(임의 판정 금지·증거 없는 판정 0)
   const compBlock = `\n  "character_comparison": [
-    {"character": "<참석자 이름>", "final_stage": "<방어|저항|수용>", "axis_levels": [{"key": "<축명>", "level": "탁월|안정적|발전중"}]}
+    {"character": "<참석자 이름>", "final_stage": "<방어|저항|수용>", "axis_levels": [{"key": "<위 5축 전부>", "level": "탁월|안정적|발전중|관찰부족"}]}
   ],`;
 
   return `당신은 기업 리더십 교육 전문 평가관입니다. 아래 대화를 평가하세요. 관대화 금지 — 행동 증거가 없으면 발전중입니다.
@@ -441,7 +442,8 @@ router.post('/evaluate', async (req, res) => {
     await saveEvaluation({ session_id, scores, feedback, total_score: total, grade });
     await completeSession(session_id);
 
-    res.json({ schema_version: 2, session_type: scores.session_type, overall_level, grade, session_id });
+    // grade(내부 판정 어휘)는 API 응답 비노출 — DB에는 게이트용 저장 유지 (박진영 권고)
+    res.json({ schema_version: 2, session_type: scores.session_type, overall_level, session_id });
   } catch (err) {
     console.error('[POST /api/evaluate]', err.message);
     res.status(500).json({ error: '평가 오류' });
