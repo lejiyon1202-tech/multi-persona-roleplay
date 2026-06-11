@@ -76,6 +76,43 @@ router.get('/sessions/:id/messages', async (req, res) => {
   }
 });
 
+// 캐릭터별 관점 chatHistory 구성 (그룹 토론 화자 라벨·인접쌍 패턴)
+// 본인 발화 = assistant / 학습자·다른 참석자 = user(화자 라벨) / 연속 user는 1블록 병합
+// → 앞 캐릭터 발언을 assistant로 주입하던 결함(자기 말로 인식) 제거
+function buildPerspectiveHistory({ history, currentCharId, charMap, learnerLabel, turnSpeeches, multiParty }) {
+  const msgs = [];
+  for (const m of history) {
+    if (m.role === 'assistant' && m.character_id === currentCharId) {
+      msgs.push({ role: 'assistant', content: m.content });
+    } else if (m.role === 'assistant') {
+      const c = charMap.get(m.character_id);
+      const label = c ? `${c.name}(${c.role_level})` : '참석자';
+      msgs.push({ role: 'user', content: `[${label}]: ${m.content}` });
+    } else {
+      // 학습자 발언 (다자 토론일 때만 라벨 — 1:1 회귀 0)
+      msgs.push({ role: 'user', content: multiParty ? `[${learnerLabel}]: ${m.content}` : m.content });
+    }
+  }
+  for (const sp of turnSpeeches) {
+    msgs.push({ role: 'user', content: `[${sp.label}]: ${sp.content}` });
+  }
+  return mergeConsecutiveUser(msgs);
+}
+
+// 연속 user 메시지 1블록 병합 (Bedrock Messages API: 연속 동일 role / final must be user 회피)
+function mergeConsecutiveUser(msgs) {
+  const out = [];
+  for (const m of msgs) {
+    const last = out[out.length - 1];
+    if (m.role === 'user' && last && last.role === 'user') {
+      last.content += `\n\n${m.content}`;
+    } else {
+      out.push({ role: m.role, content: m.content });
+    }
+  }
+  return out;
+}
+
 // 채팅 (SSE 스트리밍) — Phase E B안: LLM 맥락 선별 + 순차 응답
 router.post('/chat', async (req, res) => {
   const { session_id, message, user_message } = req.body;
@@ -138,18 +175,17 @@ router.post('/chat', async (req, res) => {
       console.log('[CHAT] fallback: 0명 선별 → 첫 파트너', partnerIds[0]);
     }
 
-    // 과다응답 제한: 4명 이상이면 상위 3명
-    if (selectedIds.length > 3) {
-      selectedIds = selectedIds.slice(0, 3);
-      console.log('[CHAT] 과다응답 제한: 상위 3명만 선택');
-    }
+    // 비용 상한 = 세션 선택 파트너 전원(자연 상한·합의 2026-06-11). 토론성 발화 시 전원 응답 허용 — 인위적 cap 제거.
 
     // 유효한 파트너 ID만 필터
     selectedIds = selectedIds.filter(id => charMap.has(id));
     if (!selectedIds.length) selectedIds = [partnerIds[0]];
 
     // ② 선별된 캐릭터별 순차 SSE 스트리밍
-    const chatHistory = history.map(m => ({ role: m.role, content: m.content }));
+    // 다자(파트너 2명+) = 그룹 토론 모드: 화자 라벨 + 관점 chatHistory. 1:1이면 기존 흐름 유지(회귀 0).
+    const multiParty = partnerIds.length > 1;
+    const learnerLabel = learnerChar ? `${learnerChar.name}(${learnerChar.role_level})` : '학습자';
+    const turnSpeeches = []; // 같은 턴 내 앞 캐릭터 발언 [{ label, content }]
 
     for (const charId of selectedIds) {
       const char = charMap.get(charId);
@@ -161,7 +197,7 @@ router.post('/chat', async (req, res) => {
       // 시스템 프롬프트 구성
       let systemPrompt = char.persona_prompt;
       if (learnerChar) {
-        systemPrompt = `${char.persona_prompt}
+        systemPrompt += `
 
 ---
 
@@ -178,13 +214,31 @@ router.post('/chat', async (req, res) => {
         }
       }
 
-      // Bedrock Messages API: 마지막 메시지는 반드시 user — 이전 캐릭터 응답(assistant) 추가 후 user 재추가
-      if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant') {
-        chatHistory.push({ role: 'user', content: userMsg });
+      // 그룹 토론 지시 (다자 세션에서만 — 1:1 회귀 0)
+      if (multiParty) {
+        const others = allChars
+          .filter(c => c && c.id !== charId)
+          .map(c => `${c.name}(${c.role_level})`)
+          .join(', ');
+        systemPrompt += `
+
+---
+
+[그룹 토론 — 반드시 준수]
+지금 여러 참석자가 함께 있는 자리입니다. 다른 참석자: ${others}.
+- 대화에서 "[이름(직책)]:" 형식으로 시작하는 발언은 다른 참석자의 발언이고, 라벨 없는 발언은 ${learnerLabel}(상대)의 발언입니다.
+- 다른 참석자의 발언에 대해 당신의 입장(core_mindset·역할·이해관계·갈등 관계)에 따라 동의·반박·조건부 수용을 분명히 하며 반응하십시오. 당신의 입장은 일관되게 유지하고, 다른 사람 의견에 무비판적으로 동조하지 마십시오.
+- 당신의 찬반·입장을 "저는 반대합니다" 같은 메타 라벨로 선언하지 말고, 구체적 근거가 담긴 자연스러운 발언으로만 드러내십시오.`;
       }
 
+      // 관점 chatHistory: 본인 발화=assistant / 학습자·다른 참석자=user(라벨) / 연속 user 1블록 병합
+      // → 앞 캐릭터 발언을 assistant로 주입하던 결함(자기 말로 인식) 제거 + Bedrock "final must be user" 회피
+      const perspective = buildPerspectiveHistory({
+        history, currentCharId: charId, charMap, learnerLabel, turnSpeeches, multiParty,
+      });
+
       let fullResponse = '';
-      for await (const chunk of invokeChat(chatHistory, systemPrompt)) {
+      for await (const chunk of invokeChat(perspective, systemPrompt)) {
         fullResponse += chunk;
         res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
       }
@@ -195,8 +249,8 @@ router.post('/chat', async (req, res) => {
       // 응답 완료 이벤트
       res.write(`data: ${JSON.stringify({ done: true, character_id: charId })}\n\n`);
 
-      // 다음 캐릭터 응답 context: 현재 응답 포함 (assistant로 끝남 → 다음 루프 시작에서 user 재추가)
-      chatHistory.push({ role: 'assistant', content: fullResponse });
+      // 같은 턴 다음 캐릭터에게 화자 라벨과 함께 전달 (user 라벨 주입용)
+      turnSpeeches.push({ label: `${char.name}(${char.role_level})`, content: fullResponse });
     }
 
   } catch (err) {
