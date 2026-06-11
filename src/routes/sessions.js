@@ -283,6 +283,7 @@ function buildTranscript(messages, learnerChar, partnerChars) {
 }
 
 function buildEvalPrompt(scenario, learnerChar, partnerChars, selectableChars) {
+  const multiParty = partnerChars.length > 1;
   const title   = scenario?.title ?? '(미지정)';
   const context = scenario?.context_description ?? '';
   const learnerLabel = learnerChar
