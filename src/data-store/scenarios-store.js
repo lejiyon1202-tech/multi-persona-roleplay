@@ -1,5 +1,17 @@
 import pool from './db.js';
 
+/* MariaDB 호환: JSON 컬럼이 LONGTEXT alias라 mysql2가 문자열로 반환 →
+   MySQL(RDS)은 native JSON이라 객체 반환. 양쪽 호환 위해 문자열이면 parse. */
+function parseJsonCols(row, cols) {
+  if (!row) return row;
+  for (const col of cols) {
+    if (typeof row[col] === 'string' && row[col].length) {
+      try { row[col] = JSON.parse(row[col]); } catch { /* 비JSON 문자열은 그대로 */ }
+    }
+  }
+  return row;
+}
+
 export async function listScenarios() {
   const [rows] = await pool.query(
     'SELECT id, title, case_name, context_description, learner_role, created_at FROM scenarios ORDER BY id'
@@ -11,7 +23,7 @@ export async function getScenario(id) {
   const [rows] = await pool.query(
     'SELECT * FROM scenarios WHERE id = ?', [id]
   );
-  return rows[0] ?? null;
+  return parseJsonCols(rows[0] ?? null, ['briefing']);
 }
 
 export async function getCharacters(scenarioId) {
@@ -25,14 +37,14 @@ export async function getCharacters(scenarioId) {
      ORDER BY display_order, card_number`,
     [scenarioId]
   );
-  return rows;
+  return rows.map(r => parseJsonCols(r, ['learner_detail']));
 }
 
 export async function getCharacter(id) {
   const [rows] = await pool.query(
     'SELECT * FROM scenario_characters WHERE id = ?', [id]
   );
-  return rows[0] ?? null;
+  return parseJsonCols(rows[0] ?? null, ['learner_detail', 'emotion_stages']);
 }
 
 // ── Admin CRUD ───────────────────────────────────────────────────────────────
