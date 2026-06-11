@@ -324,6 +324,7 @@ function appendMsg(role, text, streaming = false, speakerCharId = null) {
   div.className = `msg ${role}`;
 
   // Phase E B안: 발화자 전환 여부에 따라 CSS 클래스 적용 (기안84 단톡방 디자인)
+  // 연속 판정은 "바로 직전 메시지"가 같은 캐릭터일 때만 — 학습자 발화가 사이에 끼면 끊는다
   if (role === 'ai') {
     if (lastSpeakerId !== null && speakerCharId === lastSpeakerId) {
       div.classList.add('msg-continuous');  // 같은 캐릭터 연속 발화
@@ -331,6 +332,8 @@ function appendMsg(role, text, streaming = false, speakerCharId = null) {
       div.classList.add('msg-new-char');    // 다른 캐릭터로 전환
     }
     lastSpeakerId = speakerCharId;
+  } else {
+    lastSpeakerId = null;  // 학습자 발화 → 다음 AI는 무조건 새 캐릭터(아바타·이름 표시)
   }
 
   const avatar = document.createElement('div');
