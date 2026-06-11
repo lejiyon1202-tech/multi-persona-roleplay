@@ -96,7 +96,7 @@ function buildPartnerCardHTML(c, idx) {
 
   const learnerTag = isLearner ? '<span class="learner-tag">내 역할</span>' : '';
   const recBadge   = isRecommended
-    ? `<div class="recommended-badge" aria-label="추천 대화 상대">💡 추천<span class="recommend-reason">${esc(recReason)}</span></div>`
+    ? `<div class="recommended-badge" aria-label="추천 대화 상대" title="${esc(recReason)}">💡 추천<span class="recommend-reason">${esc(recReason)}</span></div>`
     : '';
 
   return `

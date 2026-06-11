@@ -377,32 +377,32 @@
 .partner-card.is-recommended .partner-card-accent {
   background: #09090B;
 }
+/* 추천 배지 = 카드 상단 풀폭 배너 (코너 오버레이 → 배너 재설계·체크박스 겹침 해소) */
 .recommended-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  max-width: calc(100% - 20px);   /* 카드 폭 초과 잘림 방지 */
+  display: flex;
+  align-items: center;
+  gap: 7px;
   background: #09090B;
   color: #fff;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 9px 46px 9px 16px;     /* 우측 46px = 우상단 체크박스(22px@right12) 영역 회피 */
+  line-height: 1.35;
+  white-space: nowrap;            /* "💡 추천" 라벨은 한 줄 유지 */
 }
 .recommend-reason {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
-  color: rgba(255,255,255,0.75);
-  white-space: normal;            /* 긴 사유 줄바꿈 허용 */
-  word-break: keep-all;
-  line-height: 1.3;
-  text-align: right;
+  color: rgba(255,255,255,0.82);
+  white-space: nowrap;            /* 1줄 유지 — 전체 사유는 title hover */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;                   /* flex 자식 ellipsis 필수 */
+  line-height: 1.35;
+  text-align: left;
+  flex: 1;
 }
+.recommend-reason::before { content: "· "; opacity: 0.6; }
 
 @media (max-width: 767px) {
   .page-header { padding: 16px 16px 12px; }
