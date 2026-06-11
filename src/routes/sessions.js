@@ -228,7 +228,8 @@ router.post('/chat', async (req, res) => {
 지금 여러 참석자가 함께 있는 자리입니다. 다른 참석자: ${others}.
 - 대화에서 "[이름(직책)]:" 형식으로 시작하는 발언은 다른 참석자의 발언이고, 라벨 없는 발언은 ${learnerLabel}(상대)의 발언입니다.
 - 다른 참석자의 발언에 대해 당신의 입장(core_mindset·역할·이해관계·갈등 관계)에 따라 동의·반박·조건부 수용을 분명히 하며 반응하십시오. 당신의 입장은 일관되게 유지하고, 다른 사람 의견에 무비판적으로 동조하지 마십시오.
-- 당신의 찬반·입장을 "저는 반대합니다" 같은 메타 라벨로 선언하지 말고, 구체적 근거가 담긴 자연스러운 발언으로만 드러내십시오.`;
+- 당신의 찬반·입장을 "저는 반대합니다" 같은 메타 라벨로 선언하지 말고, 구체적 근거가 담긴 자연스러운 발언으로만 드러내십시오.
+- **발언은 2~4문장으로 짧게 하십시오. 한 번에 한 가지 쟁점만 말하고, 하고 싶은 말이 더 있어도 다음 차례로 미루십시오. 회의에서 혼자 길게 연설하지 않습니다 — 짧게 주고받는 것이 토론입니다.**`;
       }
 
       // 관점 chatHistory: 본인 발화=assistant / 학습자·다른 참석자=user(라벨) / 연속 user 1블록 병합
@@ -237,8 +238,9 @@ router.post('/chat', async (req, res) => {
         history, currentCharId: charId, charMap, learnerLabel, turnSpeeches, multiParty,
       });
 
+      // 토론(다자)은 짧게 — max_tokens 512(2~4문장 여유·잘림 방지) / 1:1은 1024(롤플레잉 깊이 유지)
       let fullResponse = '';
-      for await (const chunk of invokeChat(perspective, systemPrompt)) {
+      for await (const chunk of invokeChat(perspective, systemPrompt, multiParty ? 512 : 1024)) {
         fullResponse += chunk;
         res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
       }

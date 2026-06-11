@@ -29,12 +29,12 @@ function buildBody(messages, systemPrompt, maxTokens = 1024) {
  * @param {Array}  messages     [{role, content}]
  * @param {string} systemPrompt 캐릭터 페르소나 + 상황 설명
  */
-export async function* invokeChat(messages, systemPrompt) {
+export async function* invokeChat(messages, systemPrompt, maxTokens = 1024) {
   const command = new InvokeModelWithResponseStreamCommand({
     modelId: MODEL_ID,
     contentType: 'application/json',
     accept: 'application/json',
-    body: buildBody(messages, systemPrompt, 1024),
+    body: buildBody(messages, systemPrompt, maxTokens),
   });
 
   const response = await client.send(command);
