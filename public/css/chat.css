@@ -384,23 +384,30 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
 }
 .target-indicator .target-name { font-weight: 700; }
 
-/* ── AI 발화자 이름 라벨 ── */
+/* ── AI 발화자 이름 라벨 (토론 화자 식별 강화) ── */
 .msg-speaker-name {
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 3px;
-  letter-spacing: 0.01em;
+  font-size: 12.5px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
   color: var(--text-muted);
   padding-left: 2px;
 }
 
+/* 발언자 아바타 — 토론 다자 발화에서 식별 강조 (ring) */
+.msg.ai .msg-avatar {
+  box-shadow: 0 0 0 2px var(--bg-card), 0 1px 3px rgba(0,0,0,0.14);
+}
+/* 캐릭터 색 강조 — 말풍선 좌측 바 (발언자 구분·입장 색칠 아님) */
+.msg.ai .msg-bubble { border-left-width: 4px; }
+
 /* Phase E B안 — 단톡방 연속 발화 (같은 캐릭터) */
 .msg.ai.msg-continuous { margin-top: 2px; }
-.msg.ai.msg-continuous .msg-avatar { visibility: hidden; }
+.msg.ai.msg-continuous .msg-avatar { visibility: hidden; box-shadow: none; }
 .msg.ai.msg-continuous .msg-speaker-name { display: none; }
 
-/* Phase E B안 — 캐릭터 그룹 구분 (다른 캐릭터 전환) */
-.msg.ai.msg-new-char { margin-top: 14px; }
+/* Phase E B안 — 캐릭터 그룹 구분 (다른 캐릭터 전환·토론 가독성) */
+.msg.ai.msg-new-char { margin-top: 20px; }
 
 /* ── Phase E B안 — 타이핑 인디케이터 캐릭터 이름 ── */
 .typing-content {
