@@ -162,7 +162,7 @@ function rnMakeNode(c, x, y, isCenter, delay) {
   el.innerHTML = `${isCenter ? '<span class="me-flag">핵심 인물</span>' : ''}<div class="avatar">${rnEsc(initial)}</div><div class="n-name">${rnEsc(c.name)}</div><span class="n-badge">${rnEsc(c.role_level)}</span>`;
   el.setAttribute('tabindex', '0');
   el.setAttribute('role', 'button');
-  el.setAttribute('aria-label', `${c.name} ${c.role_level}. ${job}.${isCenter ? ' 시나리오 핵심 인물.' : ''} 관계 보기`);
+  el.setAttribute('aria-label', `${c.name}. ${job}.${isCenter ? ' 시나리오 핵심 인물.' : ''} 관계 보기`);
   el.addEventListener('mouseenter', () => rnFocus(c.id));
   el.addEventListener('mouseleave', rnUnfocus);
   el.addEventListener('focus', () => rnFocus(c.id));
