@@ -241,6 +241,12 @@ function renderRadialNetwork(chars, scenarioId) {
   RN_panelBody = document.getElementById('panelBody');
   if (!RN_stage || !RN_svg || !chars || !chars.length) return;
 
+  /* 관계색 단일 소스화: design-system CSS 변수(--hier/--conf/--peer) 참조 (박진영 권고·테마 일관성·이중 소스 제거) */
+  try {
+    const cs = getComputedStyle(document.documentElement);
+    ['hier', 'conf', 'peer'].forEach(k => { const v = cs.getPropertyValue('--rel-' + k).trim(); if (v) RN_COLOR[k] = v; });
+  } catch (e) { /* CSS 변수 미정의 시 기본 hex 유지 */ }
+
   RN_stage.querySelectorAll('.node, .rel-chip').forEach(e => e.remove());
   RN_svg.innerHTML = '';
 
