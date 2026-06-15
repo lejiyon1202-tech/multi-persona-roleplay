@@ -1,5 +1,5 @@
 /* ── radial-network.js: v5 양방향 관계망 (실데이터·정보 가독성 강화) ──
-   ROLE_LAYER_CLASS·SVG_ILLUST(org-tree.js), openModal(character-select.js) 전역 공유.
+   openModal(character-select.js) 전역 공유. org-tree.js 의존 0 (자체 RN_CLS 사용).
    노출 범위: 이름·직급·역할·공개 직무·공개 조직 관계 구도까지만.
    inner_conflict·core_mindset·situation·mission·emotion 등 학습 정보 바인딩 0(절대 규칙). */
 
@@ -159,10 +159,10 @@ function rnMakeNode(c, x, y, isCenter, delay) {
   el.style.animationDelay = delay + 's';
   const initial = (c.name || '?').trim().charAt(0);
   const job = rnJob(c);
-  el.innerHTML = `${isCenter ? '<span class="me-flag">내 역할</span>' : ''}<div class="avatar">${rnEsc(initial)}</div><div class="n-name">${rnEsc(c.name)}</div><span class="n-badge">${rnEsc(c.role_level)}</span>`;
+  el.innerHTML = `${isCenter ? '<span class="me-flag">핵심 인물</span>' : ''}<div class="avatar">${rnEsc(initial)}</div><div class="n-name">${rnEsc(c.name)}</div><span class="n-badge">${rnEsc(c.role_level)}</span>`;
   el.setAttribute('tabindex', '0');
   el.setAttribute('role', 'button');
-  el.setAttribute('aria-label', `${c.name} ${c.role_level}. ${job}. 관계 보기`);
+  el.setAttribute('aria-label', `${c.name} ${c.role_level}. ${job}.${isCenter ? ' 시나리오 핵심 인물.' : ''} 관계 보기`);
   el.addEventListener('mouseenter', () => rnFocus(c.id));
   el.addEventListener('mouseleave', rnUnfocus);
   el.addEventListener('focus', () => rnFocus(c.id));
@@ -204,7 +204,7 @@ function rnPanel(id) {
     rows += `<div class="rel-row t-${rel.type}"><span class="tag">${RN_TYPE_TAG[rel.type]}</span><span class="who"><b>${rnEsc(mine.w)}</b><br><span>${rnEsc(mine.d)}</span></span></div>`;
   });
   const cls = RN_CLS[c.role_level] || 'mem';
-  RN_panelBody.innerHTML = `<div class="pb-top"><div class="pb-av">${rnEsc((c.name || '?').charAt(0))}</div><div class="pb-id"><div class="pb-name">${rnEsc(c.name)}</div><div class="pb-meta"><span class="pb-rank">${rnEsc(c.role_level)}</span>${id === RN_centerId ? '<span class="pb-me">내 역할</span>' : ''}</div></div></div><div class="pb-sec"><h4>공개 직무</h4><div class="pb-job">${rnEsc(rnJob(c))}</div></div><div class="pb-sec"><h4>이 인물의 관계 요약</h4><div class="rel-list">${rows || '<div class="rel-row t-hier"><span class="who"><span>표시할 관계가 없습니다.</span></span></div>'}</div></div><button class="pb-pick" type="button">이 인물로 시작하기</button>`;
+  RN_panelBody.innerHTML = `<div class="pb-top"><div class="pb-av">${rnEsc((c.name || '?').charAt(0))}</div><div class="pb-id"><div class="pb-name">${rnEsc(c.name)}</div><div class="pb-meta"><span class="pb-rank">${rnEsc(c.role_level)}</span>${id === RN_centerId ? '<span class="pb-me">핵심 인물</span>' : ''}</div></div></div><div class="pb-sec"><h4>공개 직무</h4><div class="pb-job">${rnEsc(rnJob(c))}</div></div><div class="pb-sec"><h4>이 인물의 관계 요약</h4><div class="rel-list">${rows || '<div class="rel-row t-hier"><span class="who"><span>표시할 관계가 없습니다.</span></span></div>'}</div></div><button class="pb-pick" type="button">이 인물로 시작하기</button>`;
   const btn = RN_panelBody.querySelector('.pb-pick');
   if (btn) btn.addEventListener('click', () => { if (typeof openModal === 'function') openModal(id); });
   const m = { exec: ['--exec', '--exec-mid', '--exec-bg'], mgr: ['--mgr', '--mgr-mid', '--mgr-bg'], lead: ['--lead', '--lead-mid', '--lead-bg'], mem: ['--mem', '--mem-mid', '--mem-bg'] }[cls];
