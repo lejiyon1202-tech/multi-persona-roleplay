@@ -59,12 +59,32 @@
   </div>
 </div>
 
-<!-- ── 조직도 트리 (D안·JS 동적 렌더) ── -->
-<div id="orgChart" class="org-chart" role="tree" aria-label="시나리오 조직 구조도">
-  <div class="loading-state grid-span-full" id="loadingState">
-    <div class="spinner"></div>
-    <p>캐릭터 정보를 불러오는 중...</p>
+<!-- ── 조직도 관계망 (v5 양방향 + 정보 가독성·JS 동적 렌더) ── -->
+<div class="legend" aria-hidden="true">
+  <i class="lg-hier"><span class="ico">↕</span><span class="pat"></span><span class="lab"><b>보고·지시</b><span>위계 · 양방향</span></span></i>
+  <i class="lg-conf"><span class="ico">⇄</span><span class="pat"></span><span class="lab"><b>갈등</b><span>쌍방 대립</span></span></i>
+  <i class="lg-peer"><span class="ico">↔</span><span class="pat"></span><span class="lab"><b>협력·동료</b><span>상호</span></span></i>
+</div>
+
+<div class="board">
+  <!-- 방사형 관계망 캔버스: radial-network.js가 .node / .edge / .rel-chip 렌더 -->
+  <div class="stage" id="stage" role="group" aria-label="시나리오 조직 관계도">
+    <svg class="net-svg" id="svg" viewBox="0 0 760 760" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>캐릭터 정보를 불러오는 중...</p>
+    </div>
   </div>
+
+  <!-- 인물 정보 패널: hover/focus/탭 시 radial-network.js가 #panelBody 렌더 -->
+  <aside class="panel" id="panel" aria-live="polite">
+    <div class="panel-empty" id="panelEmpty">
+      <div class="pe-ico">👥</div>
+      <div class="pe-t">인물을 선택하세요</div>
+      <div class="pe-s">노드에 마우스를 올리거나 <b>탭</b>하면 직급·직무와 <b>이 인물의 관계 요약</b>이 여기에 표시됩니다.</div>
+    </div>
+    <div class="panel-body" id="panelBody"></div>
+  </aside>
 </div>
 
 <!-- ── 캐릭터 상세 모달 (2열 분리: 아이덴티티 + 상세정보) ── -->
@@ -152,7 +172,6 @@
   </div>
 </div>
 
-<script src="js/org-tree.js" defer></script>
 <script src="js/radial-network.js" defer></script>
 <script src="js/character-select.js" defer></script>
 </body>
