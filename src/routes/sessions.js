@@ -232,6 +232,9 @@ router.post('/chat', async (req, res) => {
 - **발언은 2~4문장으로 짧게 하십시오. 한 번에 한 가지 쟁점만 말하고, 하고 싶은 말이 더 있어도 다음 차례로 미루십시오. 회의에서 혼자 길게 연설하지 않습니다 — 짧게 주고받는 것이 토론입니다.**`;
       }
 
+      // 절대 규칙 가드: 괄호 지문·마크다운 금지
+      systemPrompt += `\n\n---\n\n[발화 형식 — 반드시 준수]\n무대 지시·괄호 지문(*(...)* 형식) 절대 금지. 마크다운(#·**·---·*기울임*) 절대 금지. 순수 대화체로만 발화하십시오.`;
+
       // 관점 chatHistory: 본인 발화=assistant / 학습자·다른 참석자=user(라벨) / 연속 user 1블록 병합
       // → 앞 캐릭터 발언을 assistant로 주입하던 결함(자기 말로 인식) 제거 + Bedrock "final must be user" 회피
       const perspective = buildPerspectiveHistory({
