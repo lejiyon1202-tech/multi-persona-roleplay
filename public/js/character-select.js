@@ -210,8 +210,8 @@ function closeModal() {
 function selectLearnerChar(charId) {
   const c = allChars.find(ch => String(ch.id) === String(charId));
   if (!c) return;
-  // URL: partner-select.html?scenario_id=4&learner_char=15
-  window.location.href = `partner-select.html?scenario_id=${scenarioId}&learner_char=${charId}`;
+  const learnerId = sessionStorage.getItem('learner_id') || '1';
+  window.location.href = `partner-select.html?scenario_id=${scenarioId}&learner_char=${charId}&learner_id=${learnerId}`;
 }
 
 /* ── 구조화 렌더 헬퍼 ── */
@@ -435,4 +435,50 @@ function renderEmotionTimeline(id, states) {
   el.appendChild(tl);
 }
 
+/* ── 학습자 정보 입력 모달 ── */
+function initLearnerModal() {
+  const overlay   = document.getElementById('learnerInputOverlay');
+  const form      = document.getElementById('learnerForm');
+  const errorEl   = document.getElementById('learnerErrorMsg');
+  const submitBtn = document.getElementById('learnerSubmitBtn');
+  if (!overlay || !form) return;
+
+  if (sessionStorage.getItem('learner_id')) {
+    overlay.classList.add('hidden');
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name  = document.getElementById('learnerNameInput').value.trim();
+    const email = document.getElementById('learnerEmailInput').value.trim();
+    const dept  = document.getElementById('learnerDeptInput').value.trim() || '미지정';
+
+    if (!name || !email) {
+      errorEl.textContent = '이름과 이메일을 입력해주세요.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    errorEl.classList.add('hidden');
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/learners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, department: dept }),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      const data = await res.json();
+      sessionStorage.setItem('learner_id', String(data.id));
+      overlay.classList.add('hidden');
+    } catch {
+      errorEl.textContent = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+      errorEl.classList.remove('hidden');
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+initLearnerModal();
 initPage();

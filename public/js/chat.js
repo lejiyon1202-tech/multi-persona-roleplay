@@ -6,6 +6,7 @@ const LEARNER_CHAR_ID  = params.get('learner_char') || null;
 const PARTNER_IDS      = (params.get('partners') || '').split(',').filter(Boolean);
 const IS_V3            = !!LEARNER_CHAR_ID;
 const SESSION_ID       = params.get('session_id') || null;
+const LEARNER_ID       = Number(params.get('learner_id')) || Number(sessionStorage.getItem('learner_id')) || 1;
 
 let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 
@@ -194,10 +195,10 @@ async function initSession() {
   if (sessionId) return;
   try {
     const body = IS_V3
-      ? { learner_id: 1, scenario_id: SCENARIO_ID,
+      ? { learner_id: LEARNER_ID, scenario_id: SCENARIO_ID,
           learner_character_id: Number(LEARNER_CHAR_ID),
           dialogue_partner_ids: PARTNER_IDS.map(Number) }
-      : { learner_id: 1, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID };
+      : { learner_id: LEARNER_ID, scenario_id: SCENARIO_ID, character_id: CHARACTER_ID };
 
     const res  = await fetch('/api/sessions', {
       method: 'POST',

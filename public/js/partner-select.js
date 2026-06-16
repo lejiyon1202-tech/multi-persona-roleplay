@@ -6,6 +6,7 @@ const MAX_PARTNERS = 3;
 const params        = new URLSearchParams(location.search);
 const scenarioId    = params.get('scenario_id') || '1';
 const learnerCharId = params.get('learner_char');
+const learnerId     = params.get('learner_id') || sessionStorage.getItem('learner_id') || '1';
 
 let allChars         = [];
 let selectedPartners = new Set();
@@ -221,7 +222,7 @@ function bindBarEvents() {
   document.getElementById('startChatBtn').addEventListener('click', () => {
     if (selectedPartners.size === 0) return;
     const partnerIds = [...selectedPartners].join(',');
-    window.location.href = `chat.html?scenario_id=${scenarioId}&learner_char=${learnerCharId}&partners=${partnerIds}`;
+    window.location.href = `chat.html?scenario_id=${scenarioId}&learner_char=${learnerCharId}&partners=${partnerIds}&learner_id=${learnerId}`;
   });
 }
 
