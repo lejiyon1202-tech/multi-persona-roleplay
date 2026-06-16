@@ -423,6 +423,113 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
   min-height: 14px;
 }
 
+/* ── D안: 채팅 온보딩 카드 ── */
+.chat-onboarding {
+  align-self: stretch;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.chat-onboarding.fade-out {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+.chat-onboarding.hidden { display: none; }
+
+.onboarding-inner {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.onboarding-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.onboarding-situation-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+}
+
+.onboarding-partners {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.onboarding-partner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-quote);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.onboarding-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.onboarding-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.onboarding-hint-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-base);
+  font-size: 15px;
+  color: var(--text-sub);
+  line-height: 1.55;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  width: 100%;
+  font-family: var(--font);
+}
+.onboarding-hint-item:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-quote);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+.onboarding-hint-arrow {
+  font-size: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: var(--transition);
+}
+.onboarding-hint-item:hover .onboarding-hint-arrow {
+  color: var(--text-sub);
+  transform: translateX(2px);
+}
+
 @media (max-width: 767px) {
   .messages-wrap { padding: 16px; }
   .chat-input-area { padding: 12px 16px; }
@@ -430,4 +537,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
   .chat-header { padding: 10px 16px; }
   .partner-chip-info { display: none; }
   .partner-chip { padding: 5px; }
+  .onboarding-inner { padding: 18px; }
+  .onboarding-situation-text { font-size: 16px; }
+  .onboarding-hint-item { font-size: 14px; padding: 11px 14px; }
 }

@@ -24,6 +24,7 @@ let isWaiting      = false;
 let charData       = null;
 let partnersMap    = {};   // v3: { charId: charObj }
 let lastSpeakerId  = null; // Phase E B안: 발화자 연속 여부 추적
+let onboardingDismissed = false; // D안: 온보딩 카드 제거 여부
 
 /* ── 뒤로가기 ── */
 document.getElementById('backBtn').addEventListener('click', () => {
@@ -65,6 +66,7 @@ async function loadCharacter() {
     charData = data.character;
     applyCharacterUI(charData);
     await initSession();
+    await initOnboarding();
   } catch {
     applyDemoCharacter();
     addSystemMsg('데모 모드: 서버에 연결할 수 없어 데모로 실행됩니다.');
@@ -85,6 +87,7 @@ async function loadAllPartners() {
   renderPartnersStrip();
   updateTargetIndicator();
   await initSession();
+  await initOnboarding();
 }
 
 /* ── v3: 파트너 스트립 렌더링 ── */
@@ -226,6 +229,7 @@ async function sendMessage() {
   msgInput.style.height = 'auto';
 
   turnCount++;
+  if (turnCount === 1) dismissOnboarding();
   updateTurnUI();
   appendMsg('user', text);
   showTyping(true);
@@ -312,6 +316,72 @@ async function endChat() {
     });
   } catch { /* 평가 실패해도 리포트로 이동 */ }
   window.location.href = `report.html?session_id=${sessionId}&scenario_id=${SCENARIO_ID}&learner_id=${LEARNER_ID}`;
+}
+
+/* ── D안: 온보딩 카드 초기화 ── */
+async function initOnboarding() {
+  const card = document.getElementById('chatOnboarding');
+  if (!card) return;
+
+  // 시나리오 상황 요약
+  try {
+    const res = await fetch(`/api/scenarios/${SCENARIO_ID}`);
+    const scenario = await res.json();
+    const situationEl = document.getElementById('onboardingSituation');
+    if (situationEl && scenario.context_description) {
+      situationEl.textContent = scenario.context_description;
+    }
+  } catch { /* 상황 텍스트 없어도 카드 표시 유지 */ }
+
+  // 상대 태그 (이름·직급만 — 내면 노출 0)
+  const partnersEl = document.getElementById('onboardingPartners');
+  if (partnersEl) {
+    const partnerList = IS_V3 ? Object.values(partnersMap) : (charData ? [charData] : []);
+    partnerList.forEach(p => {
+      const tag = document.createElement('span');
+      tag.className = 'onboarding-partner-tag';
+      tag.textContent = `${p.name} (${p.role_level})`;
+      partnersEl.appendChild(tag);
+    });
+  }
+
+  // 힌트 — 방향성만 (정답 대사·상대 내면·메타 용어 0)
+  const hints = [
+    '상대의 현재 상황을 먼저 파악하며 시작해보세요',
+    '자신의 입장을 전달하기 전에 상대 의견을 들어보세요',
+    '구체적인 현황이나 제안을 가져와 대화를 열어보세요',
+  ];
+  const hintsEl = document.getElementById('onboardingHints');
+  if (hintsEl) {
+    hints.forEach(hint => {
+      const btn = document.createElement('button');
+      btn.className = 'onboarding-hint-item';
+      btn.textContent = hint;
+      btn.addEventListener('click', () => {
+        msgInput.value = hint;
+        msgInput.style.height = 'auto';
+        msgInput.style.height = Math.min(msgInput.scrollHeight, 120) + 'px';
+        sendBtn.disabled = false;
+        msgInput.focus();
+        dismissOnboarding();
+      });
+      const arrow = document.createElement('span');
+      arrow.className = 'onboarding-hint-arrow';
+      arrow.textContent = '›';
+      btn.appendChild(arrow);
+      hintsEl.appendChild(btn);
+    });
+  }
+}
+
+/* ── D안: 온보딩 카드 fade-out (최초 1회) ── */
+function dismissOnboarding() {
+  if (onboardingDismissed) return;
+  onboardingDismissed = true;
+  const card = document.getElementById('chatOnboarding');
+  if (!card) return;
+  card.classList.add('fade-out');
+  card.addEventListener('transitionend', () => card.classList.add('hidden'), { once: true });
 }
 
 /* ── 메시지 추가 ── */
