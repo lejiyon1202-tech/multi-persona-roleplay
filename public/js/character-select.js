@@ -138,7 +138,7 @@ function openModal(charId) {
   document.getElementById('modalName').textContent = `${emoji} ${c.name}`;
   document.getElementById('modalDept').textContent  = c.department || '';
 
-  // 공개 정보만 표시 — 내면(core_mindset·inner_conflict·emotional_states) 항상 숨김
+  // 캐릭터 소개(배경·말투·표면 미션) 표시 + 속마음(core_mindset·pressure·emotion_stages) 차단 (A안)
   const mindsetEl = document.getElementById('modalMindset');
   mindsetEl.textContent = '';
   mindsetEl.style.borderLeftColor = '';
@@ -146,8 +146,8 @@ function openModal(charId) {
   setTxt('modalBackground', ld.background || c.situation);
   renderQuoteBox('modalValues', null);
   renderIconRows('modalPressure', null, 'alert');
-  renderIconRows('modalMission', null, 'check');
-  renderSpeechBoxes('modalSpeechStyle', null);
+  renderIconRows('modalMission', ld.mission, 'check');
+  renderSpeechBoxes('modalSpeechStyle', ld.speech_style);
   renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
   renderEmotionTimeline('modalEmotionalStates', []);
   document.getElementById('modalHintWrap')?.classList.add('hidden');
