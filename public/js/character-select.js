@@ -13,7 +13,6 @@ const params     = new URLSearchParams(location.search);
 const scenarioId = params.get('scenario_id') || '1';
 
 let allChars = [];
-let confirmedCharId = null; // 본인 연기 확정 캐릭터 — 이 1명만 내면 표시
 
 /* ── 히어로 인포그래픽 주입 ── */
 function injectSceneHero(sid) {
@@ -118,7 +117,7 @@ function getDefaultEmoji(roleLevel) {
 /* ── 이벤트 바인딩 (click/keydown은 radial-network.js _buildNode에서 직접 처리) ── */
 function bindCardEvents() {}
 
-/* ── 모달 오픈 ── */
+/* ── 모달 오픈 (탐색 모드 고정 — 공개 정보만) ── */
 function openModal(charId) {
   const c = allChars.find(ch => String(ch.id) === String(charId));
   if (!c) return;
@@ -139,51 +138,23 @@ function openModal(charId) {
   document.getElementById('modalName').textContent = `${emoji} ${c.name}`;
   document.getElementById('modalDept').textContent  = c.department || '';
 
-  // 본인 확정 캐릭터 1명만 내면 표시 — 나머지(탐색·상대·되돌림) 공개만
-  const isBriefing = String(charId) === String(confirmedCharId);
-
+  // 공개 정보만 표시 — 내면(core_mindset·inner_conflict·emotional_states) 항상 숨김
   const mindsetEl = document.getElementById('modalMindset');
-  if (isBriefing) {
-    mindsetEl.textContent = c.core_mindset || '';
-    mindsetEl.style.borderLeftColor = color;
-  } else {
-    mindsetEl.textContent = '';
-    mindsetEl.style.borderLeftColor = '';
-  }
+  mindsetEl.textContent = '';
+  mindsetEl.style.borderLeftColor = '';
 
-  // 공개 정보: 항상 표시
   setTxt('modalBackground', ld.background || c.situation);
+  renderQuoteBox('modalValues', null);
+  renderIconRows('modalPressure', null, 'alert');
+  renderIconRows('modalMission', null, 'check');
+  renderSpeechBoxes('modalSpeechStyle', null);
   renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
+  renderEmotionTimeline('modalEmotionalStates', []);
+  document.getElementById('modalHintWrap')?.classList.add('hidden');
 
-  // 내면 정보: 본인 확정 시에만 표시
-  if (isBriefing) {
-    renderQuoteBox('modalValues', ld.values || c.core_mindset);
-    renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
-    renderIconRows('modalMission', ld.mission || c.mission, 'check');
-    renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
-    renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
-    const hints = ld.ai_hints?.first_utterances || c.first_utterances || [];
-    const hintEl = document.getElementById('modalHints');
-    const hintWrap = document.getElementById('modalHintWrap');
-    if (hints.length > 0) {
-      hintEl.innerHTML = hints.slice(0, 5).map(h => `<div class="modal-hint-item">${esc(h)}</div>`).join('');
-      hintWrap.classList.remove('hidden');
-    } else {
-      hintWrap.classList.add('hidden');
-    }
-  } else {
-    renderQuoteBox('modalValues', null);
-    renderIconRows('modalPressure', null, 'alert');
-    renderIconRows('modalMission', null, 'check');
-    renderSpeechBoxes('modalSpeechStyle', null);
-    renderEmotionTimeline('modalEmotionalStates', []);
-    document.getElementById('modalHintWrap')?.classList.add('hidden');
-  }
-
-  // CTA 버튼: 확정 시 "연기 시작", 탐색 시 "이 역할 맡기"
+  // CTA 버튼
   const selectBtn = document.getElementById('modalSelectBtn');
   selectBtn.dataset.charId = charId;
-  selectBtn.textContent = isBriefing ? '연기 시작' : '이 역할 맡기';
 
   // 탭 첫 번째(프로필)로 초기화
   resetModalTabs();
@@ -201,14 +172,7 @@ function bindModalEvents() {
 
   document.getElementById('modalSelectBtn').addEventListener('click', () => {
     const charId = document.getElementById('modalSelectBtn').dataset.charId;
-    if (String(confirmedCharId) === String(charId)) {
-      // 연기 시작 — 이미 확정된 본인 캐릭터 → partner-select 이동
-      selectLearnerChar(charId);
-    } else {
-      // 역할 맡기 — confirmedCharId 설정 후 브리핑 모드로 재렌더
-      confirmedCharId = charId;
-      openModal(charId);
-    }
+    selectLearnerChar(charId);
   });
 
   // 탭 전환

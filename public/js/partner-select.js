@@ -90,8 +90,8 @@ function buildPartnerCardHTML(c, idx) {
   const recReason    = isRecommended ? recommendedMap.get(String(c.id)) : '';
 
   // 상황 요약 1줄
-  const sitShort = (c.situation || '').slice(0, 50) + ((c.situation || '').length > 50 ? '...' : '');
-  // 핵심 마인드 1줄 — 본인 역할 카드만 내면 표시, 상대 카드는 공개 직무로
+  const sitShort  = (c.situation || '').slice(0, 50) + ((c.situation || '').length > 50 ? '...' : '');
+  // 핵심 마인드 1줄 — 본인 카드는 core_mindset, 상대 카드는 공개 situation만
   const mindShort = isLearner
     ? ((c.core_mindset || '').slice(0, 45) + ((c.core_mindset || '').length > 45 ? '...' : ''))
     : ((c.situation  || '').slice(0, 45) + ((c.situation  || '').length > 45 ? '...' : ''));
@@ -100,6 +100,42 @@ function buildPartnerCardHTML(c, idx) {
   const recBadge   = isRecommended
     ? `<div class="recommended-badge" aria-label="추천 대화 상대" title="${esc(recReason)}">💡 추천<span class="recommend-reason">${esc(recReason)}</span></div>`
     : '';
+
+  // 본인 카드 브리핑 — 항상 표시 (상대 카드에는 렌더하지 않음)
+  let learnerBriefHTML = '';
+  if (isLearner) {
+    const ld = c.learner_detail || {};
+    const emotionLines = (ld.emotional_states || [])
+      .map(e => `<b>${esc(e.stage || '')}</b> · ${esc((e.trigger || '').slice(0, 60) + ((e.trigger || '').length > 60 ? '...' : ''))}`)
+      .join('<br>');
+    learnerBriefHTML = `
+    <div class="learner-brief-wrap">
+      <div class="learner-brief-header">내 역할 연기 브리핑</div>
+      <div class="learner-brief-grid">
+        <div class="learner-brief-item">
+          <span class="learner-brief-label">핵심 가치관</span>
+          <p class="learner-brief-text">${esc(c.core_mindset || '')}</p>
+        </div>
+        <div class="learner-brief-item">
+          <span class="learner-brief-label">말투 · 발화 스타일</span>
+          <p class="learner-brief-text">${esc(ld.speech_style || '')}</p>
+        </div>
+        <div class="learner-brief-item">
+          <span class="learner-brief-label">학습 미션</span>
+          <p class="learner-brief-text">${esc(ld.mission || '')}</p>
+        </div>
+        <div class="learner-brief-item">
+          <span class="learner-brief-label">배경 · 경력</span>
+          <p class="learner-brief-text">${esc(ld.background || '')}</p>
+        </div>
+        ${emotionLines ? `
+        <div class="learner-brief-item full-width">
+          <span class="learner-brief-label">감정 흐름 (방어→저항→수용)</span>
+          <p class="learner-brief-text">${emotionLines}</p>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }
 
   return `
   <div class="partner-card ${roleClass}${isLearner ? ' is-learner' : ''}${isRecommended ? ' is-recommended' : ''}"
@@ -125,6 +161,7 @@ function buildPartnerCardHTML(c, idx) {
       <p class="card-mindset-short">${esc(mindShort)}</p>
       <p class="card-situation-short">${esc(sitShort)}</p>
     </div>
+    ${learnerBriefHTML}
   </div>`;
 }
 

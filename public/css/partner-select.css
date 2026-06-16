@@ -169,23 +169,151 @@
   box-shadow: var(--shadow-hover);
 }
 
-/* 내 역할 카드 */
+/* 내 역할 카드 — 항상 확장 풀 브리핑 (B안: 본인 내면은 여기서만, 진입 즉시 표시) */
 .partner-card.is-learner {
-  opacity: 0.45;
-  cursor: not-allowed;
-  filter: grayscale(30%);
+  opacity: 1;
+  cursor: default;
+  filter: none;
+  grid-column: 1 / -1;    /* 풀 폭 — 3열 그리드 가로 전체 */
+  flex-direction: row;     /* 가로 2열: 기본 카드 정보 | 브리핑 상세 */
+  gap: 0;
+  max-width: 100%;
 }
+.partner-card.is-learner:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+
+/* 내 역할 태그 */
 .is-learner .learner-tag {
   display: inline-flex;
   align-items: center;
   height: 18px;
   padding: 0 7px;
   border-radius: 4px;
-  background: var(--bg-quote);
-  border: 1px solid var(--border);
+  background: var(--role-lead);
+  border: none;
   font-size: 10px;
   font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+/* 본인 카드 왼쪽 기본 정보 영역 */
+.partner-card.is-learner .card-body {
+  min-width: 220px;
+  max-width: 260px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* 본인 브리핑 상세 영역 — 항상 표시 */
+.learner-brief-wrap {
+  flex: 1;
+  padding: 20px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.learner-brief-header {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--role-lead);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.learner-brief-header::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--role-lead);
+}
+
+.learner-brief-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  flex: 1;
+}
+
+.learner-brief-item {
+  padding: 10px 16px 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.learner-brief-item:nth-child(odd) {
+  border-right: 1px solid var(--border);
+  padding-right: 16px;
+}
+.learner-brief-item:nth-child(even) {
+  padding-left: 16px;
+  padding-right: 0;
+}
+.learner-brief-item:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+/* 감정 흐름 — 풀 폭 */
+.learner-brief-item.full-width {
+  grid-column: 1 / -1;
+  border-right: none;
+  padding-right: 0;
+}
+.learner-brief-item.full-width:last-child {
+  border-bottom: none;
+}
+
+.learner-brief-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.learner-brief-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 반응형: 태블릿 이하 — 세로 스택 */
+@media (max-width: 1023px) {
+  .partner-card.is-learner {
+    flex-direction: column;
+    grid-column: auto;
+  }
+  .partner-card.is-learner .card-body {
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .learner-brief-grid {
+    grid-template-columns: 1fr;
+  }
+  .learner-brief-item:nth-child(odd) {
+    border-right: none;
+    padding-right: 0;
+  }
+  .learner-brief-item:nth-child(even) {
+    padding-left: 0;
+  }
+  .learner-brief-item:nth-last-child(-n+2) {
+    border-bottom: 1px solid var(--border);
+  }
+  .learner-brief-item:last-child {
+    border-bottom: none;
+  }
 }
 
 /* 체크박스 */
@@ -193,8 +321,8 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid var(--border);
   background: var(--bg-card);
@@ -207,16 +335,24 @@
 .partner-card.selected .partner-checkbox {
   border-color: currentColor;
   background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 20%, transparent);
 }
 .checkbox-inner {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   opacity: 0;
   transition: opacity 0.15s;
-  background: #fff;
-  border-radius: 50%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  border-radius: 0;
 }
 .partner-card.selected .checkbox-inner { opacity: 1; }
+
+/* 선택 카드 테두리 강조 */
+.partner-card.selected {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-width: 2.5px;
+}
 
 /* 액센트 바 */
 .partner-card-accent {
@@ -270,10 +406,9 @@
   margin-top: 2px;
 }
 .card-mindset-short {
-  font-size: 14.5px;
-  font-style: italic;
-  color: var(--text-sub);
-  line-height: 1.65;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
