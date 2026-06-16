@@ -143,13 +143,13 @@ async function migrate() {
       if (r.affectedRows === 0) throw new Error(`Case2 card${cardNumber} 업데이트 실패`);
     }
 
-    // Case 3 (scenario_id=4)
+    // Case 3 (scenario_id=3)
     for (let i = 0; i < CASE3_STRUCTURED.length; i++) {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
          SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', JSON_EXTRACT(?, '$'))
-         WHERE scenario_id = 4 AND card_number = ?`,
+         WHERE scenario_id = 3 AND card_number = ?`,
         [JSON.stringify(CASE3_STRUCTURED[i].structured), cardNumber]
       );
       console.log(`[MIGRATE] Case3 card${cardNumber}: ${r.affectedRows}행`);
@@ -163,7 +163,7 @@ async function migrate() {
               JSON_LENGTH(JSON_EXTRACT(learner_detail, '$.relationships_structured')) AS arr_len,
               JSON_UNQUOTE(JSON_EXTRACT(learner_detail, '$.relationships')) IS NOT NULL AS has_str
        FROM scenario_characters
-       WHERE scenario_id IN (1,2,4)
+       WHERE scenario_id IN (1,2,3)
        ORDER BY scenario_id, card_number`
     );
 
