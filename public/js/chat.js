@@ -311,7 +311,7 @@ async function endChat() {
       body: JSON.stringify({ session_id: sessionId }),
     });
   } catch { /* 평가 실패해도 리포트로 이동 */ }
-  window.location.href = `report.html?session_id=${sessionId}`;
+  window.location.href = `report.html?session_id=${sessionId}&scenario_id=${SCENARIO_ID}&learner_id=${LEARNER_ID}`;
 }
 
 /* ── 메시지 추가 ── */
