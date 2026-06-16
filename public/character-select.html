@@ -172,6 +172,36 @@
   </div>
 </div>
 
+<!-- ── 학습자 정보 입력 모달 (B안 첫 진입) ── -->
+<div class="char-modal-overlay" id="learnerInputOverlay">
+  <div class="learner-input-modal" id="learnerInputModal">
+    <div class="li-header">
+      <span class="li-step">학습 시작 전</span>
+      <h2 class="li-title">참여자 정보를 입력해주세요</h2>
+      <p class="li-desc">학습 이력 저장 및 다회차 성장 추적에 사용됩니다.</p>
+    </div>
+    <form class="li-form" id="learnerForm" novalidate>
+      <div class="li-field">
+        <label class="li-label" for="learnerNameInput">이름 <span class="li-required">*</span></label>
+        <input class="li-input" type="text" id="learnerNameInput" placeholder="홍길동" autocomplete="name" required>
+      </div>
+      <div class="li-field">
+        <label class="li-label" for="learnerEmailInput">이메일 <span class="li-required">*</span></label>
+        <input class="li-input" type="email" id="learnerEmailInput" placeholder="hong@company.com" autocomplete="email" required>
+      </div>
+      <div class="li-field">
+        <label class="li-label" for="learnerDeptInput">부서 <span class="li-optional">선택</span></label>
+        <input class="li-input" type="text" id="learnerDeptInput" placeholder="예: 영업1팀" autocomplete="organization-title">
+      </div>
+      <p class="li-error hidden" id="learnerErrorMsg" role="alert"></p>
+      <button type="submit" class="li-submit-btn" id="learnerSubmitBtn">
+        시작하기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
 <script src="js/radial-network.js" defer></script>
 <script src="js/character-select.js" defer></script>
 </body>
