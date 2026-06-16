@@ -199,6 +199,14 @@
   letter-spacing: 0.03em;
 }
 
+/* 본인 카드 — accent bar 세로 전환 */
+.partner-card.is-learner .partner-card-accent {
+  width: 4px;
+  height: auto;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
 /* 본인 카드 왼쪽 기본 정보 영역 */
 .partner-card.is-learner .card-body {
   min-width: 220px;
@@ -214,7 +222,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 320px;
 }
 
 .learner-brief-header {
