@@ -142,13 +142,19 @@
       ctx.fillText(v.toFixed(1), x, y - 9);
     });
 
-    /* 범례 */
+    /* 범례 — DOM property 방식 (innerHTML inline style은 CSP style-src 'self' 차단) */
     const legend = document.getElementById('growthLegend');
     if (legend) {
-      legend.innerHTML = `<div class="growth-legend-item">
-        <div class="growth-legend-dot" style="background:${CHART_COLOR}"></div>
-        시나리오 총점 (/ ${MAX_SCORE}점 만점)
-      </div>`;
+      legend.innerHTML = '';
+      const item = document.createElement('div');
+      item.className = 'growth-legend-item';
+      const dot = document.createElement('div');
+      dot.className = 'growth-legend-dot';
+      dot.style.background = CHART_COLOR;
+      const label = document.createTextNode(`시나리오 총점 (/ ${MAX_SCORE}점 만점)`);
+      item.appendChild(dot);
+      item.appendChild(label);
+      legend.appendChild(item);
     }
   }
 })();
