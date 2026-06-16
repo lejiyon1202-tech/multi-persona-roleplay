@@ -6,7 +6,12 @@ const MAX_PARTNERS = 3;
 const params        = new URLSearchParams(location.search);
 const scenarioId    = params.get('scenario_id') || '1';
 const learnerCharId = params.get('learner_char');
-const learnerId     = params.get('learner_id') || sessionStorage.getItem('learner_id') || '1';
+const _rawLearnerId = params.get('learner_id') || sessionStorage.getItem('learner_id');
+if (!_rawLearnerId) {
+  window.location.replace(`character-select.html?scenario_id=${scenarioId}`);
+  throw new Error('learner_id 없음 — character-select로 리다이렉트');
+}
+const learnerId = _rawLearnerId;
 
 let allChars         = [];
 let selectedPartners = new Set();

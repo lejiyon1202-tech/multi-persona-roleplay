@@ -6,7 +6,12 @@ const LEARNER_CHAR_ID  = params.get('learner_char') || null;
 const PARTNER_IDS      = (params.get('partners') || '').split(',').filter(Boolean);
 const IS_V3            = !!LEARNER_CHAR_ID;
 const SESSION_ID       = params.get('session_id') || null;
-const LEARNER_ID       = Number(params.get('learner_id')) || Number(sessionStorage.getItem('learner_id')) || 1;
+const _rawLearnerId = params.get('learner_id') || sessionStorage.getItem('learner_id');
+if (!_rawLearnerId) {
+  window.location.replace(`character-select.html?scenario_id=${SCENARIO_ID || '1'}`);
+  throw new Error('learner_id 없음 — character-select로 리다이렉트');
+}
+const LEARNER_ID = Number(_rawLearnerId);
 
 let activePartnerId = IS_V3 ? (PARTNER_IDS[0] || null) : CHARACTER_ID;
 

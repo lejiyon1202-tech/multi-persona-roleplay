@@ -210,7 +210,11 @@ function closeModal() {
 function selectLearnerChar(charId) {
   const c = allChars.find(ch => String(ch.id) === String(charId));
   if (!c) return;
-  const learnerId = sessionStorage.getItem('learner_id') || '1';
+  const learnerId = sessionStorage.getItem('learner_id');
+  if (!learnerId) {
+    document.getElementById('learnerInputOverlay')?.classList.remove('hidden');
+    return;
+  }
   window.location.href = `partner-select.html?scenario_id=${scenarioId}&learner_char=${charId}&learner_id=${learnerId}`;
 }
 
