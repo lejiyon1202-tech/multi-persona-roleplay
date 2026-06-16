@@ -4,7 +4,7 @@ import {
   upsertLearner, createSession, getSession,
   addMessage, getMessages, incrementTurnCount, completeSession,
 } from '../data-store/sessions-store.js';
-import { saveEvaluation } from '../data-store/eval-store.js';
+import { saveEvaluation, getLearnerHistory } from '../data-store/eval-store.js';
 import { invokeChat, invokeEvaluate, invokeSelectResponders } from '../services/bedrock-service.js';
 
 const router = Router();
@@ -450,6 +450,30 @@ router.post('/evaluate', async (req, res) => {
   } catch (err) {
     console.error('[POST /api/evaluate]', err.message);
     res.status(500).json({ error: '평가 오류' });
+  }
+});
+
+// 학습자 다회차 성장 이력 (C안)
+router.get('/learners/:id/history', async (req, res) => {
+  const learnerId  = Number(req.params.id);
+  const scenarioId = Number(req.query.scenario_id);
+  if (!learnerId || !scenarioId) {
+    return res.status(400).json({ error: 'learner_id, scenario_id 필수' });
+  }
+  try {
+    const rows   = await getLearnerHistory(learnerId, scenarioId);
+    const rounds = rows.map((r, i) => ({
+      round:      i + 1,
+      session_id: r.session_id,
+      started_at: r.started_at,
+      total_score: r.total_score,
+      grade:      r.grade,
+      scores:     typeof r.scores === 'string' ? JSON.parse(r.scores) : r.scores,
+    }));
+    res.json({ learner_id: learnerId, scenario_id: scenarioId, rounds });
+  } catch (err) {
+    console.error('[GET /api/learners/:id/history]', err.message);
+    res.status(500).json({ error: 'DB 오류' });
   }
 });
 

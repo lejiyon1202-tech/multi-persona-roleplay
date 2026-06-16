@@ -20,6 +20,23 @@ export async function getEvaluation(sessionId) {
   return rows[0] ?? null;
 }
 
+export async function getLearnerHistory(learnerId, scenarioId) {
+  const [rows] = await pool.query(
+    `SELECT s.id AS session_id,
+            s.started_at,
+            s.scenario_id,
+            e.total_score,
+            e.grade,
+            e.scores
+     FROM sessions s
+     INNER JOIN evaluations e ON e.session_id = s.id
+     WHERE s.learner_id = ? AND s.scenario_id = ?
+     ORDER BY s.started_at ASC`,
+    [learnerId, scenarioId]
+  );
+  return rows;
+}
+
 export async function getSessionsForCompare(learnerId, scenarioId) {
   // v3 모드는 character_id=NULL, dialogue_partner_ids JSON 배열 첫 파트너를 fallback
   const [rows] = await pool.query(
