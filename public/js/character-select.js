@@ -151,6 +151,10 @@ function openModal(charId) {
   renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
   renderEmotionTimeline('modalEmotionalStates', []);
   document.getElementById('modalHintWrap')?.classList.add('hidden');
+  // 차단 섹션 + divider 완전 숨김 (기안84 #16 핸드오프)
+  ['valuesDivider', 'valuesSection', 'pressureDivider', 'pressureSection'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+  });
 
   // CTA 버튼
   const selectBtn = document.getElementById('modalSelectBtn');
