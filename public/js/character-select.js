@@ -13,6 +13,7 @@ const params     = new URLSearchParams(location.search);
 const scenarioId = params.get('scenario_id') || '1';
 
 let allChars = [];
+let confirmedCharId = null; // 본인 연기 확정 캐릭터 — 이 1명만 내면 표시
 
 /* ── 히어로 인포그래픽 주입 ── */
 function injectSceneHero(sid) {
@@ -138,33 +139,51 @@ function openModal(charId) {
   document.getElementById('modalName').textContent = `${emoji} ${c.name}`;
   document.getElementById('modalDept').textContent  = c.department || '';
 
+  // 본인 확정 캐릭터 1명만 내면 표시 — 나머지(탐색·상대·되돌림) 공개만
+  const isBriefing = String(charId) === String(confirmedCharId);
+
   const mindsetEl = document.getElementById('modalMindset');
-  mindsetEl.textContent = c.core_mindset || '';
-  mindsetEl.style.borderLeftColor = color;
-
-  // 연기용 detail — 구조화 렌더
-  setTxt('modalBackground', ld.background || c.situation);
-  renderQuoteBox('modalValues', ld.values || c.core_mindset);
-  renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
-  renderIconRows('modalMission', ld.mission || c.mission, 'check');
-  renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
-  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
-  renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
-
-  // 첫 발화 힌트 (3 → 5개로 확장)
-  const hints  = ld.ai_hints?.first_utterances || c.first_utterances || [];
-  const hintEl = document.getElementById('modalHints');
-  const hintWrap = document.getElementById('modalHintWrap');
-  if (hints.length > 0) {
-    hintEl.innerHTML = hints.slice(0, 5).map(h => `<div class="modal-hint-item">${esc(h)}</div>`).join('');
-    hintWrap.classList.remove('hidden');
+  if (isBriefing) {
+    mindsetEl.textContent = c.core_mindset || '';
+    mindsetEl.style.borderLeftColor = color;
   } else {
-    hintWrap.classList.add('hidden');
+    mindsetEl.textContent = '';
+    mindsetEl.style.borderLeftColor = '';
   }
 
-  // CTA 버튼 (B안: 항상 블랙·CSS에서 관리)
+  // 공개 정보: 항상 표시
+  setTxt('modalBackground', ld.background || c.situation);
+  renderRelations('modalRelationships', ld.relationships_structured, ld.relationships, c.name, c.role_level);
+
+  // 내면 정보: 본인 확정 시에만 표시
+  if (isBriefing) {
+    renderQuoteBox('modalValues', ld.values || c.core_mindset);
+    renderIconRows('modalPressure', ld.pressures || ld.inner_conflict || c.situation, 'alert');
+    renderIconRows('modalMission', ld.mission || c.mission, 'check');
+    renderSpeechBoxes('modalSpeechStyle', ld.speech_style || ld.speaking_style);
+    renderEmotionTimeline('modalEmotionalStates', ld.emotional_states);
+    const hints = ld.ai_hints?.first_utterances || c.first_utterances || [];
+    const hintEl = document.getElementById('modalHints');
+    const hintWrap = document.getElementById('modalHintWrap');
+    if (hints.length > 0) {
+      hintEl.innerHTML = hints.slice(0, 5).map(h => `<div class="modal-hint-item">${esc(h)}</div>`).join('');
+      hintWrap.classList.remove('hidden');
+    } else {
+      hintWrap.classList.add('hidden');
+    }
+  } else {
+    renderQuoteBox('modalValues', null);
+    renderIconRows('modalPressure', null, 'alert');
+    renderIconRows('modalMission', null, 'check');
+    renderSpeechBoxes('modalSpeechStyle', null);
+    renderEmotionTimeline('modalEmotionalStates', []);
+    document.getElementById('modalHintWrap')?.classList.add('hidden');
+  }
+
+  // CTA 버튼: 확정 시 "연기 시작", 탐색 시 "이 역할 맡기"
   const selectBtn = document.getElementById('modalSelectBtn');
   selectBtn.dataset.charId = charId;
+  selectBtn.textContent = isBriefing ? '연기 시작' : '이 역할 맡기';
 
   // 탭 첫 번째(프로필)로 초기화
   resetModalTabs();
@@ -182,7 +201,14 @@ function bindModalEvents() {
 
   document.getElementById('modalSelectBtn').addEventListener('click', () => {
     const charId = document.getElementById('modalSelectBtn').dataset.charId;
-    selectLearnerChar(charId);
+    if (String(confirmedCharId) === String(charId)) {
+      // 연기 시작 — 이미 확정된 본인 캐릭터 → partner-select 이동
+      selectLearnerChar(charId);
+    } else {
+      // 역할 맡기 — confirmedCharId 설정 후 브리핑 모드로 재렌더
+      confirmedCharId = charId;
+      openModal(charId);
+    }
   });
 
   // 탭 전환

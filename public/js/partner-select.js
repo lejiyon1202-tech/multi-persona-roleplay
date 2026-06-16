@@ -91,8 +91,10 @@ function buildPartnerCardHTML(c, idx) {
 
   // 상황 요약 1줄
   const sitShort = (c.situation || '').slice(0, 50) + ((c.situation || '').length > 50 ? '...' : '');
-  // 핵심 마인드 1줄
-  const mindShort = (c.core_mindset || '').slice(0, 45) + ((c.core_mindset || '').length > 45 ? '...' : '');
+  // 핵심 마인드 1줄 — 본인 역할 카드만 내면 표시, 상대 카드는 공개 직무로
+  const mindShort = isLearner
+    ? ((c.core_mindset || '').slice(0, 45) + ((c.core_mindset || '').length > 45 ? '...' : ''))
+    : ((c.situation  || '').slice(0, 45) + ((c.situation  || '').length > 45 ? '...' : ''));
 
   const learnerTag = isLearner ? '<span class="learner-tag">내 역할</span>' : '';
   const recBadge   = isRecommended
@@ -120,7 +122,7 @@ function buildPartnerCardHTML(c, idx) {
         <p class="char-name">${esc(c.name)}</p>
         <p class="char-dept">${esc(c.department)}</p>
       </div>
-      <p class="card-mindset-short">"${esc(mindShort)}"</p>
+      <p class="card-mindset-short">${esc(mindShort)}</p>
       <p class="card-situation-short">${esc(sitShort)}</p>
     </div>
   </div>`;
