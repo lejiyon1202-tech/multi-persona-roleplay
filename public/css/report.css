@@ -599,6 +599,55 @@
 /* 다음 연습 추천 — 직무 관점 */
 .next-card-perspective { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
+/* ── 성장 기록 탭 ── */
+.growth-empty {
+  padding: 64px 24px;
+  text-align: center;
+}
+.growth-empty-icon { font-size: 48px; line-height: 1; margin-bottom: 16px; }
+.growth-empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+}
+.growth-empty-desc { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+.growth-chart-wrap { margin-bottom: 28px; }
+.growth-chart-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.growth-chart-card canvas { display: block; width: 100%; max-width: 100%; }
+
+.growth-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.growth-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-sub);
+}
+.growth-legend-dot {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .growth-chart-card { padding: 12px; }
+  .growth-empty { padding: 40px 16px; }
+}
+
 /* 캐릭터별 비교 — 5축 레벨 + 도달 감정 단계 */
 .compare-axis-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 14px 0 0; padding: 0; }
 .compare-axis-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

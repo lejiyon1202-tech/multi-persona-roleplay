@@ -29,6 +29,7 @@
   <div class="report-tabs">
     <button class="report-tab active" data-tab="single">이번 세션 리포트</button>
     <button class="report-tab" data-tab="compare">캐릭터별 비교</button>
+    <button class="report-tab" data-tab="growth">나의 성장 기록</button>
   </div>
 
   <!-- ══ 단일 세션 탭 ══ -->
@@ -184,6 +185,27 @@
 
   </div><!-- /#tabSingle -->
 
+  <!-- ══ 나의 성장 기록 탭 ══ -->
+  <div class="tab-panel" id="tabGrowth">
+
+    <!-- 데이터 없음 / 1회차 — graceful degradation -->
+    <div class="growth-empty" id="growthEmpty">
+      <div class="growth-empty-icon">📈</div>
+      <p class="growth-empty-title">아직 성장 기록이 없습니다</p>
+      <p class="growth-empty-desc">다시 도전하면 성장 곡선이 나타납니다</p>
+    </div>
+
+    <!-- 차트 래퍼 — 2회차 이상 시 표시 -->
+    <div class="growth-chart-wrap hidden" id="growthChartWrap">
+      <p class="section-label-sm">회차별 점수 성장 기록</p>
+      <div class="growth-chart-card">
+        <canvas id="growthChart" aria-label="회차별 점수 성장 라인 차트"></canvas>
+      </div>
+      <div class="growth-legend" id="growthLegend"></div>
+    </div>
+
+  </div>
+
   <!-- ══ 캐릭터별 비교 탭 ══ -->
   <div class="tab-panel" id="tabCompare">
     <div id="compareContent">
@@ -211,5 +233,6 @@
 </main>
 
 <script src="js/report.js" defer></script>
+<script src="js/growth-chart.js" defer></script>
 </body>
 </html>

@@ -9,7 +9,8 @@ document.querySelectorAll('.report-tab').forEach(tab => {
     document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById(`tab${tab.dataset.tab === 'single' ? 'Single' : 'Compare'}`).classList.add('active');
+    const panelMap = { single: 'tabSingle', compare: 'tabCompare', growth: 'tabGrowth' };
+    document.getElementById(panelMap[tab.dataset.tab] || 'tabSingle').classList.add('active');
     if (tab.dataset.tab === 'compare') {
       const isV2 = document.getElementById('reportV2') && !document.getElementById('reportV2').classList.contains('hidden');
       if (!isV2) loadCompare();  // v2는 character_comparison 이미 렌더·legacy /compare 호출 안 함
