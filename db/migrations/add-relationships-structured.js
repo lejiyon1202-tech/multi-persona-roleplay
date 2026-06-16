@@ -122,7 +122,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', JSON_EXTRACT(?, '$'))
          WHERE scenario_id = 1 AND card_number = ?`,
         [JSON.stringify(CARD12_STRUCTURED[i].structured), cardNumber]
       );
@@ -135,7 +135,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', JSON_EXTRACT(?, '$'))
          WHERE scenario_id = 2 AND card_number = ?`,
         [JSON.stringify(CARD12_STRUCTURED[i].structured), cardNumber]
       );
@@ -148,7 +148,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', JSON_EXTRACT(?, '$'))
          WHERE scenario_id = 4 AND card_number = ?`,
         [JSON.stringify(CASE3_STRUCTURED[i].structured), cardNumber]
       );
