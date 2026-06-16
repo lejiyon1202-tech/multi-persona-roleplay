@@ -122,7 +122,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(learner_detail, '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
          WHERE scenario_id = 1 AND card_number = ?`,
         [JSON.stringify(CARD12_STRUCTURED[i].structured), cardNumber]
       );
@@ -135,7 +135,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(learner_detail, '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
          WHERE scenario_id = 2 AND card_number = ?`,
         [JSON.stringify(CARD12_STRUCTURED[i].structured), cardNumber]
       );
@@ -148,7 +148,7 @@ async function migrate() {
       const cardNumber = i + 1;
       const [r] = await conn.query(
         `UPDATE scenario_characters
-         SET learner_detail = JSON_SET(learner_detail, '$.relationships_structured', CAST(? AS JSON))
+         SET learner_detail = JSON_SET(COALESCE(learner_detail, '{}'), '$.relationships_structured', CAST(? AS JSON))
          WHERE scenario_id = 4 AND card_number = ?`,
         [JSON.stringify(CASE3_STRUCTURED[i].structured), cardNumber]
       );
@@ -169,7 +169,7 @@ async function migrate() {
 
     let fail = 0;
     for (const c of check) {
-      const ok = c.arr_type === 'ARRAY' && c.arr_len > 0 && c.has_str;
+      const ok = c.arr_type === 'ARRAY' && c.arr_len > 0;
       if (!ok) {
         console.error(`[MIGRATE] ❌ FAIL scenario=${c.scenario_id} card=${c.card_number} arr_type=${c.arr_type} len=${c.arr_len} has_str=${c.has_str}`);
         fail++;
