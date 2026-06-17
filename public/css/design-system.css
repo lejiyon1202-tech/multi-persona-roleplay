@@ -72,7 +72,21 @@
   --z-modal:  100;
   --z-toast:  200;
 
+  /* 컨트롤 높이 세트 (축 8) */
+  --ctrl-height-xs:   22px;   /* 역할 배지 */
+  --ctrl-height-sm:   28px;   /* 등급 배지 */
+  --ctrl-height-tool: 30px;   /* 툴바·테마 버튼 */
+  --ctrl-height:      40px;   /* 버튼 기본 */
 
+  /* 반경 추가 */
+  --radius-tool: 6px;         /* 테마 버튼·툴바 전용 */
+
+  /* 모션 추가 (축 7) */
+  --duration-theme: 0.3s;     /* body 테마 전환 */
+  --duration-spin:  0.7s;     /* 스피너 회전 */
+
+  /* 색상 — 흰색 고정값 토큰 */
+  --color-white: #FFFFFF;
 
   /* 폰트 — Pretendard 단독 (세리프 폐기) */
   --font:      'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
@@ -104,6 +118,13 @@
   --success:         #059669;
   --warning:         #D97706;
   --danger:          #DC2626;
+  --info:            #2563EB;
+  /* 포커스 링 그림자 (축 2) */
+  --shadow-focus:    0 0 0 3px rgba(99,102,241,0.1);
+  /* 등급 배지 색상 토큰 (축 3) */
+  --bg-grade-pass:    #d1fae5; --text-grade-pass:    #065f46;
+  --bg-grade-partial: #fef3c7; --text-grade-partial: #92400e;
+  --bg-grade-fail:    #fee2e2; --text-grade-fail:    #991b1b;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -119,7 +140,7 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   min-height: 100vh;
-  transition: background 0.3s, color 0.3s;
+  transition: background var(--duration-theme), color var(--duration-theme);
   -webkit-font-smoothing: antialiased;
   font-size: 16px;
 }
@@ -136,8 +157,8 @@ input, textarea, select { font-family: var(--font); }
 .role-badge {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 8px;
+  height: var(--ctrl-height-xs);
+  padding: 0 var(--sp-sm);
   border-radius: var(--radius-badge);
   font-size: 10.5px;
   font-weight: 600;
@@ -154,33 +175,33 @@ input, textarea, select { font-family: var(--font); }
 .grade-badge {
   display: inline-flex;
   align-items: center;
-  height: 28px;
+  height: var(--ctrl-height-sm);
   padding: 0 12px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 700;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-bold);
 }
-.grade-badge.pass    { background: #d1fae5; color: #065f46; }
-.grade-badge.partial { background: #fef3c7; color: #92400e; }
-.grade-badge.fail    { background: #fee2e2; color: #991b1b; }
+.grade-badge.pass    { background: var(--bg-grade-pass);    color: var(--text-grade-pass); }
+.grade-badge.partial { background: var(--bg-grade-partial); color: var(--text-grade-partial); }
+.grade-badge.fail    { background: var(--bg-grade-fail);    color: var(--text-grade-fail); }
 
 /* ── 공통 버튼 ── */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 40px;
+  height: var(--ctrl-height);
   padding: 0 20px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--text-base);
+  font-weight: var(--fw-bold);
   transition: var(--transition);
   cursor: pointer;
   border: none;
 }
 .btn-primary {
-  background: #09090B;
-  color: #fff;
+  background: var(--accent);
+  color: var(--color-white);
 }
 .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
@@ -193,7 +214,7 @@ input, textarea, select { font-family: var(--font); }
 
 .btn-danger {
   background: var(--danger);
-  color: #fff;
+  color: var(--color-white);
 }
 
 /* ── 공통 입력 ── */
@@ -209,7 +230,7 @@ input, textarea, select { font-family: var(--font); }
   outline: none;
 }
 .input-field::placeholder { color: var(--text-placeholder); }
-.input-field:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.input-field:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
 
 /* ── 테마 전환 버튼 ── */
 .theme-switcher {
@@ -217,10 +238,10 @@ input, textarea, select { font-family: var(--font); }
   gap: 6px;
 }
 .theme-btn {
-  height: 30px;
+  height: var(--ctrl-height-tool);
   padding: 0 12px;
   border: 1.5px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-tool);
   background: var(--bg-card);
   color: var(--text-sub);
   font-size: 12px;
@@ -263,7 +284,7 @@ input, textarea, select { font-family: var(--font); }
   border: 2px solid var(--border);
   border-top-color: var(--role-lead);
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin var(--duration-spin) linear infinite;
   display: inline-block;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
